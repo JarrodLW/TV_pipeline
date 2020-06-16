@@ -38,4 +38,4 @@ for sample_rate in sample_rates:
                                                            reg_type, reg_param,
                                                            subsampling_arr=subsampling_matrix, niter=500)
            
-            np.savetxt(filename, recons)
+            np.savetxt(filename, recons[0])
