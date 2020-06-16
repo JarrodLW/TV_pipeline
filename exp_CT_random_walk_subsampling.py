@@ -18,6 +18,8 @@ data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.
 
 data = np.array(io.imread(data_path), dtype=float)
 #data /= np.amax(np.abs(data)) # maybe not te correct way to normalise...
+data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
+
 
 height, width = data.shape
 
@@ -41,7 +43,7 @@ for sample_rate in sample_rates:
             recons = regularised_recons_from_subsampled_data(data, 'CT',
                                             reg_type, reg_param, subsampling_arr=subsampling_matrix,
                                                              recon_dims=(167, 167),
-                                            niter=200, a_offset=0, a_range=2*np.pi,
+                                            niter=100, a_offset=0, a_range=2*np.pi,
                                             d_offset=0, d_width=40)
 
             masked_recon = circle_mask(167, 0.95)*recons[0]
