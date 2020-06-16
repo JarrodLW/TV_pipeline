@@ -23,7 +23,7 @@ reg_params = [10**(-a) for a in range(10)]
 
 for sample_rate in sample_rates:
     #num_walks = np.floor(height*sample_rate)
-    subsampling_matrix = bernoulli_mask(height, width, expected_sparsity=0.5)[0]
+    subsampling_matrix = bernoulli_mask(height, width, expected_sparsity=sample_rate)[0]
     for reg_type in reg_types:
         for reg_param in reg_params:
             
