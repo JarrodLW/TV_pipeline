@@ -32,7 +32,7 @@ reg_params = [0.0001]
 
 for sample_rate in sample_rates:
     num_walks = round(sample_rate*height)
-    subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks)[0]
+    subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks, allowing_inter=True, p=[0, 1., 0.])[0]
     for reg_type in reg_types:
         for reg_param in reg_params:
 
@@ -46,6 +46,7 @@ for sample_rate in sample_rates:
                                                              recon_dims=(167, 167),
                                             niter=100, a_offset=0, a_range=2*np.pi,
                                             d_offset=0, d_width=40)
+
 
             masked_recon = circle_mask(167, 0.95)*recons[0]
             plt.figure()
