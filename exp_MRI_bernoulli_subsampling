@@ -14,9 +14,9 @@ directory = '/mnt/jlw31-XDrive'
 data_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
 data_vec = np.fromfile(data_path, dtype=np.int32)
 
-height = 128
-width = 128
-data = recasting_fourier_as_complex(data_vec, height, width)
+data = recasting_fourier_as_complex(data_vec, 128, 256)
+
+height, width = data.shape
 
 reg_types = ['TV', 'TGV']
 sample_rates = [0.1*(a+1) for a in range(1)]
