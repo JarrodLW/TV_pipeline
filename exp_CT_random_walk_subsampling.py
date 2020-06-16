@@ -14,11 +14,12 @@ from skimage import io
 overwrite = True
 
 directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
-data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
+#data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
+data_path = directory + '/Experiments/CT_diamond/sino_0050_cleaned.png'
 
 data = np.array(io.imread(data_path), dtype=float)
 #data /= np.amax(np.abs(data)) # maybe not te correct way to normalise...
-data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
+#data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
 
 
 height, width = data.shape
