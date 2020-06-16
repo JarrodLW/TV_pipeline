@@ -7,6 +7,7 @@ Created on Tue May 26 17:17:07 2020
 """
 from processing import regularised_recons_from_subsampled_data
 from Utils import *
+import os
 
 overwrite = False
 
@@ -15,6 +16,7 @@ data_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
 data_vec = np.fromfile(data_path, dtype=np.int32)
 
 data = recasting_fourier_as_complex(data_vec, 128, 256)
+data /= np.amax(np.abs(data))
 
 height, width = data.shape
 
