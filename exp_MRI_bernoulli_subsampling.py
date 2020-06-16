@@ -22,9 +22,9 @@ data /= np.amax(np.abs(data))
 height, width = data.shape
 
 reg_types = ['TV', 'TGV']
-sample_rates = [0.1*(a+1) for a in range(1)]
+sample_rates = [0.1*(a+1) for a in range(10)]
 #sample_rates = [1.]
-reg_params = [10**(-a) for a in range(1)]
+reg_params = [10**(-a) for a in range(10)]
 #reg_params = [0.0001]
 
 for sample_rate in sample_rates:
