@@ -40,7 +40,7 @@ for sample_rate in sample_rates:
                                                            subsampling_arr=subsampling_matrix, niter=500)
 
             plt.figure()
-            plt.imshow(recons[0], cmap=plt.cm.gray)
+            plt.imshow(np.abs(recons[0]), cmap=plt.cm.gray)
             plt.axis("off")
             plt.savefig(filename)
             plt.close()
