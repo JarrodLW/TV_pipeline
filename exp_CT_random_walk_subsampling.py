@@ -29,7 +29,7 @@ reg_params = [0.0001]
 
 for sample_rate in sample_rates:
     num_walks = round(sample_rate*height)
-    subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks)
+    subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks)[0]
     for reg_type in reg_types:
         for reg_param in reg_params:
 
