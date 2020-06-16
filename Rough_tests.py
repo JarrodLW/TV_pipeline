@@ -99,7 +99,6 @@ width = fourier_horiz.shape[1]
 
 mask = horiz_rand_walk_mask(height, width, round(0.6*height), distr='uniform', )[0]
 
-
 recons_1 = regularised_recons_from_subsampled_data(fourier_horiz_normalised, 'MRI',
                                             'TV', 0.0003, subsampling_arr=mask,
                                             niter=1)
@@ -139,8 +138,6 @@ recons_2 = regularised_recons_from_subsampled_data(raw_data_phase, 'CT',
                                             'TGV', 0.00, recon_dims=(167, 167),
                                             niter=200, a_offset=0, a_range=2*np.pi,
                                             d_offset=0, d_width=40)
-
-
 
 
 mask = circle_mask(recons_1[0].shape[0], 0.95)
