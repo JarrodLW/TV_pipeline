@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May 26 17:17:07 2020
+
+@author: jlw31
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May 26 16:05:35 2020
+
+@author: jlw31
+"""
+
+from processing import regularised_recons_from_subsampled_data
+from Utils import *
+
+overwrite = False
+
+directory = '/mnt/jlw31-XDrive'
+data_stack_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
+
+data_stack = np.array(io.imread(data_stack_path), dtype=float)[]
+
+_, height, width = data_stack.shape
+
+reg_types = ['TV', 'TGV']
+sample_rates = [0.1*(a+1) for a in range(10)]
+reg_params = [10**(-a) for a in range(10)]
+
+for sample_rate in sample_rates:
+    #num_walks = np.floor(height*sample_rate)
+    subsampling_matrix = bernoulli_mask(height, width, expected_sparsity=0.5)[0]
+    for reg_type in reg_types:
+        for reg_param in reg_params:
+            
+            filename = directory + '/Experiments/MRI_birmingham/hor_recon_sample_rate_' + str(sample_rate)\
+                       + reg_type + "reg_param_" + str(reg_param) + '.tif'
+            if os.path.isfile(filename) and not overwrite:
+                continue                
+            
+            recons = regularised_recons_from_subsampled_data(data_stack, 'MRI', 
+                                                           reg_type, reg_param,
+                                                           subsampling_arr=subsampling_matrix, niter = 500)
+           
+            np.savetxt(filename, recons)
+            

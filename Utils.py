@@ -163,7 +163,7 @@ def recasting_fourier_as_complex(vec, height, width):
 
     assert len(vec) == height*width, "prescribed dimensions inconsistent with length of array"
 
-    fourier_coeff_real_im = np.reshape(vec, (128, 128))
+    fourier_coeff_real_im = np.reshape(vec, (height, width))
     fourier_coeff_real = fourier_coeff_real_im[:, ::2]
     fourier_coeff_im = fourier_coeff_real_im[:, 1::2]
 
