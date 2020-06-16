@@ -25,10 +25,10 @@ data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
 height, width = data.shape
 
 reg_types = ['TV', 'TGV']
-#sample_rates = [0.1 * (a + 1) for a in range(1)]
-sample_rates = [1.]
-#reg_params = [10 ** (-a) for a in range(1)]
-reg_params = [0.0001]
+sample_rates = [0.1 * (a + 1) for a in range(1)]
+#sample_rates = [1.]
+reg_params = [10 ** (-a) for a in range(1)]
+#reg_params = [0.0001]
 
 for sample_rate in sample_rates:
     num_walks = round(sample_rate*height)
