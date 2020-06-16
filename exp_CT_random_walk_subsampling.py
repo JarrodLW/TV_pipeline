@@ -19,7 +19,7 @@ data_path = directory + '/Experiments/CT_diamond/sino_0050_cleaned.tif'
 
 data = np.array(io.imread(data_path), dtype=float)
 #data /= np.amax(np.abs(data)) # maybe not te correct way to normalise...
-#data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
+data = (data - np.amin(data))/(np.amax(data) - np.amin(data))
 
 
 height, width = data.shape
