@@ -8,6 +8,7 @@ Created on Tue May 26 17:17:07 2020
 from processing import regularised_recons_from_subsampled_data
 from Utils import *
 import os
+import matplotlib.pyplot as plt
 
 overwrite = False
 
@@ -30,12 +31,16 @@ for sample_rate in sample_rates:
         for reg_param in reg_params:
             
             filename = directory + '/Experiments/MRI_birmingham/hor_recon_sample_rate_' + str(sample_rate)\
-                       + reg_type + "reg_param_" + str(reg_param) + '.tif'
+                       + reg_type + "reg_param_" + str(reg_param) + '.png'
             if os.path.isfile(filename) and not overwrite:
                 continue                
             
             recons = regularised_recons_from_subsampled_data(data, 'MRI',
                                                            reg_type, reg_param,
                                                            subsampling_arr=subsampling_matrix, niter=500)
-           
-            np.savetxt(filename, recons[0])
+
+            plt.figure()
+            plt.imshow(recons[0], cmap=plt.cm.gray)
+            plt.axis("off")
+            plt.savefig(filename)
+            plt.close()
