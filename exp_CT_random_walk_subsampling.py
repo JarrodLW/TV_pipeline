@@ -37,7 +37,7 @@ for sample_rate in sample_rates:
         for reg_param in reg_params:
 
             filename = directory + '/Experiments/CT_diamond/recon_sample_rate_' + str(sample_rate) \
-                       + reg_type + "reg_param_" + str(reg_param) + '.png'
+                       + "_" + reg_type + "_reg_param_" + str(reg_param) + '.png'
             if os.path.isfile(filename) and not overwrite:
                 continue
 
