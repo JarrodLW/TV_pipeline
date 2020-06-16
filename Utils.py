@@ -8,9 +8,10 @@ Created on Tue May 26 15:56:24 2020
 
 import numpy as np
 import itertools
-        
+
+
 def circle_mask(width, ratio):
-    # taken from Paul's code
+    # taken from Vo's code
     """
     Create a circle mask.
     ---------
@@ -30,10 +31,12 @@ def circle_mask(width, ratio):
 
 
 def pad_sino(sino_array, a_step, a_min, num_angles, a_list):
-    # takes a sino and inserts zeros for the missing angle entries
-    # takes a list of floats, representing the angles at which measurements were taken, along with a_min, a_max
-    # defining range of available angles and the angle step
-    # returns: a padded sinogram array, along with the corresponding mask to be used in reconstructions
+    """
+     takes a sino and inserts zeros for the missing angle entries
+     takes a list of floats, representing the angles at which measurements were taken, along with a_min, a_max
+     defining range of available angles and the angle step
+     returns: a padded sinogram array, along with the corresponding mask to be used in reconstructions
+    """
 
     a_max = a_min + (num_angles - 1)*a_step
 
@@ -51,10 +54,13 @@ def pad_sino(sino_array, a_step, a_min, num_angles, a_list):
         new_sino_array[ind_angle, :] = sino_array[ind, :]
 
     return new_sino_array, mask
-    
+
+
 def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowing_inter=True, p=[0.25, 0.5, 0.25]):
-    # constructs random walks left to right across a rectangular grid
-    # p gives the probabilities of moving down a pixel, staying put and moving up a pixel
+    """
+     constructs random walks left to right across a rectangular grid
+     p gives the probabilities of moving down a pixel, staying put and moving up a pixel
+    """
 
     if distr == 'equipartition':
         # splits the row space into roughly equal intervals, and samples one starting position from each
@@ -99,8 +105,9 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
 
     return walk_array, transparency
 
+
 def vert_rand_walk_mask(height, width, num_walks, distr='equipartition', allowing_inter=True, p=[0.25, 0.5, 0.25]):
-    # performs vertical random walks over a grid, top to bottom.
+    """performs vertical random walks over a grid, top to bottom."""
 
     walk_array, sparsity = horiz_rand_walk_mask(width, height, num_walks, distr=distr,
                                                 allowing_inter=allowing_inter, p=p)
@@ -108,16 +115,20 @@ def vert_rand_walk_mask(height, width, num_walks, distr='equipartition', allowin
 
     return walk_array, sparsity
 
+
 def bernoulli_mask(height, width, expected_sparsity=0.5):
 
     mask = np.random.binomial(1, expected_sparsity, size=(height, width))
+    sparsity = np.count_nonzero(mask)/np.prod(np.shape(mask))
 
-    return mask
+    return mask, sparsity
+
 
 def sequence_partition(len_of_sequence, initial_division):
-    # takes the sequence [0, 1, ..., N-1] and successively partitions it by breaking up the largest existing
-    # block into two (roughly equal-sized) blocks
-    # returns the points at which successive divisions take place
+    """takes the sequence [0, 1, ..., N-1] and successively partitions it by breaking up the largest existing
+     block into two (roughly equal-sized) blocks
+     returns the points at which successive divisions take place
+    """
 
     division_list = [initial_division]
     sequence = list(np.arange(len_of_sequence))
@@ -145,6 +156,21 @@ def sequence_partition(len_of_sequence, initial_division):
         division_list.append(0)
 
     return division_list
+
+
+def recasting_fourier_as_complex(vec, height, width):
+    # Melanie's raw data files consist of a vector of real coefficients
+
+    assert len(vec) == height*width, "prescribed dimensions inconsistent with length of array"
+
+    fourier_coeff_real_im = np.reshape(vec, (128, 128))
+    fourier_coeff_real = fourier_coeff_real_im[:, ::2]
+    fourier_coeff_im = fourier_coeff_real_im[:, 1::2]
+
+    fourier_coeff = fourier_coeff_real + fourier_coeff_im * 1j
+
+    return fourier_coeff
+
 
 # def create_synthetic_data(im_stack, measurement_type):
 #     # takes a stack of images (given as numpy array) and produces synthetic data
