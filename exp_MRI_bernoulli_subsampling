@@ -11,18 +11,18 @@ from Utils import *
 overwrite = False
 
 directory = '/mnt/jlw31-XDrive'
-data_stack_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
+data_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
+data_vec = np.fromfile(data_path, dtype=np.int32)
 
-data_stack = np.array(io.imread(data_stack_path), dtype=float)[]
-
-_, height, width = data_stack.shape
+height = 128
+width = 128
+data = recasting_fourier_as_complex(data_vec, height, width)
 
 reg_types = ['TV', 'TGV']
 sample_rates = [0.1*(a+1) for a in range(10)]
 reg_params = [10**(-a) for a in range(10)]
 
 for sample_rate in sample_rates:
-    #num_walks = np.floor(height*sample_rate)
     subsampling_matrix = bernoulli_mask(height, width, expected_sparsity=sample_rate)[0]
     for reg_type in reg_types:
         for reg_param in reg_params:
@@ -32,9 +32,8 @@ for sample_rate in sample_rates:
             if os.path.isfile(filename) and not overwrite:
                 continue                
             
-            recons = regularised_recons_from_subsampled_data(data_stack, 'MRI', 
+            recons = regularised_recons_from_subsampled_data(data, 'MRI',
                                                            reg_type, reg_param,
-                                                           subsampling_arr=subsampling_matrix, niter = 500)
+                                                           subsampling_arr=subsampling_matrix, niter=500)
            
             np.savetxt(filename, recons)
-            
