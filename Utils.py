@@ -8,6 +8,8 @@ Created on Tue May 26 15:56:24 2020
 
 import numpy as np
 import itertools
+import scipy.stats as ss
+import matplotlib.pyplot as plt
 
 
 def circle_mask(width, ratio):
@@ -38,13 +40,13 @@ def pad_sino(sino_array, a_step, a_min, num_angles, a_list):
      returns: a padded sinogram array, along with the corresponding mask to be used in reconstructions
     """
 
-    a_max = a_min + (num_angles - 1)*a_step
+    a_max = a_min + (num_angles - 1) * a_step
 
     assert len(a_list) == sino_array.shape[0], "number of measurements not consistent with sinogram dims"
     assert a_min <= min(a_list), "minimum angle too large"
     assert a_max >= max(a_list), "maximum angle too small"
 
-    ind_known_angles = np.array((np.array(a_list) - a_min)/a_step, dtype=int)
+    ind_known_angles = np.array((np.array(a_list) - a_min) / a_step, dtype=int)
     mask = np.zeros((num_angles, sino_array.shape[1]))
     mask[ind_known_angles, :] = 1
 
@@ -56,6 +58,20 @@ def pad_sino(sino_array, a_step, a_min, num_angles, a_list):
     return new_sino_array, mask
 
 
+def equipartition(num_bins, num_examples):
+    # splits a given number of bins into roughly equal blocks, and samples one example from each
+
+    rem = num_bins % num_examples
+    div = num_bins // num_examples
+    interval_lengths = np.array([div] * (num_examples - rem) + [div + 1] * rem)
+    interval_lengths = list(np.random.permutation(interval_lengths))
+    interval_positions = list(itertools.accumulate(interval_lengths))
+    intervals = np.split(np.arange(num_bins), interval_positions)
+    bin_indices = np.sort(np.asarray([np.random.choice(intervals[i]) for i in range(num_examples)]))
+
+    return bin_indices
+
+
 def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowing_inter=True, p=[0.25, 0.5, 0.25]):
     """
      constructs random walks left to right across a rectangular grid
@@ -64,16 +80,35 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
 
     if distr == 'equipartition':
         # splits the row space into roughly equal intervals, and samples one starting position from each
-        rem = height % num_walks
-        div = height//num_walks
-        interval_lengths = np.array([div]*(num_walks - rem)+[div+1]*rem)
-        interval_lengths = list(np.random.permutation(interval_lengths))
-        interval_positions = list(itertools.accumulate(interval_lengths))
-        intervals = np.split(np.arange(height), interval_positions)
-        initial_position = np.sort(np.asarray([np.random.choice(intervals[i]) for i in range(num_walks)]))
+        initial_position = equipartition(height, num_walks)
+
+    if distr == 'centre_clustered':
+
+        # TO DO: ensure that the correct number of points are being sampled: right now I'm sampling with replacement!
+
+        # use equipartition and apply the inverse of a multinomial distribution which approximates the normal
+        # centred at the midpoint of the data with give variance
+        x = np.arange(-height // 2, height // 2)
+        #xU, xL = x + 0.5, x - 0.5
+        #prob = ss.norm.cdf(xU, scale=50) - ss.norm.cdf(xL, scale=50)
+        #prob = prob / prob.sum()  # normalize the probabilities so their sum is 1
+        cumul_probs = np.append([0], ss.norm.cdf(x, scale=10))
+        sample_locations = equipartition(height, num_walks)/100
+        initial_position = np.nonzero(np.histogram(sample_locations, cumul_probs)[0])[0]
 
     elif distr == 'uniform':
         initial_position = np.sort(np.random.choice(range(height), replace=False, size=num_walks))
+
+    # elif distr == 'multinomial':
+    #     x = np.arange(-height // 2, height // 2)
+    #     xU, xL = x + 0.5, x - 0.5
+    #     prob = ss.norm.cdf(xU, scale=50) - ss.norm.cdf(xL, scale=50)
+    #     prob = prob / prob.sum()  # normalize the probabilities so their sum is 1
+    #
+    #     equipartition(num_bins, num_examples)
+    #
+    #     nums = np.random.choice(x, size=num_walks, replace=False, p=prob)
+    #     initial_position = nums + height // 2
 
     else:
         print('Initial distribution type not supported')
@@ -98,10 +133,10 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
             position = np.maximum(position, position_roll_down + 1)
             position = np.minimum(position, position_roll_up - 1)
 
-        position = np.minimum(np.maximum(position, 0), height-1)
+        position = np.minimum(np.maximum(position, 0), height - 1)
         walk_array[position, i] = 1
 
-    transparency = np.count_nonzero(walk_array)/(height*width)
+    transparency = np.count_nonzero(walk_array) / (height * width)
 
     return walk_array, transparency
 
@@ -117,11 +152,21 @@ def vert_rand_walk_mask(height, width, num_walks, distr='equipartition', allowin
 
 
 def bernoulli_mask(height, width, expected_sparsity=0.5):
-
     mask = np.random.binomial(1, expected_sparsity, size=(height, width))
-    sparsity = np.count_nonzero(mask)/np.prod(np.shape(mask))
+    sparsity = np.count_nonzero(mask) / np.prod(np.shape(mask))
 
     return mask, sparsity
+
+
+# def radial_spoke_mask(height, width, num_spokes):
+#
+#     slopes = np.arange(num_spokes)*2*np.pi/num_spokes
+#     mask = np.zeros((height, width))
+#     #centre = (height//2, width//2)
+#
+#     for slope in slopes:
+#         heights = height//2 + np.tan(slope)*(np.arange(width) - width//2)
+#         np.histogram(heights, )
 
 
 def sequence_partition(len_of_sequence, initial_division):
@@ -145,8 +190,8 @@ def sequence_partition(len_of_sequence, initial_division):
         division_index = np.argmax(np.array(length_list))
         length = np.amax(np.array(length_list))
         part = partition[division_index]
-        part1 = part[0: length//2]
-        part2 = part[length//2:]
+        part1 = part[0: length // 2]
+        part2 = part[length // 2:]
         division_list.append(part2[0])
         partition.pop(division_index)
         partition.append(part1)
@@ -161,7 +206,7 @@ def sequence_partition(len_of_sequence, initial_division):
 def recasting_fourier_as_complex(vec, height, width):
     # Melanie's raw data files consist of a vector of real coefficients
 
-    assert len(vec) == height*width, "prescribed dimensions inconsistent with length of array"
+    assert len(vec) == height * width, "prescribed dimensions inconsistent with length of array"
 
     fourier_coeff_real_im = np.reshape(vec, (height, width))
     fourier_coeff_real = fourier_coeff_real_im[:, ::2]
@@ -170,7 +215,6 @@ def recasting_fourier_as_complex(vec, height, width):
     fourier_coeff = fourier_coeff_real + fourier_coeff_im * 1j
 
     return fourier_coeff
-
 
 # def create_synthetic_data(im_stack, measurement_type):
 #     # takes a stack of images (given as numpy array) and produces synthetic data
