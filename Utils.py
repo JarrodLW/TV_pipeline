@@ -112,9 +112,9 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
     #     nums = np.random.choice(x, size=num_walks, replace=False, p=prob)
     #     initial_position = nums + height // 2
 
-    else:
-        print('Initial distribution type not supported')
-        raise
+    # else:
+    #     print('Initial distribution type not supported')
+    #     raise
 
     position = initial_position
     walk_array = np.zeros((height, width))
