@@ -10,7 +10,10 @@ import odl
 import numpy as np
 from time import time
 from myOperators import RealFourierTransform, Complex2Real, Real2Complex
-# from Utils import *
+import astra
+from scipy.ndimage import interpolation
+from Utils import *
+
 
 
 class VariationalRegClass:
@@ -257,6 +260,7 @@ class VariationalRegClass:
 
 
 def recon_astra(sinogram, center, angles=None, ratio=1.0, method="FBP_CUDA", num_iter=1, win="hann", pad=0):
+    # Taken from Vo's code
     """
     Wrapper of reconstruction methods implemented in the astra toolbox package.
     https://www.astra-toolbox.com/docs/algs/index.html
@@ -302,7 +306,7 @@ def recon_astra(sinogram, center, angles=None, ratio=1.0, method="FBP_CUDA", num
     if pad > 0:
         rec = rec[pad:-pad, pad:-pad]
     if not (ratio is None):
-        rec = rec * cirle_mask(rec.shape[0], ratio)
+        rec = rec * circle_mask(rec.shape[0], ratio)
     return rec
 
 
