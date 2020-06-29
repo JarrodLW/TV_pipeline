@@ -57,7 +57,7 @@ for reg_type in reg_types:
                 os.system('mkdir '+ folder)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix,
-                                                                   recon_dims=(167, 167), niter=200, a_offset=0,
+                                                                   recon_dims=(167, 167), niter=500, a_offset=0,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
             recon_numbers = ['0049', '0050', '0051']
