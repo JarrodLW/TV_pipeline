@@ -14,7 +14,6 @@ from skimage import io
 overwrite = True
 
 directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
-#data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
 data_path_0 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0049.tif'
 data_path_1 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
 data_path_2 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0051.tif'
@@ -22,6 +21,18 @@ data_path_2 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_005
 data_0 = np.array(io.imread(data_path_0), dtype=float)
 data_1 = np.array(io.imread(data_path_1), dtype=float)
 data_2 = np.array(io.imread(data_path_2), dtype=float)
+
+step = 1.5
+
+list1 = ((np.arange(87830, 87862) - 87830) * step).tolist()
+list2 = ((np.arange(87872, 87978) - 87872) * step + 58.5).tolist()
+list3 = ((np.arange(87980, 88073) - 87872) * step + 58.5).tolist()
+
+angle_list = list1 + list2 + list3
+
+data_0, mask = pad_sino(data_0, step, 0, 240, angle_list)
+data_1, _ = pad_sino(data_0, step, 0, 240, angle_list)
+data_2, _ = pad_sino(data_0, step, 0, 240, angle_list)
 
 data = np.zeros((3, *data_1.shape))
 data[0, :, :] = data_0
@@ -56,7 +67,7 @@ for reg_type in reg_types:
             if not os.path.isdir(folder):
                 os.system('mkdir '+ folder)
 
-            recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix,
+            recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
                                                                    recon_dims=(167, 167), niter=500, a_offset=0,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
