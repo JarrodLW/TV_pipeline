@@ -259,7 +259,7 @@ class VariationalRegClass:
         return op, reg_norms
 
 
-def recon_astra(sinogram, center, angles=None, ratio=1.0, method="FBP_CUDA", num_iter=1, win="hann", pad=0):
+def recon_astra(sinogram, center, angles=None, ratio=1.0, method="SIRT", num_iter=1, win="hann", pad=0):
     # Taken from Vo's code
     """
     Wrapper of reconstruction methods implemented in the astra toolbox package.
