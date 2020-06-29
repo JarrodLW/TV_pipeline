@@ -31,8 +31,8 @@ list3 = ((np.arange(87980, 88073) - 87872) * step + 58.5).tolist()
 angle_list = list1 + list2 + list3
 
 data_0, mask = pad_sino(data_0, step, 0, 240, angle_list)
-data_1, _ = pad_sino(data_0, step, 0, 240, angle_list)
-data_2, _ = pad_sino(data_0, step, 0, 240, angle_list)
+data_1, _ = pad_sino(data_1, step, 0, 240, angle_list)
+data_2, _ = pad_sino(data_2, step, 0, 240, angle_list)
 
 data = np.zeros((3, *data_1.shape))
 data[0, :, :] = data_0
