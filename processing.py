@@ -83,7 +83,7 @@ class VariationalRegClass:
             geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
 
             # Create the forward operator
-            forward_op = odl.tomo.RayTransform(self.image_space, geometry, impl='astra') # should be using astra!
+            forward_op = odl.tomo.RayTransform(self.image_space, geometry, impl='astra_cpu') # should be using astra!
 
         else:
             raise ValueError("Measurement type " + str(self.measurement_type) + " not implemented")
