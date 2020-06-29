@@ -9,6 +9,8 @@ Created on Tue May 26 15:56:24 2020
 import numpy as np
 import itertools
 import scipy.stats as ss
+from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import peak_signal_noise_ratio as psnr
 import matplotlib.pyplot as plt
 
 
@@ -215,6 +217,16 @@ def recasting_fourier_as_complex(vec, height, width):
     fourier_coeff = fourier_coeff_real + fourier_coeff_im * 1j
 
     return fourier_coeff
+
+def recon_error(im_recon, im_ref):
+
+    l2_error = np.sqrt(np.sum(np.square(im_recon - im_ref)))
+    psnr_val = psnr(im_recon, im_ref, data_range=im_recon.max() - im_recon.min())
+    ssim_val = ssim(im_ref, im_recon, data_range=im_recon.max() - im_recon.min())
+
+    print('l2_error:'+str(l2_error))
+
+    return l2_error, psnr_val, ssim_val
 
 # def create_synthetic_data(im_stack, measurement_type):
 #     # takes a stack of images (given as numpy array) and produces synthetic data

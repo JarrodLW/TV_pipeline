@@ -90,18 +90,18 @@ class VariationalRegClass:
             self.subsampled_forward_op = forward_op
 
         else:
-            self.subsampled_forward_op = forward_op.range.element(self.subsampling_arr) * forward_op
+            self.subsampled_forward_op = forward_op.range.element(subsampling_arr) * forward_op
 
             # --- Building the regulariser and cost functional --- #
         if self.reg_type == 'TV':
             # Column vector of two operators
 
-            op, l1_norms = self.build_tv_model()
+            op, reg_norms = self.build_tv_model()
 
         elif self.reg_type == 'TGV':
             # adapted from "odl/examples/solvers/pdhg_denoising_tgv.py"
 
-            op, l1_norms = self.build_tgv_model()
+            op, reg_norms = self.build_tgv_model()
 
         else:
             raise ValueError("Regulariser " + str(self.reg_type) + " not implemented")
@@ -141,7 +141,7 @@ class VariationalRegClass:
             l2_norm_squared = odl.solvers.L2NormSquared(forward_op.range).translated(data_odl)
 
             # Make separable sum of functionals, order must be the same as in `op`
-            g = odl.solvers.SeparableSum(l2_norm_squared, *l1_norms)
+            g = odl.solvers.SeparableSum(l2_norm_squared, *reg_norms)
 
             # --- Select solver parameters and solve using PDHG --- #
             # Estimated operator norm, add 10 percent to ensure ||K||_2^2 * sigma * tau < 1
@@ -189,18 +189,19 @@ class VariationalRegClass:
             G_0 = odl.Gradient(self.image_space[0]) * odl.ComponentProjection(self.image_space, 0)
             G_1 = odl.Gradient(self.image_space[1]) * odl.ComponentProjection(self.image_space, 1)
             op = odl.BroadcastOperator(self.subsampled_forward_op, G_0, G_1)
-            l1_norms = [self.reg_param * odl.solvers.L1Norm(G_0.range), self.reg_param * odl.solvers.L1Norm(G_1.range)]
+            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(G_0.range),
+                        self.reg_param * odl.solvers.GroupL1Norm(G_1.range)]
 
         else:
             G = odl.Gradient(self.image_space)
             op = odl.BroadcastOperator(self.subsampled_forward_op, G)
-            l1_norms = [self.reg_param * odl.solvers.L1Norm(G.range)]
+            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(G.range)]
 
-        return op, l1_norms
+        return op, reg_norms
 
     def build_tgv_model(self):
 
-        if self.measurement_type == 'MRI':
+        if self.measurement_type == 'MRI': # This can be made neater with product spaces
             G_0 = odl.Gradient(self.image_space[0]) * odl.ComponentProjection(self.image_space, 0)
             G_1 = odl.Gradient(self.image_space[1]) * odl.ComponentProjection(self.image_space, 1)
             V_0 = G_0.range
@@ -227,9 +228,9 @@ class VariationalRegClass:
                 odl.ReductionOperator(G_1, odl.ZeroOperator(V_0), odl.ScalingOperator(V_1, -1)),
                 E_0 * odl.ComponentProjection(domain, 1), E_1 * odl.ComponentProjection(domain, 2))
 
-            l1_norms = [self.reg_param * odl.solvers.L1Norm(V_0), self.reg_param * odl.solvers.L1Norm(V_1),
-                        self.reg_param_2 * self.reg_param * odl.solvers.L1Norm(W_0),
-                        self.reg_param_2 * self.reg_param * odl.solvers.L1Norm(W_1)]
+            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(V_0), self.reg_param * odl.solvers.GroupL1Norm(V_1),
+                        self.reg_param_2 * self.reg_param * odl.solvers.GroupL1Norm(W_0),
+                        self.reg_param_2 * self.reg_param * odl.solvers.GroupL1Norm(W_1)]
 
         else:
             G = odl.Gradient(self.image_space, method='forward', pad_mode='symmetric')
@@ -249,8 +250,59 @@ class VariationalRegClass:
                 self.subsampled_forward_op * odl.ComponentProjection(domain, 0),
                 odl.ReductionOperator(G, odl.ScalingOperator(V, -1)), E * odl.ComponentProjection(domain, 1))
             #
-            l1_norms = [self.reg_param * odl.solvers.L1Norm(V), self.reg_param_2 * self.reg_param * odl.solvers.L1Norm(W)]
+            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(V),
+                         self.reg_param_2 * self.reg_param * odl.solvers.GroupL1Norm(W)]
 
-        return op, l1_norms
+        return op, reg_norms
+
+
+def recon_astra(sinogram, center, angles=None, ratio=1.0, method="FBP_CUDA", num_iter=1, win="hann", pad=0):
+    """
+    Wrapper of reconstruction methods implemented in the astra toolbox package.
+    https://www.astra-toolbox.com/docs/algs/index.html
+    ---------
+    Parameters: - sinogram: 2D tomographic data.
+                - center: center of rotation.
+                - angles: tomographic angles in radian.
+                - ratio: apply a circle mask to the reconstructed image.
+                - method: Reconstruction algorithms
+                    for CPU: 'FBP', 'SIRT', 'SART', 'ART', 'CGLS'.
+                    for GPU: 'FBP_CUDA', 'SIRT_CUDA', 'SART_CUDA', 'CGLS_CUDA'.
+                - num_iter: Number of iterations if using iteration methods.
+                - filter: apply filter if using FBP method:
+                    'hamming', 'hann', 'lanczos', 'kaiser', 'parzen',...
+                - pad: padding to reduce the side effect of FFT.
+    ---------
+    Return:     - square array.
+    """
+    if pad > 0:
+        sinogram = np.pad(sinogram, ((0, 0), (pad, pad)), mode='edge')
+        center = center + pad
+    (nrow, ncol) = sinogram.shape
+    if angles is None:
+        angles = np.linspace(0.0, 180.0, nrow) * np.pi / 180.0
+    proj_geom = astra.create_proj_geom('parallel', 1, ncol, angles)
+    vol_geom = astra.create_vol_geom(ncol, ncol)
+    cen_col = (ncol - 1.0) / 2.0
+    shift = cen_col - center
+    sinogram = interpolation.shift(sinogram, (0, shift), mode='nearest')
+    sino_id = astra.data2d.create('-sino', proj_geom, sinogram)
+    rec_id = astra.data2d.create('-vol', vol_geom)
+    cfg = astra.astra_dict(method)
+    cfg['ProjectionDataId'] = sino_id
+    cfg['ReconstructionDataId'] = rec_id
+    if method == "FBP_CUDA":
+        cfg["FilterType"] = win
+    alg_id = astra.algorithm.create(cfg)
+    astra.algorithm.run(alg_id, num_iter)
+    rec = astra.data2d.get(rec_id)
+    astra.algorithm.delete(alg_id)
+    astra.data2d.delete(sino_id)
+    astra.data2d.delete(rec_id)
+    if pad > 0:
+        rec = rec[pad:-pad, pad:-pad]
+    if not (ratio is None):
+        rec = rec * cirle_mask(rec.shape[0], ratio)
+    return rec
 
 
