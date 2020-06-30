@@ -62,6 +62,9 @@ for reg_type in reg_types:
             folder_clustered = directory + '/Experiments/MRI_birmingham/'+ str(reg_type)+\
                        '_regularised_recons/clustered_sampling/sample_rate_' + str(round(sample_rate, 4)) + '/'
 
+            if not os.path.isdir(folder_clustered):
+                os.system('mkdir ' + folder_clustered)
+
             if os.path.isfile(folder_clustered + "recon_array_scale_" + str(20)
                               + "_reg_param_" + str(reg_param) + ".npy") and not overwrite:
                 continue
