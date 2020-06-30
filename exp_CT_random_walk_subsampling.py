@@ -111,7 +111,7 @@ for reg_type in reg_types:
 
             plt.tight_layout(w_pad=0.05)
             plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
-                        + '_sample_rate_'+str(sample_rate))
+                        + '_sample_rate_'+str(sample_rate)+'.png')
 
 
 
