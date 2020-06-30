@@ -10,13 +10,19 @@ from Utils import *
 import os
 import matplotlib.pyplot as plt
 from skimage import io
+import datetime as dt
 
-overwrite = False
+overwrite = True
+
+#logfile = 'experiment_output_'+dt.datetime.now().isoformat()+'.txt'
+#open(logfile, 'a').write('Starting experiment at: ' +dt.datetime.now().isoformat()+'\n')
 
 directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
 data_path_0 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0049.tif'
 data_path_1 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
 data_path_2 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0051.tif'
+
+#open(logfile, 'a').write('Writing files to: '+directory+'\n')
 
 data_0 = np.array(io.imread(data_path_0), dtype=float)
 data_1 = np.array(io.imread(data_path_1), dtype=float)
@@ -64,7 +70,7 @@ for reg_type in reg_types:
 
             recon_numbers = ['0049', '0050', '0051']
 
-            if os.path.isfile(folder + '/recon_' + str(recon_numbers[-1]) + '.png') and not overwrite:
+            if os.path.isfile(folder + '/recon_' + str(recon_numbers[-1]) + '_with_pos_constraint.png') and not overwrite:
                 continue
 
             if not os.path.isdir(folder):
