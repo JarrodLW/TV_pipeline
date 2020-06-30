@@ -10,7 +10,7 @@ import odl
 import numpy as np
 from time import time
 from myOperators import RealFourierTransform, Complex2Real, Real2Complex
-import astra
+#import astra
 from scipy.ndimage import interpolation
 from Utils import *
 
@@ -83,8 +83,8 @@ class VariationalRegClass:
             geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
 
             # Create the forward operator
-            forward_op = odl.tomo.RayTransform(self.image_space, geometry, impl='astra_cpu') # should be using astra!
-
+            #forward_op = odl.tomo.RayTransform(self.image_space, geometry, impl='skimage')  # should be using astra!
+            forward_op = odl.tomo.RayTransform(self.image_space, geometry, impl='astra_cpu')
         else:
             raise ValueError("Measurement type " + str(self.measurement_type) + " not implemented")
 
