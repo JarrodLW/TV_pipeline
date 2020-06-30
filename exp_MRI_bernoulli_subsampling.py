@@ -10,7 +10,7 @@ from Utils import *
 import os
 import matplotlib.pyplot as plt
 
-overwrite = False
+overwrite = True
 
 directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
 data_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
