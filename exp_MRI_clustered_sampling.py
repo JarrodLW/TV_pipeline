@@ -26,7 +26,7 @@ sample_rates = [0.1*(a+1) for a in range(10)]
 reg_params = [10**(-a) for a in range(10)]
 #scales = [5, 10, 15, 20] # this gives the spread of the clustered mask
 
-for reg_param in reg_params:
+for reg_type in reg_types:
     model = VariationalRegClass('MRI', reg_type)
     for sample_rate in sample_rates:
         num_walks = round(sample_rate * height)
@@ -57,7 +57,7 @@ for reg_param in reg_params:
         np.save(folder + "mask_clustered_scale" + str(20) + "_sample_rate" + str(round(sample_rate, 4)) + ".npy",
                 subsampling_matrix_3)
 
-        for reg_type in reg_types:
+        for reg_param in reg_params:
 
             folder_clustered = directory + '/Experiments/MRI_birmingham/'+ str(reg_type)+\
                        '_regularised_recons/clustered_sampling/sample_rate_' + str(round(sample_rate, 4)) + '/'

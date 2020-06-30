@@ -26,7 +26,7 @@ sample_rates = [0.1*(a+1) for a in range(10)]
 reg_params = [10**(-a) for a in range(10)]
 #scales = [5, 10, 15, 20] # this gives the spread of the clustered mask
 
-for reg_param in reg_params:
+for reg_type in reg_types:
     model = VariationalRegClass('MRI', reg_type)
     for sample_rate in sample_rates:
         subsampling_matrix_bernoulli = bernoulli_mask(height, width, expected_sparsity=sample_rate)[0]
@@ -39,7 +39,7 @@ for reg_param in reg_params:
         np.save(folder + "mask_Bernoulli_sample_rate" + str(round(sample_rate, 4)) + ".npy",
                 subsampling_matrix_bernoulli)
 
-        for reg_type in reg_types:
+        for reg_param in reg_params:
 
             folder_Bernoulli = directory + '/Experiments/MRI_birmingham/'+ str(reg_type)+\
                        '_regularised_recons/Bernoulli_sampling/sample_rate_' + str(round(sample_rate, 4)) +'/'
