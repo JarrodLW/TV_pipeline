@@ -11,7 +11,7 @@ import os
 import matplotlib.pyplot as plt
 from skimage import io
 
-overwrite = True
+overwrite = False
 
 directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
 data_path_0 = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0049.tif'
@@ -88,4 +88,31 @@ for reg_type in reg_types:
                 plt.colorbar()
                 plt.savefig(folder + '/recon_' + recon_number + '.png')
                 plt.close()
+
+# generating summary slides
+recon_numbers = ['0049', '0050', '0051']
+
+for reg_type in reg_types:
+    for recon_number in recon_numbers:
+        for sample_rate in sample_rates:
+
+            fig, axes = plt.subplots(5, 2)
+
+            for j, reg_param in enumerate(reg_params):
+                folder = directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recon_sample_rate_' \
+                         + str(sample_rate) + "_reg_param_" + str(reg_param)
+
+                recon = np.load(folder + '/recon_array_'+recon_number+'.npy')
+
+                axes[j//2, j % 2].imshow(circle_mask(167, 0.95)*recon, cmap=plt.cm.gray)
+                axes[j//2, j % 2].axis('off')
+                axes[j//2, j % 2].title('reg_param:_'+str(reg_param))
+
+            plt.tight_layout(w_pad=0.05)
+            plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
+                        + '_sample_rate_'+str(sample_rate))
+
+
+
+
 
