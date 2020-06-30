@@ -71,7 +71,7 @@ for reg_type in reg_types:
                 os.system('mkdir '+ folder)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
-                                                                   recon_dims=(167, 167), niter=500, a_offset=0,
+                                                                   recon_dims=(167, 167), niter=500, a_offset=0, enforce_positivity=True,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
             for i, recon_number in enumerate(recon_numbers):
@@ -107,7 +107,7 @@ for reg_type in reg_types:
 
                 axes[j//2, j % 2].imshow(circle_mask(167, 0.95)*recon, cmap=plt.cm.gray)
                 axes[j//2, j % 2].axis('off')
-                axes[j//2, j % 2].set_title('reg_param: '+str(round(reg_param, 4))
+                axes[j//2, j % 2].set_title('reg_param: '+str(round(reg_param, 4)))
 
             plt.tight_layout(w_pad=0.05)
             plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
