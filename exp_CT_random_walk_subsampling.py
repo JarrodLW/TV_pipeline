@@ -107,7 +107,7 @@ for reg_type in reg_types:
 
                 axes[j//2, j % 2].imshow(circle_mask(167, 0.95)*recon, cmap=plt.cm.gray)
                 axes[j//2, j % 2].axis('off')
-                axes[j//2, j % 2].title('reg_param:_'+str(reg_param))
+                axes[j//2, j % 2].set_title('reg_param:_'+str(reg_param))
 
             plt.tight_layout(w_pad=0.05)
             plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
