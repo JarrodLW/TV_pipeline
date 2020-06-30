@@ -59,7 +59,7 @@ for reg_type in reg_types:
         for reg_param in reg_params:
 
             folder = directory + '/Experiments/CT_diamond/' + str(reg_type)+'_regularised_recons/recon_sample_rate_' \
-                     + str(sample_rate) + "_reg_param_" + str(reg_param)
+                     + str(round(sample_rate, 4)) + "_reg_param_" + str(reg_param)
             #filename = +folder
 
             recon_numbers = ['0049', '0050', '0051']
@@ -101,17 +101,17 @@ for reg_type in reg_types:
 
             for j, reg_param in enumerate(reg_params):
                 folder = directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recon_sample_rate_' \
-                         + str(sample_rate) + "_reg_param_" + str(reg_param)
+                         + str(round(sample_rate, 4)) + "_reg_param_" + str(reg_param)
 
                 recon = np.load(folder + '/recon_array_'+recon_number+'.npy')
 
                 axes[j//2, j % 2].imshow(circle_mask(167, 0.95)*recon, cmap=plt.cm.gray)
                 axes[j//2, j % 2].axis('off')
-                axes[j//2, j % 2].set_title('reg_param:_'+str(reg_param))
+                axes[j//2, j % 2].set_title('reg_param: '+str(reg_param))
 
             plt.tight_layout(w_pad=0.05)
             plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
-                        + '_sample_rate_'+str(sample_rate)+'.png')
+                        + '_sample_rate_'+str(round(sample_rate, 4))+'.png')
             plt.close()
 
 
