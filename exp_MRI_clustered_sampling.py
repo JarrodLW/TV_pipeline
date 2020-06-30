@@ -32,16 +32,16 @@ for reg_type in reg_types:
         num_walks = round(sample_rate * height)
         subsampling_matrix_0 = horiz_rand_walk_mask(height, width, num_walks,
                                                   distr='centre_clustered', allowing_inter=True,
-                                                  p=[0., 1., 0.], scale=5)
+                                                  p=[0., 1., 0.], scale=5)[0]
         subsampling_matrix_1 = horiz_rand_walk_mask(height, width, num_walks,
                                                     distr='centre_clustered', allowing_inter=True,
-                                                    p=[0., 1., 0.], scale=10)
+                                                    p=[0., 1., 0.], scale=10)[0]
         subsampling_matrix_2 = horiz_rand_walk_mask(height, width, num_walks,
                                                     distr='centre_clustered', allowing_inter=True,
-                                                    p=[0., 1., 0.], scale=15)
+                                                    p=[0., 1., 0.], scale=15)[0]
         subsampling_matrix_3 = horiz_rand_walk_mask(height, width, num_walks,
                                                     distr='centre_clustered', allowing_inter=True,
-                                                    p=[0., 1., 0.], scale=20)
+                                                    p=[0., 1., 0.], scale=20)[0]
 
         folder = directory + '/Experiments/MRI_birmingham/subsampled_data/'
 
