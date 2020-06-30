@@ -61,7 +61,10 @@ for reg_type in reg_types:
             folder = directory + '/Experiments/CT_diamond/' + str(reg_type)+'_regularised_recons/recon_sample_rate_' \
                      + str(sample_rate) + "_reg_param_" + str(reg_param)
             #filename = +folder
-            if os.path.isfile(folder + '/recon.png') and not overwrite:
+
+            recon_numbers = ['0049', '0050', '0051']
+
+            if os.path.isfile(folder + '/recon_' + str(recon_numbers[-1]) + '.png') and not overwrite:
                 continue
 
             if not os.path.isdir(folder):
@@ -70,8 +73,6 @@ for reg_type in reg_types:
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
                                                                    recon_dims=(167, 167), niter=500, a_offset=0,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
-
-            recon_numbers = ['0049', '0050', '0051']
 
             for i, recon_number in enumerate(recon_numbers):
 
