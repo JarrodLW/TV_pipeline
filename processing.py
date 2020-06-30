@@ -93,7 +93,13 @@ class VariationalRegClass:
             self.subsampled_forward_op = forward_op
 
         else:
-            self.subsampled_forward_op = forward_op.range.element(subsampling_arr) * forward_op
+            if self.measurement_type == 'MRI':
+                subsampling_arr_doubled = np.zeros((2, *subsampling_arr.shape))
+                subsampling_arr_doubled[0, :, :] = subsampling_arr[:, :]
+                subsampling_arr_doubled[1, :, :] = subsampling_arr[:, :]
+                self.subsampled_forward_op = forward_op.range.element(subsampling_arr_doubled) * forward_op
+            else:
+                self.subsampled_forward_op = forward_op.range.element(subsampling_arr) * forward_op
 
             # --- Building the regulariser and cost functional --- #
         if self.reg_type == 'TV':
@@ -166,6 +172,7 @@ class VariationalRegClass:
             # Run the algorithm
             print('Running PDHG on data ' + str(i + 1) + " of " + str(data_stack.shape[0]))
             t0 = time()
+            print("so far so good")
             odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma)
             dt = time() - t0
             print('done in %.2fs.' % dt)
