@@ -74,7 +74,7 @@ def equipartition(num_bins, num_examples):
     return bin_indices
 
 
-def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowing_inter=True, p=[0.25, 0.5, 0.25]):
+def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowing_inter=True, p=[0.25, 0.5, 0.25], scale=None):
     """
      constructs random walks left to right across a rectangular grid
      p gives the probabilities of moving down a pixel, staying put and moving up a pixel
@@ -94,9 +94,26 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
         #xU, xL = x + 0.5, x - 0.5
         #prob = ss.norm.cdf(xU, scale=50) - ss.norm.cdf(xL, scale=50)
         #prob = prob / prob.sum()  # normalize the probabilities so their sum is 1
-        cumul_probs = np.append([0], ss.norm.cdf(x, scale=10))
-        sample_locations = equipartition(height, num_walks)/100
-        initial_position = np.nonzero(np.histogram(sample_locations, cumul_probs)[0])[0]
+        cumul_probs = np.append([0], ss.norm.cdf(x, scale=scale))
+        sample_locations = equipartition(height, num_walks)/height
+        hist = np.histogram(sample_locations, cumul_probs)[0]
+        hist_top_half = hist[0:height//2]
+        hist_bottom_half = hist[height//2:]
+
+        for i in range(1, len(hist_top_half)):
+            if hist_top_half[-i] > 1:
+                hist_top_half[-i - 1] += hist_top_half[-i] - 1
+                hist_top_half[-i] = 1
+
+        for i in range(len(hist_bottom_half)-1):
+            if hist_bottom_half[i] > 1:
+                hist_bottom_half[i + 1] += hist_bottom_half[i] - 1
+                hist_bottom_half[i] = 1
+
+        hist_modified = np.concatenate([hist_top_half, hist_bottom_half])
+        initial_position = np.nonzero(hist_modified)[0]
+
+        #initial_position = np.nonzero(np.histogram(sample_locations, cumul_probs)[0])[0]
 
     elif distr == 'uniform':
         initial_position = np.sort(np.random.choice(range(height), replace=False, size=num_walks))
@@ -117,6 +134,7 @@ def horiz_rand_walk_mask(height, width, num_walks, distr='equipartition', allowi
     #     raise
 
     position = initial_position
+
     walk_array = np.zeros((height, width))
     walk_array[initial_position, 0] = 1
 
