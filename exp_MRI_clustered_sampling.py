@@ -67,13 +67,13 @@ for reg_type in reg_types:
                 continue
 
             recons_clustered_0 = model.regularised_recons_from_subsampled_data(data, reg_param,
-                                                           subsampling_arr=subsampling_matrix_0, niter=500)
+                                                           subsampling_arr=subsampling_matrix_0, niter=2000)
             recons_clustered_1 = model.regularised_recons_from_subsampled_data(data, reg_param,
-                                                           subsampling_arr=subsampling_matrix_1, niter=500)
+                                                           subsampling_arr=subsampling_matrix_1, niter=2000)
             recons_clustered_2 = model.regularised_recons_from_subsampled_data(data, reg_param,
-                                                           subsampling_arr=subsampling_matrix_2, niter=500)
+                                                           subsampling_arr=subsampling_matrix_2, niter=2000)
             recons_clustered_3 = model.regularised_recons_from_subsampled_data(data, reg_param,
-                                                           subsampling_arr=subsampling_matrix_3, niter=500)
+                                                           subsampling_arr=subsampling_matrix_3, niter=2000)
 
             np.save(folder_clustered + "recon_array_scale_" + str(5) + "_reg_param_" + str(reg_param) + ".npy",
                     recons_clustered_0[0])

@@ -51,7 +51,7 @@ for reg_type in reg_types:
                 continue
 
             recons_bernoulli = model.regularised_recons_from_subsampled_data(data, reg_param,
-                                                           subsampling_arr=subsampling_matrix_bernoulli, niter=500)
+                                                           subsampling_arr=subsampling_matrix_bernoulli, niter=2000)
 
             np.save(folder_Bernoulli + "recon_array_reg_param_" + str(reg_param) + ".npy", recons_bernoulli[0])
 
