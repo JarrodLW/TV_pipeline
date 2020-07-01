@@ -59,7 +59,7 @@ for reg_type in reg_types:
             f = plt.figure()
             axarr = f.subplots(1, 2)
             axarr[0].imshow(np.abs(recons_bernoulli[0]), cmap=plt.cm.gray)
-            axarr[1].imshow(pseudo_inverse, cmap=plt.cm.gray)
+            axarr[1].imshow(np.abs(pseudo_inverse), cmap=plt.cm.gray)
             axarr[0].axis("off")
             axarr[1].axis("off")
             axarr[0].colorbar()
