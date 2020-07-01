@@ -22,9 +22,9 @@ data = np.fft.fftshift(data)
 
 height, width = data.shape
 
-reg_types = ['TV', 'TGV']
-sample_rates = [0.1*(a+1) for a in range(10)]
-reg_params = [10**(-a) for a in range(10)]
+reg_types = ['TV', 'TGV'][:1]
+sample_rates = [0.1*(a+1) for a in range(10)][:1]
+reg_params = [10**(-a) for a in range(10)][:1]
 
 for reg_type in reg_types:
     model = VariationalRegClass('MRI', reg_type)
