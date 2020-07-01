@@ -62,8 +62,7 @@ for reg_type in reg_types:
             axarr[1].imshow(np.abs(pseudo_inverse), cmap=plt.cm.gray)
             axarr[0].axis("off")
             axarr[1].axis("off")
-            axarr[0].colorbar()
-            axarr[1].colorbar()
+            plt.colorbar()
             plt.savefig(folder_Bernoulli + "recon_reg_param_" + str(reg_param) + ".png")
             plt.close()
 
