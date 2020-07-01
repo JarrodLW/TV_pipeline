@@ -181,9 +181,9 @@ class VariationalRegClass:
                 RealToComplexOp = Real2Complex(self.image_space)
 
                 if self.reg_type == 'TGV': # x consists not only of the image reconstruction but also the auxiliary vector field
-                    reconstructions[i, :, :] = RealToComplexOp(x[0].asarray())
+                    reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
                 else:
-                    reconstructions[i, :, :] = RealToComplexOp(x.asarray())
+                    reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x.asarray()))
 
             else:
                 if self.reg_type == 'TGV':  # x consists not only of the image reconstruction but also the auxiliary vector field

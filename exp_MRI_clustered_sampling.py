@@ -17,7 +17,8 @@ data_path = directory + '/Data/02-20_MRI_Melanie_Britton/7/fid'
 data_vec = np.fromfile(data_path, dtype=np.int32)
 
 data = recasting_fourier_as_complex(data_vec, 128, 256)
-data /= np.amax(np.abs(data))
+data = np.fft.fftshift(data)
+#data /= np.amax(np.abs(data))
 
 height, width = data.shape
 
@@ -78,6 +79,11 @@ for reg_type in reg_types:
             recons_clustered_3 = model.regularised_recons_from_subsampled_data(data, reg_param,
                                                            subsampling_arr=subsampling_matrix_3, niter=2000)
 
+            pseudo_inverse_0 = np.fft.fftshift(np.fft.ifft2(subsampling_matrix_0 * data))
+            pseudo_inverse_1 = np.fft.fftshift(np.fft.ifft2(subsampling_matrix_1 * data))
+            pseudo_inverse_2 = np.fft.fftshift(np.fft.ifft2(subsampling_matrix_2 * data))
+            pseudo_inverse_3 = np.fft.fftshift(np.fft.ifft2(subsampling_matrix_3 * data))
+
             np.save(folder_clustered + "recon_array_scale_" + str(5) + "_reg_param_" + str(reg_param) + ".npy",
                     recons_clustered_0[0])
             np.save(folder_clustered + "recon_array_scale_" + str(10) + "_reg_param_" + str(reg_param) + ".npy",
@@ -91,24 +97,28 @@ for reg_type in reg_types:
             plt.figure()
             plt.imshow(np.abs(recons_clustered_0[0]), cmap=plt.cm.gray)
             plt.axis("off")
+            plt.colorbar()
             plt.savefig(folder_clustered + "recon_scale_" +str(5) +"_reg_param_" + str(reg_param) + ".png")
             plt.close()
 
             plt.figure()
             plt.imshow(np.abs(recons_clustered_1[0]), cmap=plt.cm.gray)
             plt.axis("off")
+            plt.colorbar()
             plt.savefig(folder_clustered + "recon_scale_" +str(10) +"_reg_param_" + str(reg_param) + ".png")
             plt.close()
 
             plt.figure()
             plt.imshow(np.abs(recons_clustered_2[0]), cmap=plt.cm.gray)
             plt.axis("off")
+            plt.colorbar()
             plt.savefig(folder_clustered + "recon_scale_" + str(15) + "_reg_param_" + str(reg_param) + ".png")
             plt.close()
 
             plt.figure()
             plt.imshow(np.abs(recons_clustered_3[0]), cmap=plt.cm.gray)
             plt.axis("off")
+            plt.colorbar()
             plt.savefig(folder_clustered + "recon_scale_" + str(20) + "_reg_param_" + str(reg_param) + ".png")
             plt.close()
 

@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from skimage import io
 import datetime as dt
 
-overwrite = True
+overwrite = False
 
 #logfile = 'experiment_output_'+dt.datetime.now().isoformat()+'.txt'
 #open(logfile, 'a').write('Starting experiment at: ' +dt.datetime.now().isoformat()+'\n')
