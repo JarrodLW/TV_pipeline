@@ -18,6 +18,8 @@ from Utils import *
 
 class VariationalRegClass:
 
+    # Decide on grid size. Should width be equal to number to pixels? Seems to be the case in MRI.
+
     def __init__(self, measurement_type, reg_type):
 
         self.measurement_type = measurement_type
@@ -60,7 +62,7 @@ class VariationalRegClass:
 
             height = data_stack.shape[1]
             width = data_stack.shape[2]
-            complex_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20],
+            complex_space = odl.uniform_discr(min_pt=[-width//2, -height//2], max_pt=[width//2, height//2],
                                             shape=[height, width], dtype='complex')
             self.image_space = complex_space.real_space ** 2
             forward_op = RealFourierTransform(self.image_space)
