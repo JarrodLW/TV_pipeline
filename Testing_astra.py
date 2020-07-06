@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from skimage import io
 from processing import *
 
-directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
+#directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
 #data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
-data_path = directory + '/Experiments/CT_diamond/sino_0050_cleaned.tif'
+#data_path = directory + '/Experiments/CT_diamond/sino_0050_cleaned.tif'
 
-data = np.array(io.imread(data_path), dtype=float)
+data = np.array(io.imread('sino_0050.tif'), dtype=float)
 
 #(height, width) = losa.load_image(list_file[depth // 2]).shape
 (height, width) = (167, 167)
