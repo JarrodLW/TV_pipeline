@@ -106,7 +106,7 @@ for reg_type in reg_types:
                 folder = directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recon_sample_rate_' \
                          + str(round(sample_rate, 4)) + "_reg_param_" + str(reg_param)
 
-                recon = np.load(folder + '/recon_array_'+recon_number+'.npy')
+                recon = np.load(folder + '/recon_array_'+recon_number+'_with_pos_constraint.npy')
 
                 axes[j//2, j % 2].imshow(circle_mask(167, 0.95)*recon, cmap=plt.cm.gray)
                 axes[j//2, j % 2].axis('off')
