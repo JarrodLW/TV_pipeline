@@ -116,7 +116,8 @@ for reg_type in reg_types:
                 axes[j//2, j % 2].set_title('reg_param: '+str(reg_param))
 
             plt.tight_layout(w_pad=0.05)
-            plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/recons_' + recon_number
+            plt.savefig(directory + '/Experiments/CT_diamond/' + str(reg_type) + '_regularised_recons/Summary_slides/'
+                                                                                 'recons_' + recon_number
                         + '_sample_rate_'+str(round(sample_rate, 4))+'_with_pos_constraint.png')
             plt.close()
 

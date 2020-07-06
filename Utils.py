@@ -69,7 +69,8 @@ def equipartition(num_bins, num_examples):
     interval_lengths = list(np.random.permutation(interval_lengths))
     interval_positions = list(itertools.accumulate(interval_lengths))
     intervals = np.split(np.arange(num_bins), interval_positions)
-    bin_indices = np.sort(np.asarray([np.random.choice(intervals[i]) for i in range(num_examples)]))
+    #bin_indices = np.sort(np.asarray([np.random.choice(intervals[i]) for i in range(num_examples)]))
+    bin_indices = [intervals[i][len(intervals[i])//2] for i in range(num_examples)]
 
     return bin_indices
 
