@@ -96,6 +96,8 @@ reg_params = [10 ** (-a) for a in range(10)]
 # generating summary slides
 recon_numbers = ['0049', '0050', '0051']
 
+reg_types = ['TV']
+
 for reg_type in reg_types:
     for recon_number in recon_numbers:
         for sample_rate in sample_rates:
