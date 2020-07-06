@@ -10,7 +10,7 @@ import odl
 import numpy as np
 from time import time
 from myOperators import RealFourierTransform, Complex2Real, Real2Complex
-#import astra
+import astra
 from scipy.ndimage import interpolation
 from Utils import *
 
