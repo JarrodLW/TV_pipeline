@@ -28,6 +28,7 @@ class VariationalRegClass:
         self.subsampled_forward_op = None
         self.reg_param = None
         self.reg_param_2 = None
+        self.V = None
 
     def regularised_recons_from_subsampled_data(self, data_stack,
                                                 reg_param, recon_dims=None,
@@ -122,7 +123,7 @@ class VariationalRegClass:
                 f = odl.solvers.IndicatorNonnegativity(self.image_space)
             elif self.reg_type == 'TGV':
                 f = odl.solvers.SeparableSum(odl.solvers.IndicatorNonnegativity(self.image_space),
-                                             odl.solvers.ZeroFunctional(V))
+                                             odl.solvers.ZeroFunctional(self.V))
         else:
             f = odl.solvers.ZeroFunctional(op.domain)
 
@@ -246,7 +247,7 @@ class VariationalRegClass:
 
         else:
             G = odl.Gradient(self.image_space, method='forward', pad_mode='symmetric')
-            V = G.range
+            self.V = G.range
 
             Dx = odl.PartialDerivative(self.image_space, 0, method='backward', pad_mode='symmetric')
             Dy = odl.PartialDerivative(self.image_space, 1, method='backward', pad_mode='symmetric')
@@ -256,13 +257,13 @@ class VariationalRegClass:
                 [[Dx, 0], [0, Dy], [0.5 * Dy, 0.5 * Dx], [0.5 * Dy, 0.5 * Dx]])
             W = E.range
 
-            domain = odl.ProductSpace(self.image_space, V)
+            domain = odl.ProductSpace(self.image_space, self.V)
 
             op = odl.BroadcastOperator(
                 self.subsampled_forward_op * odl.ComponentProjection(domain, 0),
-                odl.ReductionOperator(G, odl.ScalingOperator(V, -1)), E * odl.ComponentProjection(domain, 1))
+                odl.ReductionOperator(G, odl.ScalingOperator(self.V, -1)), E * odl.ComponentProjection(domain, 1))
             #
-            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(V),
+            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(self.V),
                          self.reg_param_2 * self.reg_param * odl.solvers.GroupL1Norm(W)]
 
         return op, reg_norms
