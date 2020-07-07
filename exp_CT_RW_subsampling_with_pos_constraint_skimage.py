@@ -63,7 +63,7 @@ for reg_type in reg_types:
         subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks, allowing_inter=True, p=[0, 1., 0.])[0]
 
         # indices at which we have measurements
-        ind = np.nonzero(mask*subsampling_matrix[:, 0])
+        ind = np.nonzero((mask*subsampling_matrix)[:, 0])
 
         list_angle = (ind * step) * np.pi / 180.0
         center = 83
