@@ -90,7 +90,7 @@ for reg_type in reg_types:
 
                 np.save(folder + '/recon_array_'+recon_number+'_with_pos_constraint.npy', recons[i])
 
-                recon_astra = recon_astra(data[i] * subsampling_matrix, center, list_angle, 0.95, method="SIRT",
+                recon_astra = recon_astra(data[i][ind], center, list_angle, 0.95, method="SIRT",
                                           num_iter=200)
 
                 # plt.figure()
