@@ -62,7 +62,7 @@ for reg_type in reg_types:
         num_walks = round(sample_rate*height)
         subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks, allowing_inter=True, p=[0, 1., 0.])[0]
 
-        list_angle = list(angle_list) * np.pi / 180.0
+        list_angle = np.array(angle_list) * np.pi / 180.0
         center = 83
         recon_astra = recon_astra(data*subsampling_matrix, center, list_angle, 0.95, method="SIRT", num_iter=200)
 
