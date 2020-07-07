@@ -65,7 +65,7 @@ for reg_type in reg_types:
         # indices at which we have measurements
         ind = np.nonzero((mask*subsampling_matrix)[:, 0])
 
-        list_angle = (ind * step) * np.pi / 180.0
+        list_angle = (step * np.array(ind, dtype=float)) * np.pi / 180.0
         center = 83
 
         for reg_param in reg_params:
