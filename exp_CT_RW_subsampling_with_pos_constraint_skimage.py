@@ -62,7 +62,10 @@ for reg_type in reg_types:
         num_walks = round(sample_rate*height)
         subsampling_matrix = horiz_rand_walk_mask(height, width, num_walks, allowing_inter=True, p=[0, 1., 0.])[0]
 
-        list_angle = np.array(angle_list) * np.pi / 180.0
+        # indices at which we have measurements
+        ind = np.nonzero(mask*subsampling_matrix[:, 0])
+
+        list_angle = (ind * step) * np.pi / 180.0
         center = 83
 
         for reg_param in reg_params:
@@ -80,7 +83,7 @@ for reg_type in reg_types:
                 os.system('mkdir '+ folder)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
-                                                                   recon_dims=(167, 167), niter=500, a_offset=0, enforce_positivity=True,
+                                                                   recon_dims=(167, 167), niter=1000, a_offset=0, enforce_positivity=True,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
             for i, recon_number in enumerate(recon_numbers):
