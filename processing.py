@@ -302,7 +302,8 @@ def recon_astra(sinogram, center, angles=None, ratio=1.0, method="SIRT", num_ite
     sino_id = astra.data2d.create('-sino', proj_geom, sinogram)
     rec_id = astra.data2d.create('-vol', vol_geom)
     cfg = astra.astra_dict(method)
-    cfg['ProjectionDataId'] = sino_id
+    #cfg['ProjectionDataId'] = sino_id
+    cfg['proj_id'] = sino_id
     cfg['ReconstructionDataId'] = rec_id
     if method == "FBP_CUDA":
         cfg["FilterType"] = win
