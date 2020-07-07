@@ -64,7 +64,6 @@ for reg_type in reg_types:
 
         list_angle = np.array(angle_list) * np.pi / 180.0
         center = 83
-        recon_astra = recon_astra(data*subsampling_matrix, center, list_angle, 0.95, method="SIRT", num_iter=200)
 
         for reg_param in reg_params:
 
@@ -88,17 +87,20 @@ for reg_type in reg_types:
 
                 np.save(folder + '/recon_array_'+recon_number+'_with_pos_constraint.npy', recons[i])
 
-                plt.figure()
-                plt.imshow(circle_mask(167, 0.95)*recons[i], cmap=plt.cm.gray)
-                plt.axis("off")
-                plt.savefig(folder + '/masked_recon_' + recon_number + '_with_pos_constraint.png')
-                plt.close()
+                recon_astra = recon_astra(data[i] * subsampling_matrix, center, list_angle, 0.95, method="SIRT",
+                                          num_iter=200)
 
-                plt.figure()
-                plt.imshow(recons[i], cmap=plt.cm.gray)
-                plt.colorbar()
-                plt.savefig(folder + '/recon_' + recon_number + '_with_pos_constraint.png')
-                plt.close()
+                # plt.figure()
+                # plt.imshow(circle_mask(167, 0.95)*recons[i], cmap=plt.cm.gray)
+                # plt.axis("off")
+                # plt.savefig(folder + '/masked_recon_' + recon_number + '_with_pos_constraint.png')
+                # plt.close()
+                #
+                # plt.figure()
+                # plt.imshow(recons[i], cmap=plt.cm.gray)
+                # plt.colorbar()
+                # plt.savefig(folder + '/recon_' + recon_number + '_with_pos_constraint.png')
+                # plt.close()
 
                 f = plt.figure()
                 axarr = f.subplots(1, 3)
