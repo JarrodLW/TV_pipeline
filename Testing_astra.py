@@ -24,18 +24,24 @@ center = 83
 
 recon_astra = recon_astra(data, center, list_angle, 0.95, method="SIRT", num_iter=200)
 
-#t = VariationalRegClass('CT', 'TV')
-#recon_tv = t.regularised_recons_from_subsampled_data(data, 0.001, subsampling_arr=None,
-#                                                   recon_dims=(167, 167), niter=200, a_offset=0, a_range=2*np.pi,
-#                                                   d_offset=0, d_width=40)[0]
+t = VariationalRegClass('CT', 'TV')
+recon_tv = t.regularised_recons_from_subsampled_data(data, 0.001, subsampling_arr=None,
+                                                   recon_dims=(167, 167), niter=200, a_offset=0, a_range=2*np.pi,
+                                                   d_offset=0, d_width=40)[0]
 
-plt.figure()
-plt.imshow(recon_astra, cmap=plt.cm.gray)
-plt.title("recon using SIRT")
-plt.savefig("astra_recon_SIRT.png")
+circ_mask = circle_mask(167, 0.95)
+
+print(recon_error(circ_mask*recon_tv, recon_astra))
+
+
+# plt.figure()
+# plt.imshow(recon_astra, cmap=plt.cm.gray)
+# plt.title("recon using SIRT")
+# plt.savefig("astra_recon_SIRT.png")
+
+
 
 #plt.figure()
 #plt.imshow(recon_tv, cmap=plt.cm.gray)
 #plt.title("recon using tv")
 #plt.savefig("tv_recon.png")
-
