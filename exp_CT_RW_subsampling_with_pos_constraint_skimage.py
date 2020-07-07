@@ -83,7 +83,7 @@ for reg_type in reg_types:
                 os.system('mkdir '+ folder)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
-                                                                   recon_dims=(167, 167), niter=200, a_offset=0, enforce_positivity=True,
+                                                                   recon_dims=(167, 167), niter=20, a_offset=0, enforce_positivity=True,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
             for i, recon_number in enumerate(recon_numbers):
@@ -108,7 +108,7 @@ for reg_type in reg_types:
                 axarr = f.subplots(1, 3)
                 im_0 = axarr[0].imshow(recons[i], cmap=plt.cm.gray)
                 im_1 = axarr[1].imshow(circle_mask(167, 0.95)*recons[i], cmap=plt.cm.gray)
-                im_2 = axarr[2].imshow(recon_astra, cmap=plt.cm.gray)
+                im_2 = axarr[2].imshow(recons_astra, cmap=plt.cm.gray)
                 axarr[0].axis("off")
                 axarr[1].axis("off")
                 axarr[2].axis("off")
