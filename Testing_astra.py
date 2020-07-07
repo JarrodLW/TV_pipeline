@@ -25,7 +25,7 @@ center = 83
 recon_astra = recon_astra(data, center, list_angle, 0.95, method="SIRT", num_iter=200)
 
 t = VariationalRegClass('CT', 'TV')
-recon_tv = t.regularised_recons_from_subsampled_data(data, 0.001, subsampling_arr=None,
+recon_tv = t.regularised_recons_from_subsampled_data(data, 0.00, subsampling_arr=None,
                                                    recon_dims=(167, 167), niter=200, a_offset=0, a_range=2*np.pi,
                                                    d_offset=0, d_width=40)[0]
 
