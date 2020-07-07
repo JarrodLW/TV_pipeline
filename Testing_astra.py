@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from skimage import io
 from processing import *
+import astra
 
 #directory = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday'
 #data_path = directory + '/Data/04-20_CT_Paul_Quinn/phase/sino_cleaned/sino_0050.tif'
