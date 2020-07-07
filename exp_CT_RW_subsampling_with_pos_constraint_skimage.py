@@ -115,7 +115,7 @@ for reg_type in reg_types:
                 f.colorbar(im_0, ax=axarr[0])
                 f.colorbar(im_1, ax=axarr[1])
                 f.colorbar(im_2, ax=axarr[2])
-                plt.savefig(folder + "recon_reg_param_" + recon_number + "_with_pos_constraint.png")
+                plt.savefig(folder + "/recon_reg_param_" + recon_number + "_with_pos_constraint.png")
                 plt.close()
 
 # generating summary slides
