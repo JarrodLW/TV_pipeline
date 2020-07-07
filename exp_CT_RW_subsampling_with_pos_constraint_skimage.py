@@ -50,7 +50,7 @@ _, height, width = data.shape
 reg_types = ['TV']
 #sample_rates = [0.1 * (a + 1) for a in range(10)]
 #reg_params = [10 ** (-a) for a in range(10)]
-sample_rates = [0.6]
+sample_rates = [0.2]
 reg_params = [0.]
 
 
@@ -91,6 +91,8 @@ for reg_type in reg_types:
                 np.save(folder + '/recon_array_'+recon_number+'_with_pos_constraint.npy', recons[i])
 
                 recons_astra = recon_astra(data[i][ind], center, list_angle, 0.95, method="SIRT", num_iter=200)
+
+                print(len(ind))
 
                 # plt.figure()
                 # plt.imshow(circle_mask(167, 0.95)*recons[i], cmap=plt.cm.gray)
