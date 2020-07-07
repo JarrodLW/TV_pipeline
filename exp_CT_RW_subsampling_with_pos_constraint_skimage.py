@@ -48,9 +48,10 @@ data[2, :, :] = data_2
 _, height, width = data.shape
 
 reg_types = ['TV']
-sample_rates = [0.1 * (a + 1) for a in range(10)]
-reg_params = [10 ** (-a) for a in range(10)]
-
+#sample_rates = [0.1 * (a + 1) for a in range(10)]
+#reg_params = [10 ** (-a) for a in range(10)]
+sample_rates = [1.0]
+reg_params = [0.]
 
 
 for reg_type in reg_types:
