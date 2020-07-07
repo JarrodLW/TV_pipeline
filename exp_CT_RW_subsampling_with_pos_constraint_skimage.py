@@ -50,7 +50,7 @@ _, height, width = data.shape
 reg_types = ['TV']
 #sample_rates = [0.1 * (a + 1) for a in range(10)]
 #reg_params = [10 ** (-a) for a in range(10)]
-sample_rates = [1.0]
+sample_rates = [0.6]
 reg_params = [0.]
 
 
@@ -83,7 +83,7 @@ for reg_type in reg_types:
                 os.system('mkdir '+ folder)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=mask*subsampling_matrix,
-                                                                   recon_dims=(167, 167), niter=20, a_offset=0, enforce_positivity=True,
+                                                                   recon_dims=(167, 167), niter=500, a_offset=0, enforce_positivity=True,
                                                                    a_range=2*np.pi, d_offset=0, d_width=40)
 
             for i, recon_number in enumerate(recon_numbers):
