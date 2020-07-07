@@ -37,7 +37,7 @@ print(recon_error(circ_mask*recon_tv, recon_astra))
 fig, axes = plt.subplots(1, 2)
 axes[0].imshow(recon_astra, cmap=plt.cm.gray)
 axes[1].imshow(circ_mask*recon_tv, cmap=plt.cm.gray)
-plt.savefig('comparing SIRT and PDHG')
+plt.savefig('comparing_SIRT_and_PDHG.png')
 
 # plt.figure()
 # plt.imshow(recon_astra, cmap=plt.cm.gray)
