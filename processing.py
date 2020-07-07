@@ -183,15 +183,23 @@ class VariationalRegClass:
                 RealToComplexOp = Real2Complex(self.image_space)
 
                 if self.reg_type == 'TGV': # x consists not only of the image reconstruction but also the auxiliary vector field
-                    reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
+                    recon = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
+                    #reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
                 else:
-                    reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x.asarray()))
+                    recon = np.fft.fftshift(RealToComplexOp(x.asarray()))
+                    #reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x.asarray()))
 
             else:
                 if self.reg_type == 'TGV':  # x consists not only of the image reconstruction but also the auxiliary vector field
-                    reconstructions[i, :, :] = x[0].asarray()
+                    recon = x[0].asarray()
+                    #reconstructions[i, :, :] = x[0].asarray()
                 else:
-                    reconstructions[i, :, :] = x.asarray()
+                    recon = x.asarray()
+                    #reconstructions[i, :, :] = x.asarray()
+
+            # rotating the reconstructed image 90 degrees anticlockwise
+            recon_rotated = recon.T[::-1, :]
+            reconstructions[i, :, :] = recon_rotated
 
         return reconstructions
 
