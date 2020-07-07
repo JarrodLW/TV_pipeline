@@ -108,7 +108,7 @@ for reg_type in reg_types:
                 f = plt.figure()
                 axarr = f.subplots(1, 3)
                 im_0 = axarr[0].imshow(recons[i], cmap=plt.cm.gray)
-                im_1 = axarr[1].imshow(circle_mask*recons[i], cmap=plt.cm.gray)
+                im_1 = axarr[1].imshow(circle_mask(167, 0.95)*recons[i], cmap=plt.cm.gray)
                 im_2 = axarr[2].imshow(recon_astra, cmap=plt.cm.gray)
                 axarr[0].axis("off")
                 axarr[1].axis("off")
