@@ -20,7 +20,7 @@ f2 = h5py.File(filename, 'r+')
 data_XRD = np.array(f2['sino_XRD'])
 
 ## Selecting which recons are to run
-FBP_recon = 'Truegit add dTV/myF'
+FBP_recon = 'True'
 TV_recon = 'True'
 dTV_recon = 'False'
 
