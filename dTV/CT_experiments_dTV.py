@@ -45,6 +45,9 @@ if FBP_recon:
     recon_XRF_FBP = recon_astra(sino_Co_1.T, center, angles=angle_array, num_iter=200)
     recon_XRD_FBP = recon_astra(sino_0_XRD.T, center, angles=angle_array, num_iter=200)
 
+    np.save('dTV/Results_CT_dTV/recon_XRF_FBP', recon_XRF_FBP)
+    np.save('dTV/Results_CT_dTV/recon_XRD_FBP', recon_XRD_FBP)
+
 
 ## TV-regularised reconstructions
 if TV_recon:
