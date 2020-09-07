@@ -1,6 +1,6 @@
 import numpy as np
 import odl
-import myOperators
+import dTV.myOperators
 from odl.solvers.functional.functional import Functional
 from odl.solvers import (GroupL1Norm, L2NormSquared, L1Norm, Huber)
 from odl.space.pspace import ProductSpace
@@ -9,9 +9,9 @@ from odl.operator.operator import Operator
 from odl.operator.default_ops import (IdentityOperator, 
                                       ConstantOperator, ZeroOperator)
 from odl.operator.tensor_ops import PointwiseInner
-import myDeform
+import dTV.myDeform
 
-from myAlgorithms import fgp_dual
+from dTV.myAlgorithms import fgp_dual
 
 ##################################################
 #################HELPER FUNCTIONS#################
@@ -342,7 +342,7 @@ class DataFitL2Disp(Functional):
         else:
             tangent_bundle = self.image_space.tangent_bundle
 
-        self.embedding = myOperators.Embedding_Affine(
+        self.embedding = dTV.myOperators.Embedding_Affine(
                 self.affine_space, tangent_bundle)
             
         super(DataFitL2Disp, self).__init__(space=space, linear=False,
@@ -360,10 +360,10 @@ class DataFitL2Disp(Functional):
         
         if isinstance(self.image_space, odl.ProductSpace):
             deform_op = odl.BroadcastOperator(
-                    myDeform.LinDeformFixedTempl(im[0]),
-                    myDeform.LinDeformFixedTempl(im[1]))
+                    dTV.myDeform.LinDeformFixedTempl(im[0]),
+                    dTV.myDeform.LinDeformFixedTempl(im[1]))
         else:
-            deform_op = myDeform.LinDeformFixedTempl(im)
+            deform_op = dTV.myDeform.LinDeformFixedTempl(im)
             
         return deform_op * self.embedding
     
@@ -371,7 +371,7 @@ class DataFitL2Disp(Functional):
     def transl_op_fixed_vf(self, disp):
                 
         # deform_op = myDeform.LinDeformFixedDisp(self.embedding(disp))
-        deform_op = myDeform.LinDeformFixedDispAffine(self.embedding(disp), disp)
+        deform_op = dTV.myDeform.LinDeformFixedDispAffine(self.embedding(disp), disp)
         
         if isinstance(self.image_space, odl.ProductSpace):
             deform_op = odl.DiagonalOperator(deform_op, len(self.image_space))
