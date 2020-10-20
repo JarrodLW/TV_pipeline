@@ -11,7 +11,7 @@ from Utils import *
 import dTV.myDeform.linearized as defs
 
 # high resolution H image
-fourier_H_real_im = np.reshape(np.fromfile('dTV/Results_MRI_dTV/fid_H', dtype=np.int32), (128, 256))
+fourier_H_real_im = np.reshape(np.fromfile('dTV/MRI_data/fid_H', dtype=np.int32), (128, 256))
 fourier_H_real = fourier_H_real_im[:, ::2]
 fourier_H_im = fourier_H_real_im[:, 1::2]
 fourier_H = fourier_H_real + fourier_H_im*1j
@@ -40,10 +40,10 @@ displ_image = defs.linear_deform(image_odl, image_space.tangent_bundle.element(d
 displ_image_odl = image_space.element(displ_image)
 displ_image_odl.show()
 
-# the given raw for for lower-resolution image
-f = open('dTV/Results_MRI_dTV/1H_lowRes_imaginaryRaw_noZeros', 'r')
+# the given raw data for for lower-resolution image
+f = open('dTV/MRI_data/1H_lowRes_imaginaryRaw_noZeros', 'r')
 fourier_data_im = np.genfromtxt(f, delimiter=' ').T
-f = open('dTV/Results_MRI_dTV/1H_lowRes_realRaw_noZeros', 'r')
+f = open('dTV/MRI_data/1H_lowRes_realRaw_noZeros', 'r')
 fourier_data_real = np.genfromtxt(f, delimiter=' ').T
 
 fourier_data = (fourier_data_real + fourier_data_im*1j)
@@ -126,6 +126,8 @@ if dTV_recon:
             dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = recon.tolist()
 
     json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/dTV_regularised_SR_32_to_128_with_regis.json', 'w'))
+
+exit()
 
 # plotting
 
