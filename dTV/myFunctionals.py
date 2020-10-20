@@ -10,6 +10,7 @@ from odl.operator.default_ops import (IdentityOperator,
                                       ConstantOperator, ZeroOperator)
 from odl.operator.tensor_ops import PointwiseInner
 import dTV.myDeform
+from odl.operator import PointwiseNorm
 
 from dTV.myAlgorithms import fgp_dual
 
@@ -416,3 +417,32 @@ class DataFitL2Disp(Functional):
     def gradient(self):
         return BroadcastOperator(*[self.partial_gradient(i) 
                                    for i in range(2)])
+
+
+
+def cross_gradient(im_1, im_2):
+    # takes two square numpy arrays, or equal sizes and computes the L2 normalised cross-gradient between the two
+
+    height, width = im_1.shape # add assert equals statement; arrays should be same size
+
+    domain = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1], shape=[height, width], dtype='float')
+    im_1_odl = domain.element(im_1)
+    im_2_odl = domain.element(im_2)
+
+    grad = odl.Gradient(domain, method='forward', pad_mode='symmetric')
+    grad_1 = grad(im_1_odl)
+    grad_2 = grad(im_2_odl)
+
+    pointwise_norm = PointwiseNorm(grad.range, 2)
+
+    pointwise_norm_1 = pointwise_norm(grad_1)
+    pointwise_norm_2 = pointwise_norm(grad_2)
+    inner = odl.operator.tensor_ops.PointwiseInner(grad.range, grad_1)(grad_2)
+
+
+    l2_norm = odl.solvers.functional.default_functionals.L2Norm(domain)
+
+    cross_grad = l2_norm(pointwise_norm_1*pointwise_norm_2)**2 - l2_norm(inner)**2
+
+    return cross_grad
+

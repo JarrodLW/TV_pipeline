@@ -20,15 +20,17 @@ f2 = h5py.File(filename, 'r+')
 data_XRD = np.array(f2['sino_XRD'])
 
 ## Selecting which recons are to run
-FBP_recon = 'True'
+FBP_recon = 'False'
 TV_recon = 'True'
 dTV_recon = 'False'
+plotting = 'False'
 
 ## pre-processing of data: cumulative sum of hits within specified freq range
 data_XRD_0 = data_XRD[:, :, :, 0]
 # summing over pixels
 plt.figure()
 plt.hist(np.sum(data_XRD_0, axis=(0, 1)), range=(0, 4000), bins=200)
+plt.title("Spectrum obtained by summing over pixels")
 plt.show()
 
 # we select the range 450-500, corresponding roughly to the second spectral peak
@@ -45,8 +47,8 @@ if FBP_recon:
     recon_XRF_FBP = recon_astra(sino_Co_1.T, center, angles=angle_array, num_iter=200)
     recon_XRD_FBP = recon_astra(sino_0_XRD.T, center, angles=angle_array, num_iter=200)
 
-    np.save('dTV/Results_CT_dTV/recon_XRF_FBP', recon_XRF_FBP)
-    np.save('dTV/Results_CT_dTV/recon_XRD_FBP', recon_XRD_FBP)
+    np.save('recon_XRF_FBP', recon_XRF_FBP)
+    np.save('recon_XRD_FBP', recon_XRD_FBP)
 
 
 ## TV-regularised reconstructions
@@ -58,7 +60,7 @@ if TV_recon:
     d_offset = 0
     d_width = 40
 
-    reg_params = [10.**(i-5) for i in np.arange(1)]
+    reg_params = [10.**(i-5) for i in np.arange(10)]
 
     TV_regularised_recons = {'XRF': {}, 'XRD': {}}
 
@@ -84,16 +86,24 @@ if TV_recon:
 if dTV_recon:
 
     gamma = 0.995
-    strong_cvx = 1e-2
+    #strong_cvx = 1e-2
+    #strong_cvx = 1e-1
     niter_prox = 20
-    niter = 50
+    #niter = 250
+    niter = 100
 
-    alphas = [100.]
-    etas = [0.01]
+    #strong_cvxs = [1e1, 1e0, 1e-1, 1e-2, 1e-3]
+    strong_cvxs = [1e-2]
+
+    #alphas = [10.**(i-5) for i in np.arange(4, 8)]
+    #etas = [10.**(-i) for i in np.arange(5)]
+    alphas = [10.**(-1)]
+    etas = [10.**(-4)]
 
     Yaff = odl.tensor_space(6)
 
     data = sino_0_XRD.T
+    #data = sino_Co_1.T
     height, width = data.shape
 
     image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20], shape=[561, 561], dtype='float')
@@ -108,7 +118,12 @@ if dTV_recon:
 
     data_odl = forward_op.range.element(data)
 
-    sinfo = image_space.element(recons_XRF[0])
+    # remembering to rotate so that orientations match
+    with open('dTV/Results_CT_dTV/TV_regularised_recons.json') as f:
+        d = json.load(f)
+
+    recon_XRF = np.asarray(d['XRF']['recon_param = 1.0e-02']).T[:, ::-1]
+    sinfo = image_space.element(recon_XRF)
     #sinfo = recons_XRF[0]
 
     # space of optimised variables
@@ -131,26 +146,79 @@ if dTV_recon:
     for alpha in alphas:
         dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)] = {}
         for eta in etas:
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = {}
+            for strong_cvx in strong_cvxs:
 
-            reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
-                                                                gamma=gamma, eta=eta, NonNeg=True, strong_convexity=strong_cvx,
-                                                                prox_options=prox_options)
+                reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
+                                                                    gamma=gamma, eta=eta, NonNeg=True, strong_convexity=strong_cvx,
+                                                                    prox_options=prox_options)
 
-            g = odl.solvers.SeparableSum(reg_im, reg_affine)
+                g = odl.solvers.SeparableSum(reg_im, reg_affine)
 
-            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True))
+                cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                      odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True))
 
-            L = [1, 1e+2]
-            ud_vars = [0]
+                L = [1, 1e+2]
+                ud_vars = [0]
 
-            # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
-            palm.run(niter)
+                # %%
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+                palm.run(niter)
 
-            recon = palm.x[0].asarray()
+                recon = palm.x[0].asarray()
 
-            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = recon
+                dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]['strong_cvx=' + '{:.1e}'.format(strong_cvx)] = recon.tolist()
 
-    hf = h5py.File('dTV_regularised_recons.h5', 'w')
+    json.dump(dTV_regularised_recons, open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json', 'w'))
+
+
+
+if plotting:
+
+    ## turning arrays into images
+    imaging_types = ['XRF', 'XRD']
+
+    for imaging_type in imaging_types:
+        for reg_param in reg_params:
+
+            recon = np.asarray(TV_regularised_recons[imaging_type]['recon_param = '+'{:.1e}'.format(reg_param)])
+
+            plt.figure()
+            plt.imshow(recon, cmap=plt.cm.gray)
+            plt.colorbar()
+            plt.axis('off')
+            plt.savefig('dTV/Results_CT_dTV/TV_'+imaging_type+'_reg_param_'+'{:.1e}'.format(reg_param)+'.png')
+            plt.close()
+
+
+
+    with open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json') as f:
+        d = json.load(f)
+
+    #fig, axs = plt.subplots(4, 5)
+
+    for i, alpha in enumerate(alphas):
+        for j, eta in enumerate(etas):
+            for k, strong_cvx in enumerate(strong_cvxs):
+
+
+            #dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]
+
+            axs[i, j].imshow(np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]).T[::-1, :], cmap=plt.cm.gray)
+            axs[i, j].axis("off")
+
+    plt.tight_layout(w_pad=0.1, rect=[0.2, 0, 0.2, 1])
+
+with open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json') as f:
+    d = json.load(f)
+
+plt.figure()
+
+for i, alpha in enumerate(alphas):
+    for j, eta in enumerate(etas):
+        for k, strong_cvx in enumerate(strong_cvxs):
+
+            plt.subplot(1,5,k+1)
+            plt.imshow(np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]['strong_cvx=' +'{:.1e}'.format(strong_cvx)]).T[::-1, :], cmap=plt.cm.gray)
+            plt.axis("off")

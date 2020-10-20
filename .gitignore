@@ -2,3 +2,6 @@
 __pycache__/
 venv/
 Rough_tests.py
+*.json
+*.hdf5
+.DS_Store

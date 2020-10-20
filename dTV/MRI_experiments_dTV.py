@@ -1,3 +1,6 @@
+## proof-of-concept experiments with Melanie and Pooja's original data as side info and a synthetic dataset
+
+
 import numpy as np
 
 #import sys
