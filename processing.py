@@ -14,7 +14,6 @@ from myOperators import RealFourierTransform, Complex2Real, Real2Complex
 from scipy.ndimage import interpolation
 from Utils import *
 
-
 class VariationalRegClass:
 
     # Decide on grid size. Should width be equal to number to pixels? Seems to be the case in MRI.
@@ -183,11 +182,13 @@ class VariationalRegClass:
                 RealToComplexOp = Real2Complex(self.image_space)
 
                 if self.reg_type == 'TGV': # x consists not only of the image reconstruction but also the auxiliary vector field
-                    recon = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
+                    #recon = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
                     #reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x[0].asarray()))
+                    recon = RealToComplexOp(x[0].asarray()).asarray()
                 else:
-                    recon = np.fft.fftshift(RealToComplexOp(x.asarray()))
+                    #recon = np.fft.fftshift(RealToComplexOp(x.asarray()))
                     #reconstructions[i, :, :] = np.fft.fftshift(RealToComplexOp(x.asarray()))
+                    recon = RealToComplexOp(x.asarray()).asarray()
 
             else:
                 if self.reg_type == 'TGV':  # x consists not only of the image reconstruction but also the auxiliary vector field
@@ -197,6 +198,8 @@ class VariationalRegClass:
                     recon = x.asarray()
                     #reconstructions[i, :, :] = x.asarray()
 
+            print(type(recon))
+            print(recon)
             # rotating the reconstructed image 90 degrees anticlockwise
             recon_rotated = recon.T[::-1, :]
             reconstructions[i, :, :] = recon_rotated

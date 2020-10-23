@@ -97,6 +97,7 @@ if dTV_recon:
     f = fctls.DataFitL2Disp(X, data_odl, forward_op)
 
     dTV_regularised_recons = {}
+    exp = 0
     for alpha in alphas:
         dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)] = {}
         for eta in etas:
@@ -107,23 +108,26 @@ if dTV_recon:
 
             g = odl.solvers.SeparableSum(reg_im, reg_affine)
 
-            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                  odl.solvers.CallbackShow(step=10))
+            # cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+            #       odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+            #       odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+            #       odl.solvers.CallbackShow(step=10))
 
             L = [1, 1e+2]
             # ud_vars = [0]
             ud_vars = [0, 1]
 
+            print('experiment '+str(exp))
             # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
             palm.run(niter)
 
             recon = palm.x[0].asarray()
             affine_params = palm.x[1].asarray()
 
             dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = recon.tolist()
+
+            exp+=1
 
     json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/dTV_regularised_SR_32_to_128_with_regis.json', 'w'))
 
@@ -141,16 +145,16 @@ plt.figure()
 plt.imshow(recon, cmap=plt.cm.gray)
 
 
-with open('dTV/Results_MRI_dTV/dTV_regularised_SR_32_to_64.json') as f:
+with open('dTV/Results_MRI_dTV/dTV_regularised_SR_32_to_128_with_regis.json') as f:
     d = json.load(f)
 
 fig, axs = plt.subplots(10, 6)
 
-l2_norm_sinfo = np.sum(image**2)
+#l2_norm_sinfo = np.sum(image**2)
 
 for j, eta in enumerate(etas):
     ssim_vals = []
-    for i, alpha in enumerate(alphas[:-1]):
+    for i, alpha in enumerate(alphas):
         # dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]
 
         recon = np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)])

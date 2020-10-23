@@ -435,9 +435,9 @@ synth_data = max_intens*np.exp(-forward_op(phantom))
 
 g = CTKullbackLeibler(forward_op.range, prior=synth_data, max_intens=max_intens)
 
-#f = odl.solvers.ZeroFunctional(image_space)
+f = odl.solvers.ZeroFunctional(image_space)
 #f = 0.1*odl.solvers.L2NormSquared(image_space)
-f = 0.1*odl.solvers.IndicatorNonnegativity(image_space)
+#f = 0.1*odl.solvers.IndicatorNonnegativity(image_space)
 x = image_space.zero()
 
 odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma)
