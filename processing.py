@@ -61,8 +61,10 @@ class VariationalRegClass:
 
             height = data_stack.shape[1]
             width = data_stack.shape[2]
-            complex_space = odl.uniform_discr(min_pt=[-width//2, -height//2], max_pt=[width//2, height//2],
-                                            shape=[height, width], dtype='complex')
+            #complex_space = odl.uniform_discr(min_pt=[-width//2, -height//2], max_pt=[width//2, height//2],
+            #                                shape=[height, width], dtype='complex')
+            complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                              shape=[height, width], dtype='complex')
             self.image_space = complex_space.real_space ** 2
             forward_op = RealFourierTransform(self.image_space)
 
@@ -153,6 +155,11 @@ class VariationalRegClass:
             # Make separable sum of functionals, order must be the same as in `op`
             g = odl.solvers.SeparableSum(l2_norm_squared, *reg_norms)
 
+            print(l2_norm_squared(data_odl))
+            naive_recon = forward_op.inverse(data_odl).asarray()
+            plt.imshow(np.abs(naive_recon[0]+naive_recon[1]*1j))
+            print(reg_norms[0](naive_recon))
+
             # --- Select solver parameters and solve using PDHG --- #
             # Estimated operator norm, add 10 percent to ensure ||K||_2^2 * sigma * tau < 1
             op_norm = 1.1 * odl.power_method_opnorm(op)
@@ -198,8 +205,6 @@ class VariationalRegClass:
                     recon = x.asarray()
                     #reconstructions[i, :, :] = x.asarray()
 
-            print(type(recon))
-            print(recon)
             # rotating the reconstructed image 90 degrees anticlockwise
             recon_rotated = recon.T[::-1, :]
             reconstructions[i, :, :] = recon_rotated

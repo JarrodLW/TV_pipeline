@@ -1,0 +1,12 @@
+##TITLE=Parameter List, ParaVision 6.0.1
+##JCAMPDX=4.24
+##DATATYPE=Parameter Values
+##ORIGIN=Bruker BioSpin MRI GmbH
+##OWNER=pxk
+$$ 2020-10-09 13:34:26.785 +0100  pxk@CZC7148FSD
+$$ /opt/PV6.0.1/data/pxk/20201009_104229_Li2So4_cap_opt_pjk_Li2So4_cap_opt_pjk_1_1/14/pdata/1/id
+$$ process /opt/PV6.0.1/prog/bin/parxserver
+##$DATASET_KEY=( 65 )
+<2.16.756.5.5.100.3278643094.37857.1602246866.688>
+##END=
+$$ File finished by PARX at 2020-10-09 13:34:26.785 +0100
