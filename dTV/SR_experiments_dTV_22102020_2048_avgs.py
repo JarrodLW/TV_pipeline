@@ -107,7 +107,7 @@ if dTV_recon:
                 ud_vars = [0, 1]
 
                 # %%
-                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
                 palm.run(niter)
 
                 recon = palm.x[0].asarray()
