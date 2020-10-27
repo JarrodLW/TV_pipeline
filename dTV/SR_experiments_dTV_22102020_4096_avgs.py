@@ -8,7 +8,7 @@ from processing import *
 from Utils import *
 import dTV.myDeform.linearized as defs
 
-dir = 'dTV/7Li_1H_MRI_Data_22102020/'
+dir = 'dTV/7LI_1H_MRI_Data_22102020/'
 
 image_H = np.reshape(np.fromfile(dir+'1mm_1H_high_res/2dseq', dtype=np.uint16), (128, 128))
 plt.figure()
