@@ -30,16 +30,15 @@ for avg in avgs:
 my_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier_coeffs[-1])))
 image = np.abs(my_recon)
 
-plt.figure()
-plt.imshow(image, cmap=plt.cm.gray)
+#plt.figure()
+#plt.imshow(image, cmap=plt.cm.gray)
 
-reg_types = ['TV']
-#reg_params = np.logspace(np.log10(2e3), np.log10(5e4), num=20)
-reg_params = [10000.]
+reg_types = ['TV', 'TGV']
+reg_params = np.logspace(np.log10(2e3), np.log10(1e7), num=20)
 
 output_dims = [int(64), int(128)]
-
-Li_fourier_coeffs = [Li_fourier_coeffs[-1]]
+#output_dims = [int(128)]
+#Li_fourier_coeffs = [Li_fourier_coeffs[-1]]
 
 regularised_recons = {}
 exp = 0
@@ -68,6 +67,3 @@ for i, Li_fourier in enumerate(Li_fourier_coeffs):
                     [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
 
 json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json', 'w'))
-
-
-
