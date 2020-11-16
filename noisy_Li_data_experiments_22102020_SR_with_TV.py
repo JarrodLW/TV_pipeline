@@ -67,11 +67,7 @@ for i, Li_fourier in enumerate(Li_fourier_coeffs):
                 regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + output_dim] = \
                     [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
 
-json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_finer_hyperparam_full_recon.json', 'w'))
+json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json', 'w'))
 
 
-with open('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_22102020_finer_hyperparam.json') as f:
-    d = json.load(f)
-
-dir_save = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
 
