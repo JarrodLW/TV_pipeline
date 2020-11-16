@@ -117,3 +117,62 @@ if dTV_recon:
                     = [recon.tolist(), affine_params.tolist()]
 
     json.dump(dTV_regularised_recons, open('dTV/dTV_regularised_SR_4096_avgs_22102020.json', 'w'))
+
+with open('dTV/Results_MRI_dTV/dTV_regularised_SR_4096_avgs_22102020.json') as f:
+    d = json.load(f)
+
+#dir2 = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
+
+loss_ratios = np.zeros((len(pixels), len(alphas), len(etas)))
+l2_dist_to_best = np.zeros((len(pixels), len(alphas), len(etas)))
+
+image_Li_TV_regularised = np.load('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_example.npy').T[:, ::-1]
+image_Li_TV_regularised /= np.sqrt(np.sum(np.square(image_Li_TV_regularised)))
+
+for k, pixel_num in enumerate(pixels):
+    d2 = d['32_to_' + pixel_num]
+
+    # redefining relevant functionals
+    forward_op = subsampling_ops[k]
+    sinfo = sinfos[k]
+    Yaff = odl.tensor_space(6)
+    X = odl.ProductSpace(forward_op.domain, Yaff)
+    f = fctls.DataFitL2Disp(X, data_odl, forward_op)
+
+    #image_Li_most_avgs = np.reshape(np.fromfile(dir + '1mm_7Li_8192_avgs/2dseq', dtype=np.uint16), (32, 32))
+    #image_Li_most_avgs_odl = coarse_image_space_2.element(image_Li_most_avgs)
+
+    fig, axs = plt.subplots(10, 6, figsize=(6, 10))
+
+    for j, eta in enumerate(etas):
+
+        reg_im_unit = fctls.directionalTotalVariationNonnegative(forward_op.domain, alpha=1, sinfo=sinfo,
+                                                                 gamma=gamma, eta=eta, NonNeg=True,
+                                                                 strong_convexity=strong_cvx,
+                                                                 prox_options=prox_options)
+
+        for i, alpha in enumerate(alphas):
+            # dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]
+
+            recon = np.asarray(d2['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][0])
+
+            dTV_loss = reg_im_unit(recon)
+            x = X.element([recon, X[1].zero()])
+            data_loss = f(x)
+            # x2 = X.element([sinfo, X[1].zero()])
+            # data_loss_2 = f(x2)
+
+            # print(data_loss/data_loss_2)
+            loss_ratios[k, i, j] = data_loss / dTV_loss
+
+            downsampled_recon = forward_op(forward_op.domain.element(recon)).asarray()
+            downsampled_recon /= np.sqrt(np.sum(np.square(downsampled_recon)))
+
+            dist_to_best = np.sum(np.square(downsampled_recon - image_Li_TV_regularised))
+            l2_dist_to_best[k, i, j] = dist_to_best
+
+            axs[i, j].imshow(recon.T[::-1, :], cmap=plt.cm.gray)
+            axs[i, j].axis("off")
+
+    fig.tight_layout(w_pad=0.4, h_pad=0.4)
+    plt.savefig(dir+"/SR_22102020_data_4096_avgs_32_to_"+pixel_num+".pdf")

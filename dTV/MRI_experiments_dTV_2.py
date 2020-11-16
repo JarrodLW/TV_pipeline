@@ -11,20 +11,21 @@ import dTV.myAlgorithms as algs
 import matplotlib.pyplot as plt
 import os
 import odl
-import dTV.myOperators as ops
+#import dTV.myOperators as ops
+import myOperators as ops
 from Utils import *
 from skimage.measure import block_reduce
 
-fourier_H_real_im = np.reshape(np.fromfile('dTV/Results_MRI_dTV/fid_H', dtype=np.int32), (128, 256))
+fourier_H_real_im = np.reshape(np.fromfile('dTV/MRI_data/fid_H', dtype=np.int32), (128, 256))
 
 # for some reason the fid_7 data comes padded: all even rows are zero and the first and 65-128th columns are zeros
 # once the zeros are removed, you get a 32x64 array that can then be unpacked into real-im parts as before
-fourier_Li_real_im_padded = np.reshape(np.fromfile('dTV/Results_MRI_dTV/fid_Li_actual', dtype=np.int32), (64, 128))
+fourier_Li_real_im_padded = np.reshape(np.fromfile('dTV/MRI_data/fid_Li_actual', dtype=np.int32), (64, 128))
 fourier_Li_real_im = fourier_Li_real_im_padded[:, 1:65]
 fourier_Li_real_im = fourier_Li_real_im[::2, :]
 
 # same for the low res H data
-fourier_H_low_res_real_im_padded = np.reshape(np.fromfile('dTV/Results_MRI_dTV/fid_H_low_res', dtype=np.int32), (64, 128))
+fourier_H_low_res_real_im_padded = np.reshape(np.fromfile('dTV/MRI_data/fid_H_low_res', dtype=np.int32), (64, 128))
 fourier_H_low_res_real_im = fourier_H_low_res_real_im_padded[:, 1:65]
 fourier_H_low_res_real_im = fourier_H_low_res_real_im[::2, :]
 
@@ -52,9 +53,9 @@ my_recon_Li_rotated = my_recon_Li.T[:, ::-1]
 my_recon_H_low_res_rotated = my_recon_H_low_res.T[:, ::-1]
 
 ### working instead with the unpacked raw data provided
-f = open('dTV/Results_MRI_dTV/1H_lowRes_imaginaryRaw_noZeros', 'r')
+f = open('dTV/MRI_data/1H_lowRes_imaginaryRaw_noZeros', 'r')
 fourier_data_im = np.genfromtxt(f, delimiter=' ').T
-f = open('dTV/Results_MRI_dTV/1H_lowRes_realRaw_noZeros', 'r')
+f = open('dTV/MRI_data/1H_lowRes_realRaw_noZeros', 'r')
 fourier_data_real = np.genfromtxt(f, delimiter=' ').T
 
 fourier_data = (fourier_data_real + fourier_data_im*1j)
@@ -99,8 +100,8 @@ niter = 150
 #alphas = [10. ** (i - 5) for i in np.arange(10)]
 #etas = [10. ** (-i) for i in np.arange(6)]
 
-alphas = [0.]
-etas = [1.]
+alphas = [0.00001]
+etas = [0.001]
 
 Yaff = odl.tensor_space(6)
 
@@ -139,20 +140,23 @@ for dict_key in sinfos.keys():
 
     subsampling_arr = np.zeros((height, width))
     subsampling_arr[height//2 - data_height//2: height//2 + data_height//2, width//2 - data_width//2: width//2 + data_width//2] = 1
+    subsampling_arr = np.fft.fftshift(subsampling_arr)
     subsampling_arr_doubled = np.array([subsampling_arr, subsampling_arr])
 
     forward_op = fourier_transf.range.element(subsampling_arr_doubled) * fourier_transf
 
-    sinfo = complex_space.real_space.element(sinfo)
+    #sinfo = complex_space.real_space.element(sinfo)
+
     padded_fourier_data_real = np.zeros((height, width))
-    padded_fourier_data_real[height//2 - data_height//2: height//2 + data_height//2,
-        width//2 - data_width//2: width//2 + data_width//2] = fourier_data_real
-
     padded_fourier_data_im = np.zeros((height, width))
-    padded_fourier_data_im[height // 2 - data_height // 2: height // 2 + data_height // 2,
-        width // 2 - data_width // 2: width // 2 + data_width // 2] = fourier_data_im
+    padded_fourier_data_real[height//2 - data_height//2: height//2
+                                                         + data_height//2, width//2 - data_width//2: width//2 + data_width//2]=fourier_data_real
 
-    data_odl = forward_op.range.element([padded_fourier_data_real, padded_fourier_data_im])
+    padded_fourier_data_im[height // 2 - data_height // 2: height // 2
+                                                             + data_height // 2, width // 2 - data_width // 2: width // 2 + data_width // 2] = fourier_data_im
+
+    data_odl = forward_op.range.element([np.fft.fftshift(padded_fourier_data_real), np.fft.fftshift(padded_fourier_data_im)])
+    #data_odl = forward_op.range.element([np.real(np.fft.fftshift(fourier_data)), np.imag(np.fft.fftshift(fourier_data))])
 
     # Set some parameters and the general TV prox options
     prox_options = {}
@@ -182,7 +186,7 @@ for dict_key in sinfos.keys():
                   odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True))
 
             L = [1, 1e+2]
-            ud_vars = [0]
+            ud_vars = [0, 1]
 
             # %%
             palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)

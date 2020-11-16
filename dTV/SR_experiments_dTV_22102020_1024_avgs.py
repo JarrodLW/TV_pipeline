@@ -12,7 +12,9 @@ dir = 'dTV/7LI_1H_MRI_Data_22102020/'
 
 image_H = np.reshape(np.fromfile(dir+'1mm_1H_high_res/2dseq', dtype=np.uint16), (128, 128))
 plt.figure()
-plt.imshow(image_H, cmap=plt.cm.gray)
+plt.imshow(image_H.T[::-1, :], cmap=plt.cm.gray)
+plt.axis("off")
+
 
 image_Li = np.reshape(np.fromfile(dir+'1mm_7Li_1024_avgs/2dseq', dtype=np.uint16), (32, 32))
 plt.figure()
@@ -117,3 +119,25 @@ if dTV_recon:
                     = [recon.tolist(), affine_params.tolist()]
 
     json.dump(dTV_regularised_recons, open('dTV/dTV_regularised_SR_1024_avgs_22102020.json', 'w'))
+
+with open('dTV/Results_MRI_dTV/dTV_regularised_SR_1024_avgs_22102020.json') as f:
+    d = json.load(f)
+
+dir = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
+
+for pixel_num in pixels:
+    d2 = d['32_to_'+pixel_num]
+
+    fig, axs = plt.subplots(10, 6, figsize=(6, 10))
+
+    for j, eta in enumerate(etas):
+        for i, alpha in enumerate(alphas):
+            # dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]
+
+            recon = np.asarray(d2['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][0])
+
+            axs[i, j].imshow(recon.T[::-1, :], cmap=plt.cm.gray)
+            axs[i, j].axis("off")
+
+    fig.tight_layout(w_pad=0.4, h_pad=0.4)
+    plt.savefig(dir+"/SR_22102020_data_1024_avgs_32_to_"+pixel_num+".pdf")

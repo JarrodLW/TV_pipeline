@@ -1,5 +1,5 @@
 # created 02/10/20
-# Aim: process noisy Li data resulting from relatively few averages
+# Aim: process noisy Li data resulting from relatively few averages, using TV and TGV
 
 import numpy as np
 import matplotlib.pyplot as plt

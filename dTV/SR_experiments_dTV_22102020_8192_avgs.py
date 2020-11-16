@@ -7,6 +7,7 @@ import dTV.myAlgorithms as algs
 from processing import *
 from Utils import *
 import dTV.myDeform.linearized as defs
+from time import time
 
 dir = 'dTV/7LI_1H_MRI_Data_22102020/'
 
@@ -39,8 +40,11 @@ downsampled_image_H_2_odl.show()
 
 image_Li_odl = coarse_image_space_2.element(image_Li)
 
-subsampling_ops = [odl.operator.default_ops.IdentityOperator(coarse_image_space_2), subsampling_op_3, subsampling_op_2]
-sinfos = [downsampled_image_H_2_odl, downsampled_image_H_1_odl, image_H_odl]
+#subsampling_ops = [odl.operator.default_ops.IdentityOperator(coarse_image_space_2), subsampling_op_3, subsampling_op_2]
+#sinfos = [downsampled_image_H_2_odl, downsampled_image_H_1_odl, image_H_odl]
+
+subsampling_ops = [subsampling_op_2]
+sinfos = [image_H_odl]
 
 # running dTV
 dTV_recon = True
@@ -51,15 +55,17 @@ if dTV_recon:
     gamma = 0.995
     strong_cvx = 1e-5
     niter_prox = 20
-    niter = 2000
+    niter = 500
 
     alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
     etas = [10.**(-i) for i in np.arange(6)]
-    #alphas = [10**4]
-    #etas = [10**(-5)]
+
+    #alphas = [10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
+    #etas = [1e-2, 1e-3, 1e-4]
 
     dTV_regularised_recons = {}
     pixels = ['32', '64', '128']
+    #pixels = ['128']
     for i in range(len(sinfos)):
         dTV_regularised_recons['32_to_'+pixels[i]] = {}
 
@@ -88,9 +94,12 @@ if dTV_recon:
 
         f = fctls.DataFitL2Disp(X, data_odl, forward_op)
 
+        j = 0
         for alpha in alphas:
             dTV_regularised_recons['32_to_'+pixels[i]]['alpha=' + '{:.1e}'.format(alpha)] = {}
             for eta in etas:
+                print('experiment ' + str(j))
+                j += 1
 
                 reg_im = fctls.directionalTotalVariationNonnegative(forward_op.domain, alpha=alpha, sinfo=sinfo,
                                                                     gamma=gamma, eta=eta, NonNeg=True, strong_convexity=strong_cvx,
@@ -107,8 +116,10 @@ if dTV_recon:
                 ud_vars = [0, 1]
 
                 # %%
+                start = time()
                 palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
                 palm.run(niter)
+                print('time='+str(time()-start))
 
                 recon = palm.x[0].asarray()
                 affine_params = palm.x[1].asarray()
@@ -116,10 +127,57 @@ if dTV_recon:
                 dTV_regularised_recons['32_to_'+pixels[i]]['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] \
                     = [recon.tolist(), affine_params.tolist()]
 
-    json.dump(dTV_regularised_recons, open('dTV/dTV_regularised_SR_8192_avgs_22102020.json', 'w'))
+    json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/dTV_regularised_SR_8192_avgs_22102020.json', 'w'))
 
-# with open('dTV/Results_MRI_dTV/dTV_regularised_SR_8192_avgs_22102020.json') as f:
-#     d = json.load(f)
+with open('dTV/Results_MRI_dTV/dTV_regularised_SR_8192_avgs_22102020.json') as f:
+    d = json.load(f)
+
+dir = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
+
+loss_ratios = np.zeros((len(pixels), len(alphas), len(etas)))
+
+for k, pixel_num in enumerate(pixels):
+    d2 = d['32_to_'+pixel_num]
+
+    # redefining relevant functionals
+    forward_op = subsampling_ops[k]
+    sinfo = sinfos[k]
+    Yaff = odl.tensor_space(6)
+    X = odl.ProductSpace(forward_op.domain, Yaff)
+    f = fctls.DataFitL2Disp(X, data_odl, forward_op)
+
+
+    fig, axs = plt.subplots(10, 6, figsize=(6, 10))
+
+    for j, eta in enumerate(etas):
+
+        reg_im_unit = fctls.directionalTotalVariationNonnegative(forward_op.domain, alpha=1, sinfo=sinfo,
+                                                                 gamma=gamma, eta=eta, NonNeg=True,
+                                                                 strong_convexity=strong_cvx,
+                                                                 prox_options=prox_options)
+
+        for i, alpha in enumerate(alphas):
+            # dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]
+
+            recon = np.asarray(d2['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][0])
+
+            dTV_loss = reg_im_unit(recon)
+            x = X.element([recon, X[1].zero()])
+            data_loss = f(x)
+            #x2 = X.element([sinfo, X[1].zero()])
+            #data_loss_2 = f(x2)
+
+            #print(data_loss/data_loss_2)
+            loss_ratios[k, i, j] = data_loss/dTV_loss
+
+            axs[i, j].imshow(recon.T[::-1, :], cmap=plt.cm.gray)
+            axs[i, j].axis("off")
+
+    fig.tight_layout(w_pad=0.4, h_pad=0.4)
+    plt.savefig(dir+"/SR_22102020_data_8192_avgs_32_to_"+pixel_num+".pdf")
+    #plt.figure()
+
+
 #
 # d2 = d['32_to_32']
 # d3 = d2['alpha=1.0e+04']

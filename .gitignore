@@ -5,3 +5,8 @@ Rough_tests.py
 *.json
 *.hdf5
 .DS_Store
+*.pdf
+*.tif
+*.png
+*.npy
+Temp_data_manipulation/

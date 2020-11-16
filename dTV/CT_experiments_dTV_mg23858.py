@@ -41,30 +41,87 @@ for i in range(31):
 
     sino_XRD[:, i] = sino_XRD_single_proj
 
-plt.figure()
-plt.imshow(sino_Co_1, cmap=plt.cm.gray, aspect=0.1)
-plt.colorbar()
+# plt.figure()
+# plt.imshow(sino_Co_1, cmap=plt.cm.gray, aspect=0.1)
+# plt.colorbar()
+#
+# plt.figure()
+# plt.imshow(sino_XRD, cmap=plt.cm.gray, aspect=0.1, vmin=2.5, vmax=3.2)
+# plt.colorbar()
+#
+# plt.figure()
+# plt.hist(sino_Co_1.tolist(), range=(0, 7000), bins=20)
+#
+# plt.figure()
+# plt.hist(sino_XRD.tolist(), range=(0, 18), bins=20)
+#
+# plt.figure()
+# plt.imshow(sino_XRD>2.7, cmap=plt.cm.gray, aspect=0.1)
+#
+# plt.figure()
+# plt.imshow(sino_XRD>5, cmap=plt.cm.gray, aspect=0.1)
+
+# reconstructions using FBP
+height=width=230
+image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20],
+                                            shape=[height, width], dtype='float')
+
+a_offset = 0
+a_range = np.pi
+d_offset = 0
+d_width = 40
+
+# Make a parallel beam geometry with flat detector
+angle_partition = odl.uniform_partition(a_offset, a_offset+a_range, 31)
+# Detector: uniformly sampled
+detector_partition = odl.uniform_partition(d_offset-d_width/2, d_offset+d_width/2, width)
+geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
+
+forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
+FBP = odl.tomo.fbp_op(forward_op)
+
+recon_XRF = FBP(forward_op.range.element(sino_Co_1.T))
+recon_XRD = FBP(forward_op.range.element(sino_XRD.T))
 
 plt.figure()
-plt.imshow(sino_XRD, cmap=plt.cm.gray, aspect=0.1, vmin=2.5, vmax=3.2)
-plt.colorbar()
+plt.imshow(recon_XRF)
 
 plt.figure()
-plt.hist(sino_Co_1.tolist(), range=(0, 7000), bins=20)
+plt.imshow(recon_XRD, cmap=plt.cm.gray)
 
-plt.figure()
-plt.hist(sino_XRD.tolist(), range=(0, 18), bins=20)
+# pdhg using new functional
+from odl_implementation_CT_KL import CTKullbackLeibler
 
-plt.figure()
-plt.imshow(sino_XRD>2.7, cmap=plt.cm.gray, aspect=0.1)
+max_intens = 1.
+beta = 0.05
+data = max_intens*np.exp(-beta*forward_op.range.element(sino_XRD.T))
+#data_odl = forward_op.range(data)
 
-plt.figure()
-plt.imshow(sino_XRD>5, cmap=plt.cm.gray, aspect=0.1)
+op_norm = 1.1 * odl.power_method_opnorm(forward_op)
+tau = 1.0 / op_norm  # Step size for the primal variable
+sigma = 1.0 / op_norm  # Step size for the dual variable
+niter = 200
 
+g = CTKullbackLeibler(forward_op.range, prior=data, max_intens=max_intens)
+
+#f = odl.solvers.ZeroFunctional(image_space)
+f = 0.01*odl.solvers.L2NormSquared(image_space)
+#f = odl.solvers.IndicatorNonnegativity(image_space)
+x = image_space.zero()
+
+cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                      odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                      odl.solvers.CallbackShow(step=10))
+
+odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma, callback=cb)
+
+## TV recon
 
 TV_recon = "True"
 
 subsampling_arr=(sino_XRD>5)*np.ones(sino_XRD.shape)
+
 
 ## TV-regularised reconstructions
 if TV_recon:
