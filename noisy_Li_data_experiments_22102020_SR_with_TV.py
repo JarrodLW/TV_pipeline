@@ -62,7 +62,7 @@ for i, Li_fourier in enumerate(Li_fourier_coeffs):
                 subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
                 subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
-                recons_bernoulli = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=1000)
+                recons_bernoulli = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
                 regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
                     [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
 
