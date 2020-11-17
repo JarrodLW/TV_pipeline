@@ -1,49 +1,42 @@
-# created 02/11/2020
-# based on "MRI_experiments_dTV_2.py"
+# created on 16/11/2020. Based on "SR_experiments_dTV_ _avgs.py" file and "Inverse_problem_dTV_22102020"
 
-import h5py
 import numpy as np
+import matplotlib.pyplot as plt
+import json
+import dTV.myOperators as ops
 import dTV.myFunctionals as fctls
 import dTV.myAlgorithms as algs
-import json
-import dTV.myAlgorithms as algs
-import matplotlib.pyplot as plt
-import os
-import odl
-#import dTV.myOperators as ops
-import myOperators as ops
+from processing import *
 from Utils import *
+import dTV.myDeform.linearized as defs
 from skimage.measure import block_reduce
 
-dir = 'dTV/7Li_1H_MRI_Data_22102020/'
-
-avgs = ['512', '1024', '2048', '4096', '8192']
-Li_fourier_coeffs = []
+dir = 'dTV/7LI_1H_MRI_Data_22102020/'
 
 image_H = np.reshape(np.fromfile(dir+'1mm_1H_high_res/2dseq', dtype=np.uint16), (128, 128))
+#plt.figure()
+#plt.imshow(image_H, cmap=plt.cm.gray)
 
-for avg in avgs:
-    # files from Bearshare folder, labelled 7Li_Axial_512averages_1mmslicethickness etc.
-    fourier_Li_real_im_padded = np.reshape(np.fromfile(dir + '1mm_7Li_'+avg+'_avgs/fid', dtype=np.int32), (64, 128))
-    fourier_Li_real_im = fourier_Li_real_im_padded[:, 1:65]
-    #fourier_Li_real_im = fourier_Li_real_im_padded[:, 5:69]
-    fourier_Li_real_im = fourier_Li_real_im[::2, :]
+#image_Li = np.reshape(np.fromfile(dir+'1mm_7Li_512_avgs/2dseq', dtype=np.uint16), (32, 32))
+#plt.figure()
+#plt.imshow(image_Li, cmap=plt.cm.gray)
 
-    fourier_Li_real = fourier_Li_real_im[:, 1::2]
-    fourier_Li_im = fourier_Li_real_im[:, ::2]
-    fourier_Li = fourier_Li_real + fourier_Li_im*1j
-    Li_fourier_coeffs.append(fourier_Li)
+# files from Bearshare folder, labelled 7Li_Axial_512averages_1mmslicethickness etc.
+fourier_Li_real_im_padded = np.reshape(np.fromfile(dir + '1mm_7Li_8192_avgs/fid', dtype=np.int32), (64, 128))
+fourier_Li_real_im = fourier_Li_real_im_padded[:, 1:65]
+fourier_Li_real_im = fourier_Li_real_im[::2, :]
 
-fourier_data_real = np.real(Li_fourier_coeffs[-1])
-fourier_data_im = np.imag(Li_fourier_coeffs[-1])
+fourier_data_real = fourier_Li_real_im[:, 1::2]
+fourier_data_im = fourier_Li_real_im[:, ::2]
+fourier_Li = fourier_Li_real + fourier_Li_im*1j
 
 gamma = 0.995
 strong_cvx = 1e-2
 niter_prox = 20
-niter = 150
+niter = 500
 
-alphas = [1000]
-etas = [0.001]
+alphas = [10000.]
+etas = [0.01]
 
 Yaff = odl.tensor_space(6)
 
@@ -52,12 +45,12 @@ sinfo_med_res = block_reduce(sinfo_high_res, block_size=(2, 2), func=np.mean)
 sinfo_low_res = block_reduce(sinfo_high_res, block_size=(4, 4), func=np.mean)
 
 sinfos = {}
-sinfos['high_res'] = sinfo_high_res
-#sinfos['med_res'] = sinfo_med_res
+#sinfos['high_res'] = sinfo_high_res
+sinfos['med_res'] = sinfo_med_res
 #sinfos['low_res'] = sinfo_low_res
 
-#fourier_data_real = np.random.normal(-2000, 1e4, size=fourier_data_real.shape)
-#fourier_data_im = np.random.normal(600, 1e4, size=fourier_data_im.shape)
+# running dTV
+dTV_recon = True
 
 for dict_key in sinfos.keys():
 
@@ -135,34 +128,7 @@ for dict_key in sinfos.keys():
             recon = palm.x[0].asarray()
 
 
-# fourier_rec_odl = fourier_transf.inverse(data_odl).asarray()
-# fourier_rec_odl = fourier_rec_odl[0] + 1j*fourier_rec_odl[1]
-# plt.figure()
-# plt.imshow(np.abs(fourier_rec_odl), cmap=plt.cm.gray)
-#
-# fourier_rec = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(fourier_data_real + 1j*fourier_data_im)))
-# plt.figure()
-# plt.imshow(np.abs(fourier_rec), cmap=plt.cm.gray)
-#
-# fourier_rec_odl_norm = np.sqrt(np.sum(np.square(np.abs(fourier_rec_odl))))
-# fourier_rec_norm = np.sqrt(np.sum(np.square(np.abs(fourier_rec))))
-#
-# np.sum(np.square((np.abs(fourier_rec_odl)/fourier_rec_odl_norm) - (np.abs(fourier_rec)/fourier_rec_norm)))
-#
-# plt.figure()
-# plt.imshow(sinfo_low_res, cmap=plt.cm.gray)
-#
-# plt.figure()
-# plt.imshow(image_H.T)
-#
-# plt.figure()
-# plt.imshow(sinfo)
-#
-# fourier_data = fourier_data_real + 1j*fourier_data_im
-# plt.imshow(np.abs(fourier_data), cmap=plt.cm.gray)
-#
-# plt.figure()
-# plt.imshow(fourier_data_real, cmap=plt.cm.gray)
-#
-# plt.figure()
-# plt.imshow(fourier_data_im, cmap=plt.cm.gray)
+with open('dTV/Results_MRI_dTV/dTV_regularised_SR_8192_avgs_22102020.json') as f:
+    d = json.load(f)
+
+d2 = d['32_to_64']

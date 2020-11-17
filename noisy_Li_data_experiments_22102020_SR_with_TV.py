@@ -67,3 +67,27 @@ for i, Li_fourier in enumerate(Li_fourier_coeffs):
                     [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
 
 json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json', 'w'))
+
+with open('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_22102020_finer_hyperparam.json') as f:
+    d = json.load(f)
+
+#dir_save = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
+
+for avg in avgs:
+    d2 = d['avgs='+avg]
+    for reg_type in reg_types:
+        d3 = d2['reg_type='+reg_type]
+
+        fig, axs = plt.subplots(4, 5, figsize=(5, 4))
+        for output_dim in output_dims:
+            for i, reg_param in enumerate(reg_params):
+                d4 = d3['reg_param='+'{:.1e}'.format(reg_param)]
+                recon = np.asarray(d4['output_size=' + str(output_dim)]).astype('float64')
+
+                recon_rotated_flipped = recon[:, ::-1].T[:, ::-1]
+
+                axs[i//5, i % 5].imshow(recon_rotated_flipped, cmap=plt.cm.gray)
+                axs[i//5, i % 5].axis("off")
+
+            fig.tight_layout(w_pad=0.4, h_pad=0.4)
+            plt.savefig("'dTV/Results_MRI_dTV/SR_with_TV_22102020_data_8192_avgs_32_to_" + str(output_dim) + ".pdf")
