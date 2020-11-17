@@ -90,10 +90,11 @@ if plot_results:
                 for i, reg_param in enumerate(reg_params):
                     d4 = d3['reg_param='+'{:.1e}'.format(reg_param)]
                     recon = np.asarray(d4['output_size=' + str(output_dim)]).astype('float64')
+                    image = np.abs(recon[0] + 1j*recon[1])
 
-                    recon_rotated_flipped = recon[:, ::-1].T[:, ::-1]
+                    image_rotated_flipped = image[:, ::-1].T[:, ::-1]
 
-                    axs[i//5, i % 5].imshow(recon_rotated_flipped, cmap=plt.cm.gray)
+                    axs[i//5, i % 5].imshow(image_rotated_flipped, cmap=plt.cm.gray)
                     axs[i//5, i % 5].axis("off")
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
