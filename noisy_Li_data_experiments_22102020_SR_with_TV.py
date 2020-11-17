@@ -40,54 +40,61 @@ output_dims = [int(64), int(128)]
 #output_dims = [int(128)]
 #Li_fourier_coeffs = [Li_fourier_coeffs[-1]]
 
-regularised_recons = {}
-exp = 0
-for i, Li_fourier in enumerate(Li_fourier_coeffs):
-    regularised_recons['avgs=' + str(avgs[i])] = {}
-    for reg_type in reg_types:
-        regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type] = {}
-        model = VariationalRegClass('MRI', reg_type)
-        for reg_param in reg_params:
-            regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type][
-                'reg_param=' + '{:.1e}'.format(reg_param)] = {}
+run_exp = False
+plot_results = True
+
+if run_exp:
+
+    regularised_recons = {}
+    exp = 0
+    for i, Li_fourier in enumerate(Li_fourier_coeffs):
+        regularised_recons['avgs=' + str(avgs[i])] = {}
+        for reg_type in reg_types:
+            regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type] = {}
+            model = VariationalRegClass('MRI', reg_type)
+            for reg_param in reg_params:
+                regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type][
+                    'reg_param=' + '{:.1e}'.format(reg_param)] = {}
+                for output_dim in output_dims:
+
+                    print("Experiment_" + str(exp))
+                    exp+=1
+
+                    data = np.zeros((output_dim, output_dim), dtype='complex')
+                    data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
+                    data = np.fft.fftshift(data)
+                    subsampling_matrix = np.zeros((output_dim, output_dim))
+                    subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
+                    subsampling_matrix = np.fft.fftshift(subsampling_matrix)
+
+                    recons_bernoulli = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
+                    regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
+                        [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
+
+    json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json', 'w'))
+
+if plot_results:
+
+    with open('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_22102020_finer_hyperparam.json') as f:
+        d = json.load(f)
+
+    #dir_save = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
+
+    for avg in avgs:
+        d2 = d['avgs='+avg]
+        for reg_type in reg_types:
+            d3 = d2['reg_type='+reg_type]
+
+            fig, axs = plt.subplots(4, 5, figsize=(5, 4))
             for output_dim in output_dims:
+                for i, reg_param in enumerate(reg_params):
+                    d4 = d3['reg_param='+'{:.1e}'.format(reg_param)]
+                    recon = np.asarray(d4['output_size=' + str(output_dim)]).astype('float64')
 
-                print("Experiment_" + str(exp))
-                exp+=1
+                    recon_rotated_flipped = recon[:, ::-1].T[:, ::-1]
 
-                data = np.zeros((output_dim, output_dim), dtype='complex')
-                data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
-                data = np.fft.fftshift(data)
-                subsampling_matrix = np.zeros((output_dim, output_dim))
-                subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
-                subsampling_matrix = np.fft.fftshift(subsampling_matrix)
+                    axs[i//5, i % 5].imshow(recon_rotated_flipped, cmap=plt.cm.gray)
+                    axs[i//5, i % 5].axis("off")
 
-                recons_bernoulli = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
-                regularised_recons['avgs=' + str(avgs[i])]['reg_type=' + reg_type]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
-                    [np.real(recons_bernoulli[0]).tolist(), np.imag(recons_bernoulli[0]).tolist()]
-
-json.dump(regularised_recons, open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json', 'w'))
-
-with open('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_22102020_finer_hyperparam.json') as f:
-    d = json.load(f)
-
-#dir_save = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
-
-for avg in avgs:
-    d2 = d['avgs='+avg]
-    for reg_type in reg_types:
-        d3 = d2['reg_type='+reg_type]
-
-        fig, axs = plt.subplots(4, 5, figsize=(5, 4))
-        for output_dim in output_dims:
-            for i, reg_param in enumerate(reg_params):
-                d4 = d3['reg_param='+'{:.1e}'.format(reg_param)]
-                recon = np.asarray(d4['output_size=' + str(output_dim)]).astype('float64')
-
-                recon_rotated_flipped = recon[:, ::-1].T[:, ::-1]
-
-                axs[i//5, i % 5].imshow(recon_rotated_flipped, cmap=plt.cm.gray)
-                axs[i//5, i % 5].axis("off")
-
-            fig.tight_layout(w_pad=0.4, h_pad=0.4)
-            plt.savefig("'dTV/Results_MRI_dTV/SR_with_TV_22102020_data_8192_avgs_32_to_" + str(output_dim) + ".pdf")
+                fig.tight_layout(w_pad=0.4, h_pad=0.4)
+                plt.savefig("'dTV/Results_MRI_dTV/SR_with_TV_22102020_data_8192_avgs_32_to_" + str(output_dim) + ".pdf")
