@@ -75,7 +75,7 @@ if run_exp:
 
 if plot_results:
 
-    with open('dTV/Results_MRI_dTV/TV_TGV_recons_multiple_avgs_22102020_finer_hyperparam.json') as f:
+    with open('dTV/Results_MRI_dTV/TV_recons_multiple_avgs_22102020_SR.json') as f:
         d = json.load(f)
 
     #dir_save = '/Users/jlw31/Desktop/Presentations:Reports/dTV results/Applications_of_dTV'
