@@ -98,4 +98,4 @@ if plot_results:
                     axs[i//5, i % 5].axis("off")
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig("'dTV/Results_MRI_dTV/SR_with_TV_22102020_data_8192_avgs_32_to_" + str(output_dim) + ".pdf")
+                plt.savefig("dTV/Results_MRI_dTV/SR_with_TV_22102020_data_8192_avgs_32_to_" + str(output_dim) + ".pdf")
