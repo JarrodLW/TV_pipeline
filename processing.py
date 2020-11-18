@@ -155,10 +155,10 @@ class VariationalRegClass:
             # Make separable sum of functionals, order must be the same as in `op`
             g = odl.solvers.SeparableSum(l2_norm_squared, *reg_norms)
 
-            print(l2_norm_squared(data_odl))
-            naive_recon = forward_op.inverse(data_odl).asarray()
-            plt.imshow(np.abs(naive_recon[0]+naive_recon[1]*1j))
-            print(reg_norms[0](naive_recon))
+            # print(l2_norm_squared(data_odl))
+            # naive_recon = forward_op.inverse(data_odl).asarray()
+            # plt.imshow(np.abs(naive_recon[0]+naive_recon[1]*1j))
+            # print(reg_norms[0](naive_recon))
 
             # --- Select solver parameters and solve using PDHG --- #
             # Estimated operator norm, add 10 percent to ensure ||K||_2^2 * sigma * tau < 1

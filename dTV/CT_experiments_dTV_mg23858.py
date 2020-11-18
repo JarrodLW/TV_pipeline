@@ -41,6 +41,8 @@ for i in range(31):
 
     sino_XRD[:, i] = sino_XRD_single_proj
 
+plt.hist(sino_XRD)
+
 # plt.figure()
 # plt.imshow(sino_Co_1, cmap=plt.cm.gray, aspect=0.1)
 # plt.colorbar()
@@ -120,7 +122,7 @@ odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma, callbac
 
 TV_recon = "True"
 
-subsampling_arr=(sino_XRD>5)*np.ones(sino_XRD.shape)
+subsampling_arr=(sino_XRD>4)*np.ones(sino_XRD.shape)
 
 
 ## TV-regularised reconstructions
