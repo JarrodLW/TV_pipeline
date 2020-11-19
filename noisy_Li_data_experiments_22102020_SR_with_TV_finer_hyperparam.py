@@ -40,8 +40,8 @@ output_dims = [int(64), int(128)]
 #output_dims = [int(128)]
 #Li_fourier_coeffs = [Li_fourier_coeffs[-1]]
 
-run_exp = True
-plot_results = False
+run_exp = False
+plot_results = True
 
 if run_exp:
 
@@ -98,4 +98,4 @@ if plot_results:
                     axs[i//5, i % 5].axis("off")
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig("dTV/Results_MRI_dTV/SR_with_"+ reg_type +"_22102020_data_" + avg + "_avgs_32_to_" + str(output_dim) + ".pdf")
+                plt.savefig("dTV/Results_MRI_dTV/SR_with_"+ reg_type +"_22102020_data_" + avg + "_avgs_32_to_" + str(output_dim) + "finer_hyperparam.pdf")

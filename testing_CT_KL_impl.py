@@ -4,6 +4,7 @@ from odl.operator import Operator
 import numpy as np
 from odl_implementation_CT_KL import CTKullbackLeibler
 from processing import *
+import json
 
 height=width=100
 image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20],
@@ -73,21 +74,71 @@ odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma)
 # using new functional + TV
 G = odl.Gradient(image_space)
 op = odl.BroadcastOperator(forward_op, G)
-reg_param = 1.
-g = odl.solvers.SeparableSum(CTKullbackLeibler(forward_op.range, prior=noisy_synth_data, max_intens=max_intens), reg_param * odl.solvers.GroupL1Norm(G.range))
-x = image_space.zero()
 f = odl.solvers.IndicatorNonnegativity(image_space)
 
-odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma)
+reg_params = np.linspace(0.05, 1., num=20).tolist()
+regularised_recons = {}
+exp = 0
 
-# original TV
+for reg_param in reg_params:
+
+    print("CTKL experiment"+str(exp))
+
+    g = odl.solvers.SeparableSum(CTKullbackLeibler(forward_op.range, prior=noisy_synth_data, max_intens=max_intens), reg_param * odl.solvers.GroupL1Norm(G.range))
+    x = image_space.zero()
+
+    odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma)
+    regularised_recons['reg_param=' + '{:.1e}'.format(reg_param)] = x.asarray().tolist()
+
+    exp+=1
+
+json.dump(regularised_recons, open('dTV/Results_CT_dTV/TV_CTKL_phantom.json', 'w'))
+
+# TV with L2 data fidelity
 model = VariationalRegClass('CT', 'TV')
-reg_param = 2.
-recons = model.regularised_recons_from_subsampled_data(log_data.asarray(), reg_param, recon_dims=phantom.shape,
-                                                                      niter=1000, a_offset=a_offset, enforce_positivity=True,
-                                                                      a_range=a_range, d_offset=d_offset, d_width=d_width)
+
+reg_params = np.linspace(1., 10., num=20).tolist()
+regularised_recons = {}
+exp = 0
+
+for reg_param in reg_params:
+
+    print("L2 experiment" + str(exp))
+
+    recons = model.regularised_recons_from_subsampled_data(log_data.asarray(), reg_param, recon_dims=phantom.shape,
+                                                                          niter=1000, a_offset=a_offset, enforce_positivity=True,
+                                                                          a_range=a_range, d_offset=d_offset, d_width=d_width)
+
+    regularised_recons['reg_param=' + '{:.1e}'.format(reg_param)] = recons[0].tolist()
+
+    exp+=1
+
+json.dump(regularised_recons, open('dTV/Results_CT_dTV/TV_L2_phantom.json', 'w'))
 
 
+with open('dTV/Results_CT_dTV/TV_CTKL_phantom.json') as f:
+    d = json.load(f)
+
+fig, axs = plt.subplots(4, 5, figsize=(5, 4))
+reg_params = np.linspace(0.05, 1., num=20).tolist()
+
+for i, reg_param in enumerate(reg_params):
+
+    recon = np.asarray(d['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+    axs[i//5, i % 5].imshow(recon.T[::-1 ,:], cmap=plt.cm.gray)
+    axs[i//5, i % 5].axis("off")
+
+with open('dTV/Results_CT_dTV/TV_L2_phantom.json') as f:
+    d = json.load(f)
+
+fig, axs = plt.subplots(4, 5, figsize=(5, 4))
+reg_params = np.linspace(1., 10., num=20).tolist()
+
+for i, reg_param in enumerate(reg_params):
+
+    recon = np.asarray(d['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+    axs[i//5, i % 5].imshow(recon, cmap=plt.cm.gray)
+    axs[i//5, i % 5].axis("off")
 
 log_data.show()
 synth_data.show()
