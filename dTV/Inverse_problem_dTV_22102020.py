@@ -34,16 +34,19 @@ for avg in avgs:
     fourier_Li = fourier_Li_real + fourier_Li_im*1j
     Li_fourier_coeffs.append(fourier_Li)
 
-fourier_data_real = np.real(Li_fourier_coeffs[-1])
-fourier_data_im = np.imag(Li_fourier_coeffs[-1])
+fourier_data_real = np.real(Li_fourier_coeffs[2])
+fourier_data_im = np.imag(Li_fourier_coeffs[2])
+
+naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(fourier_data_real+1j*fourier_data_im)))
 
 gamma = 0.995
 strong_cvx = 1e-2
 niter_prox = 20
 niter = 150
 
-alphas = [1000]
-etas = [0.001]
+
+alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
+etas = [0.01]
 
 Yaff = odl.tensor_space(6)
 
@@ -52,8 +55,8 @@ sinfo_med_res = block_reduce(sinfo_high_res, block_size=(2, 2), func=np.mean)
 sinfo_low_res = block_reduce(sinfo_high_res, block_size=(4, 4), func=np.mean)
 
 sinfos = {}
-sinfos['high_res'] = sinfo_high_res
-#sinfos['med_res'] = sinfo_med_res
+#sinfos['high_res'] = sinfo_high_res
+sinfos['med_res'] = sinfo_med_res
 #sinfos['low_res'] = sinfo_low_res
 
 #fourier_data_real = np.random.normal(-2000, 1e4, size=fourier_data_real.shape)
@@ -127,12 +130,51 @@ for dict_key in sinfos.keys():
             ud_vars = [0, 1]
 
             # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
             print('Experiment '+'alpha='+str(alpha)+' eta='+str(eta))
 
             palm.run(niter)
 
             recon = palm.x[0].asarray()
+
+            diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
+            diff = diff[0].asarray() + 1j*diff[1].asarray()
+            diff_shift = np.fft.ifftshift(diff)
+            diff_shift_subsampled = diff_shift[sinfo.shape[0]//2-16:sinfo.shape[0]//2+16,
+                                    sinfo.shape[1]//2-16:sinfo.shape[1]//2+16]
+
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [np.real(diff_shift_subsampled).tolist(),
+                                                                                         np.imag(diff_shift_subsampled).tolist()]
+
+json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/dTV_recons_2048_avgs_22102020_SR_to_64.json', 'w'))
+
+with open('dTV/Results_MRI_dTV/dTV_recons_2048_avgs_22102020_SR_to_64.json') as f:
+    d = json.load(f)
+
+fig, axs = plt.subplots(10, 4, figsize=(5, 4))
+
+for i, alpha in enumerate(alphas):
+    recon = np.asarray(dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['recon'])
+    recon = recon[0] + 1j*recon[1]
+    im = np.abs(recon)
+
+    fourier_diff = np.asarray(dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'])
+    fourier_diff = fourier_diff[0] + 1j*fourier_diff[1]
+    abs_fourier_diff = np.abs(fourier_diff)
+
+    axs[i, 0].imshow(sinfo_med_res, cmap=plt.cm.gray)
+    axs[i, 0].axis("off")
+    axs[i, 1].imshow(np.abs(naive_recon), cmap=plt.cm.gray)
+    axs[i, 1].axis("off")
+    axs[i, 2].imshow(im, cmap=plt.cm.gray)
+    axs[i, 2].axis("off")
+    axs[i, 3].imshow(abs_fourier_diff, cmap=plt.cm.gray)
+    axs[i, 3].axis("off")
+
+
+
 
 
 # fourier_rec_odl = fourier_transf.inverse(data_odl).asarray()

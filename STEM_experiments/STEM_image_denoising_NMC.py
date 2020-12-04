@@ -34,3 +34,48 @@ plt.imshow(im_3_arr, cmap=plt.cm.gray)
 
 plt.figure()
 plt.imshow(recon, cmap=plt.cm.gray)
+
+from skimage.restoration import (denoise_wavelet, estimate_sigma)
+
+im_bayes = denoise_wavelet(im_3_arr, multichannel=False, convert2ycbcr=False,
+                           method='BayesShrink', mode='soft',
+                           rescale_sigma=True)
+
+sigma_est = estimate_sigma(im_3_arr)
+
+im_visushrink = denoise_wavelet(im_3_arr, multichannel=False, convert2ycbcr=False,
+                                method='VisuShrink', mode='soft',
+                                sigma=sigma_est, rescale_sigma=True)
+
+im_visushrink2 = denoise_wavelet(im_3_arr, multichannel=False, convert2ycbcr=False,
+                                 method='VisuShrink', mode='soft',
+                                 sigma=sigma_est/2, rescale_sigma=True)
+im_visushrink4 = denoise_wavelet(im_3_arr, multichannel=False, convert2ycbcr=False,
+                                 method='VisuShrink', mode='soft',
+                                 sigma=sigma_est/4, rescale_sigma=True)
+
+plt.figure()
+plt.imshow(im_3_arr, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(im_bayes, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(im_visushrink, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(im_visushrink2, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(im_visushrink4, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(im_3_arr - im_bayes, cmap=plt.cm.gray)
+plt.colorbar()
+
+
