@@ -32,8 +32,8 @@ for i in range(2, 34):
     f_coeff_list.append(f_coeffs_unpacked)
 
 f_coeff_list_grouped = []
-for ele in range(0, len(f_coeff_list), 8):
-    f_coeff_list_grouped.append(np.sum(f_coeff_list[ele:ele+8]))
+for ele in range(len(f_coeff_list)//8):
+    f_coeff_list_grouped.append(np.sum(np.asarray(f_coeff_list[8*ele:8*ele+8]), axis=0))
 
 f_coeff_list = f_coeff_list_grouped
 
