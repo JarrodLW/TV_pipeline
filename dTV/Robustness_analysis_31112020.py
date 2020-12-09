@@ -17,11 +17,10 @@ for k, avg in enumerate(avgs):
             fig, axs = plt.subplots(8, 4, figsize=(5, 4))
             for i in range(32):
 
-                recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
-                                   ['output_size=' + str(output_dim)]).astype('float64')
-                image = np.abs(recon[0] + 1j*recon[1])
-
                 if i <= int(32/2**k):
+                    recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
+                                       ['output_size=' + str(output_dim)]).astype('float64')
+                    image = np.abs(recon[0] + 1j * recon[1])
                     axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
                 else:
                     axs[i // 4, i % 4].imshow(np.zeros(), cmap=plt.cm.gray)
