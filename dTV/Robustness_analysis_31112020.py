@@ -2,7 +2,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512.json') as f:
+with open('Results_MRI_dTV/Robustness_31112020_TV_512.json') as f:
     d = json.load(f)
 
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
