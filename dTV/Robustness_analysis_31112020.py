@@ -13,14 +13,19 @@ for k, avg in enumerate(avgs):
 
     for output_dim in output_dims:
         for reg_param in reg_params:
+
             fig, axs = plt.subplots(8, 4, figsize=(5, 4))
-            for i in range(int(32/2**k)):
+            for i in range(32):
 
                 recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                    ['output_size=' + str(output_dim)]).astype('float64')
                 image = np.abs(recon[0] + 1j*recon[1])
 
-                axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
+                if i <= int(32/2**k):
+                    axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
+                else:
+                    axs[i // 4, i % 4].imshow(np.zeros(), cmap=plt.cm.gray)
+
                 axs[i//4, i % 4].axis("off")
 
             fig.tight_layout(w_pad=0.4, h_pad=0.4)
