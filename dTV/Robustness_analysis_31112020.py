@@ -40,5 +40,5 @@ test_recon = np.asarray(d['measurement=' + str(2)]['reg_param=3.0e+03']
                                        ['output_size=' + str(64)]).astype('float64')
 
 plt.figure()
-plt.imshow(test_recon, cmap=plt.cm.gray)
+plt.imshow(np.abs(test_recon[0]+1j*test_recon[1]), cmap=plt.cm.gray)
 plt.savefig("7Li_1H_MRI_Data_31112020/test_image.pdf")
