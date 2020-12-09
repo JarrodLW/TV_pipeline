@@ -11,7 +11,7 @@ output_dims = [int(32), int(64)]
 for output_dim in output_dims:
     for reg_param in enumerate(reg_params):
         fig, axs = plt.subplots(8, 4, figsize=(5, 4))
-        for i in np.range(32):
+        for i in range(32):
 
             recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                ['output_size=' + str(output_dim)]).astype('float64')
