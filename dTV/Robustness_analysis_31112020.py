@@ -23,5 +23,5 @@ for output_dim in output_dims:
             axs[i//5, i % 5].axis("off")
 
         fig.tight_layout(w_pad=0.4, h_pad=0.4)
-        plt.savefig("dTV/7Li_1H_MRI_Data_31112020/TV_31112020_data_512_avgs_32_to_" + str(
+        plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_512_avgs_32_to_" + str(
             output_dim) + "reg_param" + str(reg_param) + ".pdf")
