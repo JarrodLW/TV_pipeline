@@ -31,3 +31,14 @@ for k, avg in enumerate(avgs):
             plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                 output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ".pdf")
             plt.close()
+
+
+with open('Results_MRI_dTV/Robustness_31112020_TV_2048.json') as f:
+    d = json.load(f)
+
+test_recon = np.asarray(d['measurement=' + str(2)]['reg_param=3.0e+03']
+                                       ['output_size=' + str(64)]).astype('float64')
+
+plt.figure()
+plt.imshow(test_recon, cmap=plt.cm.gray)
+plt.savefig("7Li_1H_MRI_Data_31112020/test_image.pdf")
