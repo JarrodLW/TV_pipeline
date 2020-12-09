@@ -1,25 +1,124 @@
 import numpy as np
 from scipy import stats
 import json
+import matplotlib.pyplot as plt
+import scipy as sp
+import itertools
 
-A = np.random.normal(scale=3000, size=(32, 32))
+dir = 'dTV/7Li_1H_MRI_Data_31112020/'
+
+def unpacking_fourier_coeffs(arr):
+
+    fourier_real_im = arr[:, 1:65]
+    fourier_real_im = fourier_real_im[::2, :]
+
+    fourier_real = fourier_real_im[:, 1::2]
+    fourier_im = fourier_real_im[:, ::2]
+    fourier = fourier_real + fourier_im * 1j
+
+    return fourier
+
+f_coeff_list = []
+recon_list = []
+
+for i in range(2, 36):
+    f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+    f_coeff_list.append(f_coeffs_unpacked)
+    recon = 32*np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs_unpacked))) # inserting factor of 32 to ensure transform is unitary
+    recon_list.append(recon)
+
+plt.imshow(np.abs(recon_list[0]), cmap=plt.cm.gray)
+
+recon_arr = np.asarray(recon_list)
+# grabbing the pixels around the border of each reconstruction
+block_1 = np.reshape(recon_arr[:, :8, :24], (34, 8*24))
+block_2 = np.reshape(recon_arr[:, 8:, :8], (34, 8*24))
+block_3 = np.reshape(recon_arr[:, 24:, 8:], (34, 8*24))
+block_4 = np.reshape(recon_arr[:, :24, 24:], (34, 8*24))
+
+border_pixels = np.concatenate((block_1, block_2, block_3, block_4), axis=1)
+border_pixels_real_part = np.real(border_pixels)
+border_pixels_imag_part = np.imag(border_pixels)
+
+# means and standard deviations
+mean_for_each_pixel_real = np.mean(border_pixels_real_part, axis=0)
+mean_real = np.mean(border_pixels_real_part)
+
+mean_for_each_pixel_imag = np.mean(border_pixels_imag_part, axis=0)
+mean_imag = np.mean(border_pixels_imag_part)
+
+std_for_each_pixel_real = np.std(border_pixels_real_part, axis=0)
+std_real = np.std(border_pixels_real_part)
+
+std_for_each_imag_real = np.std(border_pixels_imag_part, axis=0)
+std_imag = np.std(border_pixels_imag_part)
+
+# histograms
+plt.figure()
+plt.hist(np.ndarray.flatten(border_pixels_real_part), bins=100)
+
+plt.figure()
+plt.hist(np.ndarray.flatten(border_pixels_imag_part), bins=100)
+
+# covariances of pixels
+cov_matrix = np.cov(border_pixels_real_part.T)
+
+plt.imshow(cov_matrix, cmap=plt.cm.gray)
+plt.colorbar()
+
+## Morozov
+allowed_data_res_real = 32*std_real
+allowed_data_res_imag = 32*std_imag
+
+## Hypothesis testing
+# testing that each pixel has zero mean (assuming iid samples, normal, unknown variance) - student-t
+pop_mean = np.zeros(border_pixels_real_part.shape[1])
+p_vals_real = sp.stats.ttest_1samp(border_pixels_real_part, pop_mean, axis=0)[1]
+p_vals_imag = sp.stats.ttest_1samp(border_pixels_imag_part, pop_mean, axis=0)[1]
+
+# testing that collected measurements (all pixels) have zero mean (assuming iid samples, normal, unknown variance) - student-t
+pop_mean = 0
+p_val_real = sp.stats.ttest_1samp(np.ndarray.flatten(border_pixels_real_part), pop_mean)[1]
+p_val_imag = sp.stats.ttest_1samp(np.ndarray.flatten(border_pixels_imag_part), pop_mean)[1]
+
+# testing normality of each pixel, unknown mean and variance (assuming iid samples) - Shapiro-Wilks
+p_vals_real = []
+p_vals_imag = []
+for i in range(border_pixels_real_part.shape[1]):
+    p_vals_real.append(stats.shapiro(border_pixels_real_part[:, i])[1])
+    p_vals_imag.append(stats.shapiro(border_pixels_imag_part[:, i])[1])
+
+# testing that pairs of pixels have same means (assuming iid samples, same variance) - student-t (2 sample)
+# does this assume normality?
+random_pixel_nums = np.random.choice(np.arange(750), size = 100)
+p_vals_real = []
+p_vals_imag = []
+
+for (i, j) in list(itertools.combinations(random_pixel_nums, 2)):
+    p_val_real = sp.stats.ttest_ind(border_pixels_real_part[:, i], border_pixels_real_part[:, j])[1]
+    p_val_imag = sp.stats.ttest_ind(border_pixels_real_part[:, i], border_pixels_imag_part[:, j])[1]
+    p_vals_real.append(p_val_real)
+    p_vals_imag.append(p_val_imag)
+
+np.amin(p_vals_real)
+np.amin(p_vals_imag) # how to interpret this?
+
+# testing that pairs of pixels have same means (assuming iid samples, not assuming same variance) - Welch
+# does this assume normality
+random_pixel_nums = np.random.choice(np.arange(750), size=100)
+p_vals_real = []
+p_vals_imag = []
+
+for (i, j) in list(itertools.combinations(random_pixel_nums, 2)):
+    p_val_real = sp.stats.ttest_ind(border_pixels_real_part[:, i], border_pixels_real_part[:, j], equal_var=False)[1]
+    p_val_imag = sp.stats.ttest_ind(border_pixels_real_part[:, i], border_pixels_imag_part[:, j], equal_var=False)[1]
+    p_vals_real.append(p_val_real)
+    p_vals_imag.append(p_val_imag)
+
+np.amin(p_vals_real)
+np.amin(p_vals_imag)  # how to interpret this?
+
+# testing pairwise independence of pixels
 
 
-with open('dTV/Results_MRI_dTV/dTV_recons_2048_avgs_22102020_SR_to_64.json') as f:
-    d = json.load(f)
-
-alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
-
-fourier_diffs = []
-
-for i, alpha in enumerate(alphas):
-
-    fourier_diff = np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'])
-    fourier_diff = fourier_diff[0] + 1j * fourier_diff[1]
-    fourier_diffs.append(fourier_diff)
-
-np.sum(np.real(fourier_diffs[5]))
-np.std(np.real(fourier_diffs[5]))
-
-stats.chisquare(np.ndarray.flatten(A))
-stats.chisquare(np.ndarray.flatten(np.real(fourier_diffs[5])))
