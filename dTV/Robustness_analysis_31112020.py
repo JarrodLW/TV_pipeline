@@ -19,8 +19,8 @@ for output_dim in output_dims:
 
             #image_rotated_flipped = image[:, ::-1].T[:, ::-1]
 
-            axs[i//5, i % 5].imshow(image, cmap=plt.cm.gray)
-            axs[i//5, i % 5].axis("off")
+            axs[i//5, i % 4].imshow(image, cmap=plt.cm.gray)
+            axs[i//5, i % 4].axis("off")
 
         fig.tight_layout(w_pad=0.4, h_pad=0.4)
         plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_512_avgs_32_to_" + str(
