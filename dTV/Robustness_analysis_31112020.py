@@ -23,7 +23,7 @@ for k, avg in enumerate(avgs):
                     image = np.abs(recon[0] + 1j * recon[1])
                     axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
                 else:
-                    axs[i // 4, i % 4].imshow(np.zeros(), cmap=plt.cm.gray)
+                    axs[i // 4, i % 4].imshow(np.zeros((32, 32)), cmap=plt.cm.gray)
 
                 axs[i//4, i % 4].axis("off")
 
