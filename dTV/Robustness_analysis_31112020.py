@@ -9,7 +9,7 @@ reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 output_dims = [int(32), int(64)]
 
 for output_dim in output_dims:
-    for reg_param in enumerate(reg_params):
+    for reg_param in reg_params:
         fig, axs = plt.subplots(8, 4, figsize=(5, 4))
         for i in range(32):
 
