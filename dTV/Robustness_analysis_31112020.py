@@ -14,7 +14,7 @@ for k, avg in enumerate(avgs):
     for output_dim in output_dims:
         for reg_param in reg_params:
             fig, axs = plt.subplots(8, 4, figsize=(5, 4))
-            for i in range(32):
+            for i in range(32/2**k):
 
                 recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                    ['output_size=' + str(output_dim)]).astype('float64')
