@@ -31,10 +31,13 @@ for i in range(2, 34):
     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
     f_coeff_list.append(f_coeffs_unpacked)
 
+f_coeff_arr = np.asarray(f_coeff_list)
 f_coeff_list_grouped = []
-for ele in range(len(f_coeff_list)//16):
-    f_coeff_list_grouped.append(np.sum(np.asarray(f_coeff_list[16*ele:16*ele+16]), axis=0))
-
+num = 16
+for i in range(num):
+    data_arr = np.roll(f_coeff_arr, i, axis=0)
+    for ele in range(len(f_coeff_list)//num):
+        f_coeff_list_grouped.append(np.sum(data_arr[num*ele:num*(ele+1)], axis=0)/num)
 
 f_coeff_list = f_coeff_list_grouped
 
