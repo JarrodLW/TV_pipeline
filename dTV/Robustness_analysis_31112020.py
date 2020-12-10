@@ -6,7 +6,7 @@ avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 output_dims = [int(32), int(64)]
 
-for k, avg in enumerate(avgs):
+for avg in enumerate(avgs):
 
     with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + '.json') as f:
         d = json.load(f)
@@ -26,7 +26,8 @@ for k, avg in enumerate(avgs):
             fig.tight_layout(w_pad=0.4, h_pad=0.4)
             plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                 output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ".pdf")
-            plt.close()
+
+    print("done")
 
 
 # with open('Results_MRI_dTV/Robustness_31112020_TV_2048.json') as f:
