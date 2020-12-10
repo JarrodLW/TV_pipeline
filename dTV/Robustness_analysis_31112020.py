@@ -67,7 +67,7 @@ for avg in avgs:
                 output_dim // 2 - 16:output_dim // 2 + 16] = 1
                 subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
-                diff = subsampling_matrix*(forward_op(forward_op.domain.element([recon[0], recon[1]])) - forward_op.range.element(data))
+                diff = np.asarray([subsampling_matrix, subsampling_matrix])*(forward_op(forward_op.domain.element([recon[0], recon[1]])) - forward_op.range.element(data))
                 diff_norm = l2_norm(diff)
                 diff_norms.append(diff_norm)
                 #diff = diff[0].asarray() + 1j * diff[1].asarray()
