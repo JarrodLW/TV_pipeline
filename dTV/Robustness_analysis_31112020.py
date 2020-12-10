@@ -42,7 +42,7 @@ for avg in avgs:
         image_space = complex_space.real_space ** 2
         forward_op = RealFourierTransform(image_space)
 
-        l2_norm = odl.solvers.L2NormSquared(forward_op.range)
+        l2_norm = odl.solvers.L2Norm(forward_op.range)
         diff_norms = []
 
         for reg_param in reg_params:
