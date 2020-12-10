@@ -41,7 +41,7 @@ border_pixels = np.concatenate((block_1, block_2, block_3, block_4), axis=1)
 border_pixels_real_part = np.real(border_pixels)
 border_pixels_imag_part = np.imag(border_pixels)
 
-# means and standard deviations
+# means and standard deviations for 512 data
 mean_for_each_pixel_real = np.mean(border_pixels_real_part, axis=0)
 mean_real = np.mean(border_pixels_real_part)
 
@@ -60,6 +60,19 @@ plt.hist(np.ndarray.flatten(border_pixels_real_part), bins=100)
 
 plt.figure()
 plt.hist(np.ndarray.flatten(border_pixels_imag_part), bins=100)
+
+# standard deviations for varying numbers of averages
+border_pixels_real_part_paired = (1/2)*(border_pixels_real_part[:-2, :][::2, :] + border_pixels_real_part[:-2, :][1::2, :])
+border_pixels_real_part_paired_2 = (1/2)*(border_pixels_real_part_paired[::2, :] + border_pixels_real_part_paired[1::2, :])
+border_pixels_real_part_paired_3 = (1/2)*(border_pixels_real_part_paired_2[::2, :] + border_pixels_real_part_paired_2[1::2, :])
+
+np.std(border_pixels_real_part_paired)
+np.std(border_pixels_real_part_paired_2)
+np.std(border_pixels_real_part_paired_3)
+
+np.std(border_pixels_real_part_paired, axis=0)[:20]
+np.std(border_pixels_real_part_paired_2, axis=0)[:20]
+np.std(border_pixels_real_part_paired_3, axis=0)[:20]
 
 # covariances of pixels
 cov_matrix = np.cov(border_pixels_real_part.T)
