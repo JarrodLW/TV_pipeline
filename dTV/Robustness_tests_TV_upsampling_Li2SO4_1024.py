@@ -62,14 +62,15 @@ if run_exp:
                 print("Experiment_" + str(exp))
                 exp+=1
 
-                data = np.zeros((output_dim, output_dim), dtype='complex')
-                data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
-                data = np.fft.fftshift(data)
-                subsampling_matrix = np.zeros((output_dim, output_dim))
-                subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
-                subsampling_matrix = np.fft.fftshift(subsampling_matrix)
-
-                recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
+                # data = np.zeros((output_dim, output_dim), dtype='complex')
+                # data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
+                # data = np.fft.fftshift(data)
+                # subsampling_matrix = np.zeros((output_dim, output_dim))
+                # subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
+                # subsampling_matrix = np.fft.fftshift(subsampling_matrix)
+                #
+                # recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
+                recons = np.zeros((1, output_dim, output_dim))
                 regularised_recons['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
                     [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
 

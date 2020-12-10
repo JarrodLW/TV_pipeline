@@ -26,6 +26,7 @@ for avg in avgs:
             fig.tight_layout(w_pad=0.4, h_pad=0.4)
             plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                 output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ".pdf")
+            plt.close()
 
     print("done")
 
