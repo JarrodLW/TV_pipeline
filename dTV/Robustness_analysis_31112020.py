@@ -57,7 +57,7 @@ for avg in avgs:
                 #axs[i//4, i % 4].axis("off")
 
                 # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
-                recon_rotated = recon.T[:, :-1]
+                recon_rotated = recon.T[:, ::-1]
 
                 data = np.zeros((output_dim, output_dim), dtype='complex')
                 data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = f_coeff_list[i]
