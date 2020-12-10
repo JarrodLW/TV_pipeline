@@ -9,7 +9,7 @@ avgs = ['512']
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 output_dims = [int(32), int(64)]
 
-dir = '7Li_1H_MRI_Data_31112020/'
+dir = 'dTV/7Li_1H_MRI_Data_31112020/'
 
 def unpacking_fourier_coeffs(arr):
 
@@ -61,7 +61,7 @@ for avg in avgs:
 
                 data = np.zeros((output_dim, output_dim), dtype='complex')
                 data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = f_coeff_list[i]
-                data = np.fft.fftshift(data)
+                #data = np.fft.fftshift(data)
                 subsampling_matrix = np.zeros((output_dim, output_dim))
                 subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
                 output_dim // 2 - 16:output_dim // 2 + 16] = 1
