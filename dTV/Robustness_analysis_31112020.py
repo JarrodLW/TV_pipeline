@@ -53,8 +53,8 @@ for avg in avgs:
                 recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                    ['output_size=' + str(output_dim)]).astype('float64')
                 image = np.abs(recon[0] + 1j * recon[1])
-                axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
-                axs[i//4, i % 4].axis("off")
+                #axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
+                #axs[i//4, i % 4].axis("off")
 
                 # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
                 recon_rotated = recon.T[:, :-1]
@@ -67,12 +67,15 @@ for avg in avgs:
                 output_dim // 2 - 16:output_dim // 2 + 16] = 1
                 subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
-                diff = np.asarray([subsampling_matrix, subsampling_matrix])*(forward_op(forward_op.domain.element([recon[0], recon[1]]))
-                                                                             - forward_op.range.element([np.real(data), np.imag(data)]))
+                synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon[0], recon[1]])
+                diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
                 diff_norm = l2_norm(diff)
                 diff_norms.append(diff_norm)
                 #diff = diff[0].asarray() + 1j * diff[1].asarray()
                 #diff_shift = np.fft.ifftshift(diff)
+
+                axs[i // 4, i % 4].imshow(np.abs(synth_data[0] + 1j*synth_data[1]), cmap=plt.cm.gray)
+                axs[i // 4, i % 4].axis("off")
 
             np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim), diff_norms)
 
@@ -81,21 +84,21 @@ for avg in avgs:
                 output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ".pdf")
 
 
-    # example recons, subset of regularisation params, with K-space diffs
-    for output_dim in output_dims:
-        for reg_param in reg_params[::4]:
-
-            fig, axs = plt.subplots(10, 6, figsize=(5, 4))
-            for i in range(30):
-
-                recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
-                                   ['output_size=' + str(output_dim)]).astype('float64')
-                image = np.abs(recon[0] + 1j * recon[1])
-                axs[2*i//6, i % 6].imshow(image, cmap=plt.cm.gray)
-                axs[2*i//6, i % 6].axis("off")
-
-                axs[1+2*i//6, i % 6].imshow(fourier_diff, cmap=plt.cm.gray)
-                axs[1+2*i//6, i % 6].axis("off")
+    # # example recons, subset of regularisation params, with K-space diffs
+    # for output_dim in output_dims:
+    #     for reg_param in reg_params[::4]:
+    #
+    #         fig, axs = plt.subplots(10, 6, figsize=(5, 4))
+    #         for i in range(30):
+    #
+    #             recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
+    #                                ['output_size=' + str(output_dim)]).astype('float64')
+    #             image = np.abs(recon[0] + 1j * recon[1])
+    #             axs[2*i//6, i % 6].imshow(image, cmap=plt.cm.gray)
+    #             axs[2*i//6, i % 6].axis("off")
+    #
+    #             axs[1+2*i//6, i % 6].imshow(fourier_diff, cmap=plt.cm.gray)
+    #             axs[1+2*i//6, i % 6].axis("off")
 
 
 
