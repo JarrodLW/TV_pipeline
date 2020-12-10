@@ -47,7 +47,7 @@ for avg in avgs:
 
         for reg_param in reg_params:
 
-            fig, axs = plt.subplots(16, 4, figsize=(10, 4))
+            fig, axs = plt.subplots(16, 4, figsize=(4, 10))
             for i in range(32):
 
                 recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
