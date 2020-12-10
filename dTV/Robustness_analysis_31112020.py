@@ -2,7 +2,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-avgs = ['512', '1024', '2048', '4096', '8192', '16384']
+avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 output_dims = [int(32), int(64)]
 
