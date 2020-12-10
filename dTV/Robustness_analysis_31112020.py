@@ -47,7 +47,7 @@ for avg in avgs:
 
         for reg_param in reg_params:
 
-            fig, axs = plt.subplots(8, 4, figsize=(5, 4))
+            fig, axs = plt.subplots(16, 4, figsize=(5, 4))
             for i in range(32):
 
                 recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
@@ -61,7 +61,7 @@ for avg in avgs:
 
                 data = np.zeros((output_dim, output_dim), dtype='complex')
                 data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = f_coeff_list[i]
-                #data = np.fft.fftshift(data)
+                data = np.fft.fftshift(data)
                 subsampling_matrix = np.zeros((output_dim, output_dim))
                 subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
                 output_dim // 2 - 16:output_dim // 2 + 16] = 1
@@ -74,8 +74,11 @@ for avg in avgs:
                 #diff = diff[0].asarray() + 1j * diff[1].asarray()
                 #diff_shift = np.fft.ifftshift(diff)
 
-                axs[i // 4, i % 4].imshow(np.fft.fftshift(np.abs(synth_data.asarray()[0] + 1j*synth_data.asarray()[1])), cmap=plt.cm.gray)
-                axs[i // 4, i % 4].axis("off")
+                axs[2*i // 4, i % 4].imshow(np.fft.fftshift(np.abs(synth_data.asarray()[0] + 1j*synth_data.asarray()[1])), cmap=plt.cm.gray)
+                axs[2*i // 4, i % 4].axis("off")
+
+                axs[1+2 * i // 4, i % 4].imshow(np.fft.fftshift(np.abs(data)), cmap=plt.cm.gray)
+                axs[1+2 * i // 4, i % 4].axis("off")
 
             np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim), diff_norms)
 
