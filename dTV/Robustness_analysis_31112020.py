@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-#avgs = ['512', '1024', '2048', '4096', '8192']
-avgs = ['512']
+avgs = ['512', '1024', '2048', '4096', '8192']
+#avgs = ['512']
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 output_dims = [int(32), int(64)]
 
@@ -72,7 +72,7 @@ for avg in avgs:
                 diff_norm = l2_norm(diff)
                 diff_norms.append(diff_norm)
                 #diff = diff[0].asarray() + 1j * diff[1].asarray()
-                #diff_shift = np.fft.ifftshift(diff)
+                #diff_shift = np.fft.ifftshift(diff)probability
 
                 axs[2*(i // 4), i % 4].imshow(np.fft.fftshift(np.abs(synth_data.asarray()[0] + 1j*synth_data.asarray()[1])), cmap=plt.cm.gray)
                 axs[2*(i // 4), i % 4].axis("off")

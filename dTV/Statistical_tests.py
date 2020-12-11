@@ -102,6 +102,13 @@ for i in range(border_pixels_real_part.shape[1]):
     p_vals_real.append(stats.shapiro(border_pixels_real_part[:, i])[1])
     p_vals_imag.append(stats.shapiro(border_pixels_imag_part[:, i])[1])
 
+# testing normality of each pixel - D'Agostino-Pearson
+p_vals_real = []
+p_vals_imag = []
+for i in range(border_pixels_real_part.shape[1]):
+    p_vals_real.append(stats.normaltest(border_pixels_real_part[:, i])[1])
+    p_vals_imag.append(stats.normaltest(border_pixels_imag_part[:, i])[1])
+
 # testing that pairs of pixels have same means (assuming iid samples, same variance) - student-t (2 sample)
 # does this assume normality?
 random_pixel_nums = np.random.choice(np.arange(750), size = 100)
@@ -118,7 +125,7 @@ np.amin(p_vals_real)
 np.amin(p_vals_imag) # how to interpret this?
 
 # testing that pairs of pixels have same means (assuming iid samples, not assuming same variance) - Welch
-# does this assume normality
+# does this assume normality?
 random_pixel_nums = np.random.choice(np.arange(750), size=100)
 p_vals_real = []
 p_vals_imag = []
@@ -131,6 +138,16 @@ for (i, j) in list(itertools.combinations(random_pixel_nums, 2)):
 
 np.amin(p_vals_real)
 np.amin(p_vals_imag)  # how to interpret this?
+
+# testing equivalence of means of real and imaginary parts, thinking of pixels as iid - student-t, 2 sample
+# does this assume normality?
+sp.stats.ttest_ind(np.ndarray.flatten(border_pixels_real_part), np.ndarray.flatten(border_pixels_imag_part))
+
+# testing equivalence of variances of real and imaginary parts, thinking of pixels as iid normal - Bartlett
+sp.stats.bartlett(np.ndarray.flatten(border_pixels_real_part), np.ndarray.flatten(border_pixels_imag_part))
+
+# testing equivalence of variances of real and imaginary parts, thinking of pixels as iid, allowing for non-nomrality - Levene
+sp.stats.levene(np.ndarray.flatten(border_pixels_real_part), np.ndarray.flatten(border_pixels_imag_part))
 
 # testing pairwise independence of pixels
 
