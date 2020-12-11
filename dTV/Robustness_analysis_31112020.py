@@ -74,10 +74,10 @@ for avg in avgs:
                 #diff = diff[0].asarray() + 1j * diff[1].asarray()
                 #diff_shift = np.fft.ifftshift(diff)probability
 
-                axs[2*(i // 4), i % 4].imshow(np.fft.fftshift(np.abs(synth_data.asarray()[0] + 1j*synth_data.asarray()[1])), cmap=plt.cm.gray)
+                axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
                 axs[2*(i // 4), i % 4].axis("off")
 
-                axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(data)), cmap=plt.cm.gray)
+                axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
                 axs[1+2 * (i // 4), i % 4].axis("off")
 
             np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim), diff_norms)
