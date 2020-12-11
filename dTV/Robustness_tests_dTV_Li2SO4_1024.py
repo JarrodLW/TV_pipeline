@@ -1,7 +1,6 @@
 # created 11/12/2020
 # based on "Inverse_problem_dTV_22102020.py"
 
-import h5py
 import numpy as np
 import dTV.myFunctionals as fctls
 import dTV.myAlgorithms as algs
