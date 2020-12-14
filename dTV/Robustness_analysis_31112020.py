@@ -119,8 +119,8 @@ if plot_TV_results:
                     # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
                     #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
-                    json.dump(norms_dict,
-                              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+    json.dump(norms_dict,
+              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
 # dTV results
 
