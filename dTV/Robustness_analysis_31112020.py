@@ -25,19 +25,19 @@ def unpacking_fourier_coeffs(arr):
 
     return fourier
 
-f_coeff_list = []
-
-for i in range(2, 34):
-    f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/'+str(i)+'/fid', dtype=np.int32), (64, 128))
-    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
-    f_coeff_list.append(f_coeffs_unpacked)
-
-f_coeff_list_Li_LS = []
-
-for i in range(2, 34):
-    f_coeffs = np.reshape(np.fromfile(dir + 'Li_LS/'+str(i)+'/fid', dtype=np.int32), (64, 128))
-    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
-    f_coeff_list_Li_LS.append(f_coeffs_unpacked)
+# f_coeff_list = []
+#
+# for i in range(2, 34):
+#     f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+#     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+#     f_coeff_list.append(f_coeffs_unpacked)
+#
+# f_coeff_list_Li_LS = []
+#
+# for i in range(2, 34):
+#     f_coeffs = np.reshape(np.fromfile(dir + 'Li_LS/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+#     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+#     f_coeff_list_Li_LS.append(f_coeffs_unpacked)
 
 extensions = ['', '_Li_LS']
 
@@ -45,19 +45,41 @@ if plot_TV_results:
 
     norms_dict = {}
 
-    for avg in avgs:
+    for j, avg in enumerate(avgs):
 
         norms_dict['avgs='+ avg] = {}
         for k, ext in enumerate(extensions):
+
+            f_coeff_list = []
 
             with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
                 d = json.load(f)
 
             if k==0:
+                # getting the data
+                for i in range(2, 34):
+                    f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/' + str(i) + '/fid', dtype=np.int32), (64, 128))
+                    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+                    f_coeff_list.append(f_coeffs_unpacked)
+
                 coeffs = f_coeff_list
 
             if k==1:
-                coeffs = f_coeff_list_Li_LS
+
+                for i in range(2, 34):
+                    f_coeffs = np.reshape(np.fromfile(dir + 'Li_LS/' + str(i) + '/fid', dtype=np.int32), (64, 128))
+                    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+                    f_coeff_list.append(f_coeffs_unpacked)
+
+            f_coeff_arr = np.asarray(f_coeff_list)
+            f_coeff_list_grouped = []
+            num = int(2 ** j)
+            for i in range(num):
+                data_arr = np.roll(f_coeff_arr, i, axis=0)
+                for ele in range(len(f_coeff_list) // num):
+                    f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
+
+            coeffs = f_coeff_list_grouped
 
             # all the recons for each num of avgs for each reg parameter, in separate plots
             for output_dim in output_dims:
@@ -122,7 +144,29 @@ if plot_TV_results:
     json.dump(norms_dict,
               open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
-# dTV results
+# plotting data discrepancies
+
+with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
+    d = json.load(f)
+
+for avg in avgs:
+
+    discrep_arr = np.zeros((len(reg_params), 32))
+    d3 = d['avgs='+avg]['output_dim=64']
+
+    for i, reg_param in enumerate(reg_params):
+
+        discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
+        discrep_arr[i, :] = discrep
+
+    plt.figure()
+    plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1))
+    plt.ylim(30000, 75000)
+
+    #plt.figure()
+    #plt.scatter(np.tile(np.log10(np.asarray(reg_params)), (32, 1)).T, discrep_arr)
+
+## dTV results
 
 alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
 
