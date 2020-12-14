@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
+plot_TV_results = False
+plot_dTV_results = True
+
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
 reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
@@ -38,99 +41,104 @@ for i in range(2, 34):
 
 extensions = ['', '_Li_LS']
 
-for avg in avgs:
+if plot_TV_results:
 
-    for k, ext in enumerate(extensions):
+    for avg in avgs:
 
-        with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
+        for k, ext in enumerate(extensions):
+
+            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
+                d = json.load(f)
+
+            if k==0:
+                coeffs = f_coeff_list
+
+            if k==1:
+                coeffs = f_coeff_list_Li_LS
+
+            # all the recons for each num of avgs for each reg parameter, in separate plots
+            for output_dim in output_dims:
+
+                complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                                  shape=[output_dim, output_dim], dtype='complex')
+                image_space = complex_space.real_space ** 2
+                forward_op = RealFourierTransform(image_space)
+
+                l2_norm = odl.solvers.L2Norm(forward_op.range)
+                diff_norms = []
+
+                for reg_param in reg_params:
+
+                    fig, axs = plt.subplots(16, 4, figsize=(4, 10))
+                    for i in range(32):
+
+                        recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
+                                           ['output_size=' + str(output_dim)]).astype('float64')
+                        image = np.abs(recon[0] + 1j * recon[1])
+                        #axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
+                        #axs[i//4, i % 4].axis("off")
+
+                        # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
+                        recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
+
+                        data = np.zeros((output_dim, output_dim), dtype='complex')
+                        data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
+                        data = np.fft.fftshift(data)
+                        subsampling_matrix = np.zeros((output_dim, output_dim))
+                        subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
+                        output_dim // 2 - 16:output_dim // 2 + 16] = 1
+                        subsampling_matrix = np.fft.fftshift(subsampling_matrix)
+
+                        synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon_rotated[0], recon_rotated[1]]))
+                        diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
+                        diff_norm = l2_norm(diff)
+                        diff_norms.append(diff_norm)
+                        #diff = diff[0].asarray() + 1j * diff[1].asarray()
+                        #diff_shift = np.fft.ifftshift(diff)probability
+
+                        axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
+                        axs[2*(i // 4), i % 4].axis("off")
+
+                        axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
+                        axs[1+2 * (i // 4), i % 4].axis("off")
+
+                    np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim)+ext, diff_norms)
+
+                    fig.tight_layout(w_pad=0.4, h_pad=0.4)
+                    plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
+
+# dTV results
+
+alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
+
+if plot_dTV_results:
+    for avg in avgs:
+
+        with open('Results_MRI_dTV/Robustness_31112020_dTV_' + avg + '.json') as f:
             d = json.load(f)
 
-        if k==0:
-            coeffs = f_coeff_list
+            for output_dim in output_dims:
+                for alpha in alphas:
 
-        if k==1:
-            coeffs = f_coeff_list_Li_LS
+                    fig, axs = plt.subplots(16, 4, figsize=(4, 10))
+                    for i in range(32):
 
-        # all the recons for each num of avgs for each reg parameter, in separate plots
-        for output_dim in output_dims:
+                        recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                            'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
 
-            complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
-                                              shape=[output_dim, output_dim], dtype='complex')
-            image_space = complex_space.real_space ** 2
-            forward_op = RealFourierTransform(image_space)
+                        fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                            'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
-            l2_norm = odl.solvers.L2Norm(forward_op.range)
-            diff_norms = []
+                        recon_image = np.abs(recon[0] + 1j * recon[1])
+                        fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
-            for reg_param in reg_params:
+                        axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray)
+                        axs[2 * (i // 4), i % 4].axis("off")
 
-                fig, axs = plt.subplots(16, 4, figsize=(4, 10))
-                for i in range(32):
+                        axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
+                        axs[1 + 2 * (i // 4), i % 4].axis("off")
 
-                    recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
-                                       ['output_size=' + str(output_dim)]).astype('float64')
-                    image = np.abs(recon[0] + 1j * recon[1])
-                    #axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
-                    #axs[i//4, i % 4].axis("off")
-
-                    # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
-                    recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
-
-                    data = np.zeros((output_dim, output_dim), dtype='complex')
-                    data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
-                    data = np.fft.fftshift(data)
-                    subsampling_matrix = np.zeros((output_dim, output_dim))
-                    subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
-                    output_dim // 2 - 16:output_dim // 2 + 16] = 1
-                    subsampling_matrix = np.fft.fftshift(subsampling_matrix)
-
-                    synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon_rotated[0], recon_rotated[1]]))
-                    diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
-                    diff_norm = l2_norm(diff)
-                    diff_norms.append(diff_norm)
-                    #diff = diff[0].asarray() + 1j * diff[1].asarray()
-                    #diff_shift = np.fft.ifftshift(diff)probability
-
-                    axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
-                    axs[2*(i // 4), i % 4].axis("off")
-
-                    axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
-                    axs[1+2 * (i // 4), i % 4].axis("off")
-
-                np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim)+ext, diff_norms)
-
-                fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
-
-
-    # # example recons, subset of regularisation params, with K-space diffs
-    # for output_dim in output_dims:
-    #     for reg_param in reg_params[::4]:
-    #
-    #         fig, axs = plt.subplots(10, 6, figsize=(5, 4))
-    #         for i in range(30):
-    #
-    #             recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
-    #                                ['output_size=' + str(output_dim)]).astype('float64')
-    #             image = np.abs(recon[0] + 1j * recon[1])
-    #             axs[2*i//6, i % 6].imshow(image, cmap=plt.cm.gray)
-    #             axs[2*i//6, i % 6].axis("off")
-    #
-    #             axs[1+2*i//6, i % 6].imshow(fourier_diff, cmap=plt.cm.gray)
-    #             axs[1+2*i//6, i % 6].axis("off")
-
-
-
-
-
-
-# with open('Results_MRI_dTV/Robustness_31112020_TV_2048.json') as f:
-#     d = json.load(f)
-#
-# test_recon = np.asarray(d['measurement=' + str(2)]['reg_param=3.0e+03']
-#                                        ['output_size=' + str(64)]).astype('float64')
-#
-# plt.figure()
-# plt.imshow(np.abs(test_recon[0]+1j*test_recon[1]), cmap=plt.cm.gray)
-# plt.savefig("7Li_1H_MRI_Data_31112020/test_image.pdf")
+                    fig.tight_layout(w_pad=0.4, h_pad=0.4)
+                    plt.savefig("7Li_1H_MRI_Data_31112020/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + ".pdf")
