@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -119,7 +119,7 @@ if plot_TV_results:
                     #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
                     json.dump(norms_dict,
-                              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+                              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
 # dTV results
 
