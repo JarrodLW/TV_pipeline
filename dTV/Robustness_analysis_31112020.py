@@ -6,6 +6,7 @@ from myOperators import RealFourierTransform
 
 plot_TV_results = True
 plot_dTV_results = False
+discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -146,25 +147,27 @@ if plot_TV_results:
 
 # plotting data discrepancies
 
-with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
-    d = json.load(f)
+if discrepancy_plots:
 
-for avg in avgs:
+    with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
+        d = json.load(f)
 
-    discrep_arr = np.zeros((len(reg_params), 32))
-    d3 = d['avgs='+avg]['output_dim=64']
+    for avg in avgs:
 
-    for i, reg_param in enumerate(reg_params):
+        discrep_arr = np.zeros((len(reg_params), 32))
+        d3 = d['avgs='+avg]['output_dim=64']
 
-        discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
-        discrep_arr[i, :] = discrep
+        for i, reg_param in enumerate(reg_params):
 
-    plt.figure()
-    plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1))
-    plt.ylim(30000, 75000)
+            discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
+            discrep_arr[i, :] = discrep
 
-    #plt.figure()
-    #plt.scatter(np.tile(np.log10(np.asarray(reg_params)), (32, 1)).T, discrep_arr)
+        plt.figure()
+        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1))
+        plt.ylim(30000, 75000)
+
+        #plt.figure()
+        #plt.scatter(np.tile(np.log10(np.asarray(reg_params)), (32, 1)).T, discrep_arr)
 
 ## dTV results
 
