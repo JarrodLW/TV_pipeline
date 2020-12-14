@@ -43,8 +43,11 @@ extensions = ['', '_Li_LS']
 
 if plot_TV_results:
 
+    norms_dict = {}
+
     for avg in avgs:
 
+        norms_dict['avgs='+ avg] = {}
         for k, ext in enumerate(extensions):
 
             with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
@@ -59,15 +62,18 @@ if plot_TV_results:
             # all the recons for each num of avgs for each reg parameter, in separate plots
             for output_dim in output_dims:
 
+                norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
+
                 complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
                                                   shape=[output_dim, output_dim], dtype='complex')
                 image_space = complex_space.real_space ** 2
                 forward_op = RealFourierTransform(image_space)
 
                 l2_norm = odl.solvers.L2Norm(forward_op.range)
-                diff_norms = []
 
                 for reg_param in reg_params:
+
+                    diff_norms = []
 
                     fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                     for i in range(32):
@@ -102,11 +108,18 @@ if plot_TV_results:
                         axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
                         axs[1+2 * (i // 4), i % 4].axis("off")
 
-                    np.save("7Li_1H_MRI_Data_31112020/norms_"+str(output_dim)+ext, diff_norms)
-
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
+
+                    norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                        'reg_param=' + '{:.1e}'.format(reg_param)] = diff_norms
+
+                    # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
+                    #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
+
+                    json.dump(norms_dict,
+                              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
 # dTV results
 
