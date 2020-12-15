@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = True
-plot_dTV_results = False
+plot_TV_results = False
+plot_dTV_results = True
 discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
@@ -158,7 +158,7 @@ if discrepancy_plots:
     for k, avg in enumerate(avgs):
 
         discrep_arr = np.zeros((len(reg_params), 32))
-        d3 = d['avgs='+avg]['output_dim=32']
+        d3 = d['avgs='+avg]['output_dim=64']
 
         for i, reg_param in enumerate(reg_params):
 
