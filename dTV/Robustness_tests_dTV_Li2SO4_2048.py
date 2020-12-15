@@ -21,6 +21,11 @@ image_H = np.reshape(np.fromfile(dir_H+'6/pdata/1/2dseq', dtype=np.uint16), (128
 plt.figure()
 plt.imshow(np.abs(image_H), cmap=plt.cm.gray)
 
+# image_H_low_res = np.reshape(np.fromfile(dir_H+'4/pdata/1/2dseq', dtype=np.uint16), (32, 32))
+# plt.figure()
+# plt.imshow(np.abs(image_H_low_res), cmap=plt.cm.gray)
+
+
 dir = 'dTV/7Li_1H_MRI_Data_31112020/'
 
 def unpacking_fourier_coeffs(arr):
@@ -55,6 +60,7 @@ sinfo_high_res = image_H.T
 sinfo_med_res = block_reduce(sinfo_high_res, block_size=(2, 2), func=np.mean)
 sinfo_low_res = block_reduce(sinfo_high_res, block_size=(4, 4), func=np.mean)
 
+
 sinfos = {}
 #sinfos['high_res'] = sinfo_high_res
 sinfos['med_res'] = sinfo_med_res
@@ -73,8 +79,6 @@ Yaff = odl.tensor_space(6)
 
 dTV_regularised_recons = {}
 exp = 0
-
-#f_coeff_list = [f_coeff_list[0]]
 
 for i, Li_fourier in enumerate(f_coeff_list):
 

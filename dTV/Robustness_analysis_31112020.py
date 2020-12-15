@@ -6,7 +6,7 @@ from myOperators import RealFourierTransform
 
 plot_TV_results = True
 plot_dTV_results = False
-discrepancy_plots = False
+discrepancy_plots = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -152,19 +152,23 @@ if discrepancy_plots:
     with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
         d = json.load(f)
 
+    # with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
+    #     d = json.load(f)
+
     for avg in avgs:
 
         discrep_arr = np.zeros((len(reg_params), 32))
-        d3 = d['avgs='+avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=32']
 
         for i, reg_param in enumerate(reg_params):
 
             discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
             discrep_arr[i, :] = discrep
 
-        plt.figure()
-        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1))
-        plt.ylim(30000, 75000)
+        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
+                     label=avg+'avgs')
+        plt.legend()
+
 
         #plt.figure()
         #plt.scatter(np.tile(np.log10(np.asarray(reg_params)), (32, 1)).T, discrep_arr)
