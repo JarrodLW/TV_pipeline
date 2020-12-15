@@ -142,18 +142,18 @@ if plot_TV_results:
                     # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
                     #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
-    json.dump(norms_dict,
-              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+        json.dump(norms_dict,
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
 # plotting data discrepancies
 
 if discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
-        d = json.load(f)
-
-    # with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
+    # with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
     #     d = json.load(f)
+
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
+        d = json.load(f)
 
     for avg in avgs:
 
