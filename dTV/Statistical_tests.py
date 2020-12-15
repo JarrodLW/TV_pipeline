@@ -152,3 +152,32 @@ sp.stats.levene(np.ndarray.flatten(border_pixels_real_part), np.ndarray.flatten(
 # testing pairwise independence of pixels
 
 
+
+### some statistics for Li_LS dataset
+
+f_coeff_list = []
+recon_list = []
+
+for i in range(2, 36):
+    f_coeffs = np.reshape(np.fromfile(dir + 'Li_LS/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+    f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+    f_coeff_list.append(f_coeffs_unpacked)
+    recon = 32*np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs_unpacked))) # inserting factor of 32 to ensure transform is unitary
+    recon_list.append(recon)
+
+recon_arr = np.asarray(recon_list)
+# grabbing the pixels around the border of each reconstruction
+block_1 = np.reshape(recon_arr[:, :8, :24], (34, 8*24))
+block_2 = np.reshape(recon_arr[:, 8:, :8], (34, 8*24))
+block_3 = np.reshape(recon_arr[:, 24:, 8:], (34, 8*24))
+block_4 = np.reshape(recon_arr[:, :24, 24:], (34, 8*24))
+
+border_pixels = np.concatenate((block_1, block_2, block_3, block_4), axis=1)
+border_pixels_real_part = np.real(border_pixels)
+border_pixels_imag_part = np.imag(border_pixels)
+
+32*np.sqrt(np.std(border_pixels_real_part)**2 + np.std(border_pixels_imag_part)**2)
+
+32*np.std((1/2)*(border_pixels_imag_part[:17, :] + border_pixels_imag_part[17:, :]))
+
+
