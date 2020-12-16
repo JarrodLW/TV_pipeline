@@ -194,23 +194,23 @@ if discrepancy_plots:
 
 # stdev plots
 
-with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
-    d = json.load(f)
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
+        d = json.load(f)
 
-for k, avg in enumerate(avgs):
+    for k, avg in enumerate(avgs):
 
-    stdev_arr = np.zeros(len(reg_params))
-    d3 = d['avgs='+avg]['output_dim=64']
+        stdev_arr = np.zeros(len(reg_params))
+        d3 = d['avgs='+avg]['output_dim=64']
 
-    for i, reg_param in enumerate(reg_params):
+        for i, reg_param in enumerate(reg_params):
 
-        stdev = d3['reg_param='+'{:.1e}'.format(reg_param)]
-        stdev_arr[i] = stdev
+            stdev = d3['reg_param='+'{:.1e}'.format(reg_param)]
+            stdev_arr[i] = stdev
 
-    plt.plot(np.log10(reg_params), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
-    plt.xlabel("log10(lambda)")
-    plt.ylabel("recon. standard deviation")
-    plt.legend()
+        plt.plot(np.log10(reg_params), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+        plt.xlabel("log10(lambda)")
+        plt.ylabel("recon. standard deviation")
+        plt.legend()
 
 
 ## dTV results
