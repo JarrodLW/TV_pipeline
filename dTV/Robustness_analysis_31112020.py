@@ -153,6 +153,13 @@ if plot_TV_results:
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
                         'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
 
+                    plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
+                    plt.colorbar()
+                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + ".pdf")
+                    plt.close()
+
+
         json.dump(norms_dict,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
@@ -184,9 +191,26 @@ if discrepancy_plots:
         plt.plot(np.log10(np.asarray(reg_params))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
+# stdev plots
 
-        #plt.figure()
-        #plt.scatter(np.tile(np.log10(np.asarray(reg_params)), (32, 1)).T, discrep_arr)
+with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
+    d = json.load(f)
+
+for k, avg in enumerate(avgs):
+
+    stdev_arr = np.zeros(len(reg_params))
+    d3 = d['avgs='+avg]['output_dim=64']
+
+    for i, reg_param in enumerate(reg_params):
+
+        stdev = d3['reg_param='+'{:.1e}'.format(reg_param)]
+        stdev_arr[i] = stdev
+
+    plt.plot(np.log10(reg_params), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+    plt.xlabel("log10(lambda)")
+    plt.ylabel("recon. standard deviation")
+    plt.legend()
+
 
 ## dTV results
 
