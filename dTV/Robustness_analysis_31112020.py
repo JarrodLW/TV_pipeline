@@ -153,6 +153,7 @@ if plot_TV_results:
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
                         'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
 
+                    plt.figure()
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
                     plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
