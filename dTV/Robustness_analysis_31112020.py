@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 discrepancy_plots = False
 TV_discrepancy_plots = False
 
@@ -47,10 +47,12 @@ if plot_TV_results:
 
     for k, ext in enumerate(extensions):
         norms_dict = {}
+        stdevs = {}
+
         for j, avg in enumerate(avgs):
 
             norms_dict['avgs='+ avg] = {}
-
+            stdevs['avgs=' + avg] = {}
 
             f_coeff_list = []
 
@@ -87,6 +89,7 @@ if plot_TV_results:
             for output_dim in output_dims:
 
                 norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
+                stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
                 complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
                                                   shape=[output_dim, output_dim], dtype='complex')
@@ -98,6 +101,7 @@ if plot_TV_results:
                 for reg_param in reg_params:
 
                     diff_norms = []
+                    recons = []
 
                     fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                     for i in range(32):
@@ -132,6 +136,8 @@ if plot_TV_results:
                         axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
                         axs[1+2 * (i // 4), i % 4].axis("off")
 
+                        recons.append(image)
+
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
@@ -143,8 +149,15 @@ if plot_TV_results:
                     # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
                     #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
+                    stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
+                    stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
+                        'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
+
         json.dump(norms_dict,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+
+        json.dump(stdevs,
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '.json', 'w'))
 
 # plotting data discrepancies
 
@@ -258,3 +271,21 @@ if TV_discrepancy_plots:
         plt.plot(np.log10(np.asarray(alphas)[:-2]), 63000*np.ones(8)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
+
+with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
+    d = json.load(f)
+
+for k, avg in enumerate(avgs):
+
+    stdev_arr = np.zeros(len(alphas))
+    d3 = d['avgs='+avg]['output_dim=64']
+
+    for i, alpha in enumerate(alphas):
+
+        stdev = d3['reg_param='+'{:.1e}'.format(alpha)]
+        stdev_arr[i] = stdev
+
+    plt.plot(np.log10(alphas), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+    plt.xlabel("log10(alpha)")
+    plt.ylabel("recon. standard deviation")
+    plt.legend()
