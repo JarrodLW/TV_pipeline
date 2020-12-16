@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = True
-plot_dTV_results = False
+plot_TV_results = False
+plot_dTV_results = True
 discrepancy_plots = False
-TV_discrepancy_plots = False
+dTV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -268,6 +268,13 @@ if plot_dTV_results:
                     stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
 
+                    plt.figure()
+                    plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
+                    plt.colorbar()
+                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot.pdf')
+                    plt.close()
+
     json.dump(norms_dict,
               open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_fidelities.json', 'w'))
 
@@ -276,7 +283,7 @@ if plot_dTV_results:
 
 # plotting data discrepancies
 
-if TV_discrepancy_plots:
+if dTV_discrepancy_plots:
 
     with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities.json') as f:
         d = json.load(f)
@@ -284,16 +291,16 @@ if TV_discrepancy_plots:
     for k, avg in enumerate(avgs):
 
         discrep_arr = np.zeros((len(alphas), 32))
-        d3 = d['avgs='+avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=32']
 
         for i, alpha in enumerate(alphas):
 
             discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(alpha)]).astype('float64')
             discrep_arr[i, :] = discrep
 
-        plt.errorbar(np.log10(np.asarray(alphas)[:-2]), np.average(discrep_arr[:-2, :], axis=1), yerr=np.std(discrep_arr[:-2, :], axis=1),
+        plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
                      label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas)[:-2]), 63000*np.ones(8)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        plt.plot(np.log10(np.asarray(alphas)), 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
 
