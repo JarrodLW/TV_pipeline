@@ -213,7 +213,7 @@ if plot_dTV_results:
                         axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
                         axs[1 + 2 * (i // 4), i % 4].axis("off")
 
-                        diff_norms.append(np.sqrt(np.sum.np.square(fourier_diff_image)))
+                        diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
