@@ -182,18 +182,22 @@ alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10
 if plot_dTV_results:
 
     norms_dict = {}
+    stdevs = {}
 
     for avg in avgs:
         norms_dict['avgs=' + avg] = {}
+        stdevs['avgs=' + avg] = {}
 
         with open('Results_MRI_dTV/Robustness_31112020_dTV_' + avg + '.json') as f:
             d = json.load(f)
 
             for output_dim in output_dims:
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
                 for alpha in alphas:
                     diff_norms = []
+                    recons = []
 
                     fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                     for i in range(32):
@@ -214,6 +218,7 @@ if plot_dTV_results:
                         axs[1 + 2 * (i // 4), i % 4].axis("off")
 
                         diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
+                        recons.append(recon_image)
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
@@ -222,14 +227,20 @@ if plot_dTV_results:
                     norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                         'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
 
+                    stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
+                    stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
+
     json.dump(norms_dict,
               open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_fidelities.json', 'w'))
+
+    json.dump(stdevs,
+              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_aggregated_pixel_stds.json', 'w'))
 
 # plotting data discrepancies
 
 if TV_discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities.json.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -242,8 +253,8 @@ if TV_discrepancy_plots:
             discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(alpha)]).astype('float64')
             discrep_arr[i, :] = discrep
 
-        plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
+        plt.errorbar(np.log10(np.asarray(alphas)[:-2]), np.average(discrep_arr[:-2, :], axis=1), yerr=np.std(discrep_arr[:-2, :], axis=1),
                      label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        plt.plot(np.log10(np.asarray(alphas)[:-2]), 63000*np.ones(8)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
