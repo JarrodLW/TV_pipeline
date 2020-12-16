@@ -7,6 +7,7 @@ from myOperators import RealFourierTransform
 plot_TV_results = False
 plot_dTV_results = True
 discrepancy_plots = False
+TV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -179,13 +180,20 @@ if discrepancy_plots:
 alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
 
 if plot_dTV_results:
+
+    norms_dict = {}
+
     for avg in avgs:
+        norms_dict['avgs=' + avg] = {}
 
         with open('Results_MRI_dTV/Robustness_31112020_dTV_' + avg + '.json') as f:
             d = json.load(f)
 
             for output_dim in output_dims:
+                norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+
                 for alpha in alphas:
+                    diff_norms = []
 
                     fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                     for i in range(32):
@@ -205,6 +213,37 @@ if plot_dTV_results:
                         axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
                         axs[1 + 2 * (i // 4), i % 4].axis("off")
 
+                        diff_norms.append(np.sqrt(np.sum.np.square(fourier_diff_image)))
+
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + ".pdf")
+
+                    norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                        'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
+
+    json.dump(norms_dict,
+              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_fidelities.json', 'w'))
+
+# plotting data discrepancies
+
+if TV_discrepancy_plots:
+
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities.json.json') as f:
+        d = json.load(f)
+
+    for k, avg in enumerate(avgs):
+
+        discrep_arr = np.zeros((len(alphas), 32))
+        d3 = d['avgs='+avg]['output_dim=64']
+
+        for i, alpha in enumerate(alphas):
+
+            discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(alpha)]).astype('float64')
+            discrep_arr[i, :] = discrep
+
+        plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
+                     label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(np.asarray(alphas))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        plt.legend()
+
