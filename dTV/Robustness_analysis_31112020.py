@@ -160,6 +160,12 @@ if plot_TV_results:
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + ".pdf")
                     plt.close()
 
+                    plt.figure()
+                    plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
+                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + ".pdf")
+                    plt.close()
+
 
         json.dump(norms_dict,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
@@ -207,7 +213,7 @@ if discrepancy_plots:
             stdev = d3['reg_param='+'{:.1e}'.format(reg_param)]
             stdev_arr[i] = stdev
 
-        plt.plot(np.log10(reg_params), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(reg_params), np.log10(stdev_arr), label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(lambda)")
         plt.ylabel("recon. standard deviation")
         plt.legend()
