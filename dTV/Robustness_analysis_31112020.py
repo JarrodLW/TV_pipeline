@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
 
