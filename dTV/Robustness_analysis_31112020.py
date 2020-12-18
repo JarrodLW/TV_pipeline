@@ -47,7 +47,7 @@ if plot_TV_results:
 
     for k, ext in enumerate(extensions):
 
-        GT_norms_dict = []
+        GT_norms_dict = {}
         norms_dict = {}
         stdevs = {}
 
