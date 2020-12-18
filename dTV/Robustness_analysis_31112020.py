@@ -46,11 +46,14 @@ extensions = ['', '_Li_LS']
 if plot_TV_results:
 
     for k, ext in enumerate(extensions):
+
+        GT_norms_dict = []
         norms_dict = {}
         stdevs = {}
 
         for j, avg in enumerate(avgs):
 
+            GT_norms_dict['avgs=' + avg] = {}
             norms_dict['avgs='+ avg] = {}
             stdevs['avgs=' + avg] = {}
 
@@ -66,7 +69,7 @@ if plot_TV_results:
                     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
                     f_coeff_list.append(f_coeffs_unpacked)
 
-                coeffs = f_coeff_list
+                #coeffs = f_coeff_list
 
             if k==1:
 
@@ -76,6 +79,7 @@ if plot_TV_results:
                     f_coeff_list.append(f_coeffs_unpacked)
 
             f_coeff_arr = np.asarray(f_coeff_list)
+            fully_averaged_coeffs = np.average(f_coeff_arr, axis=0)
             f_coeff_list_grouped = []
             num = int(2 ** j)
             for i in range(num):
@@ -88,6 +92,7 @@ if plot_TV_results:
             # all the recons for each num of avgs for each reg parameter, in separate plots
             for output_dim in output_dims:
 
+                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                 norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
@@ -100,6 +105,7 @@ if plot_TV_results:
 
                 for reg_param in reg_params:
 
+                    GT_diff_norms = []
                     diff_norms = []
                     recons = []
 
@@ -118,6 +124,12 @@ if plot_TV_results:
                         data = np.zeros((output_dim, output_dim), dtype='complex')
                         data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
                         data = np.fft.fftshift(data)
+
+                        fully_averaged_data = np.zeros((output_dim, output_dim), dtype='complex')
+                        fully_averaged_data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = \
+                        fully_averaged_coeffs
+                        fully_averaged_data = np.fft.fftshift(fully_averaged_data)
+
                         subsampling_matrix = np.zeros((output_dim, output_dim))
                         subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
                         output_dim // 2 - 16:output_dim // 2 + 16] = 1
@@ -127,6 +139,10 @@ if plot_TV_results:
                         diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
                         diff_norm = l2_norm(diff)
                         diff_norms.append(diff_norm)
+
+                        GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
+                        GT_diff_norm = l2_norm(GT_diff)
+                        GT_diff_norms.append(GT_diff_norm)
                         #diff = diff[0].asarray() + 1j * diff[1].asarray()
                         #diff_shift = np.fft.ifftshift(diff)probability
 
@@ -145,6 +161,9 @@ if plot_TV_results:
 
                     norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                         'reg_param=' + '{:.1e}'.format(reg_param)] = diff_norms
+
+                    GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                        'reg_param=' + '{:.1e}'.format(reg_param)] = GT_diff_norms
 
                     # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
                     #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
@@ -169,6 +188,9 @@ if plot_TV_results:
 
         json.dump(norms_dict,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+
+        json.dump(GT_norms_dict,
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '.json', 'w'))
 
         json.dump(stdevs,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '.json', 'w'))
@@ -226,20 +248,24 @@ alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10
 if plot_dTV_results:
 
     norms_dict = {}
+    GT_norms_dict = {}
     stdevs = {}
 
     for avg in avgs:
         norms_dict['avgs=' + avg] = {}
+        GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
         with open('Results_MRI_dTV/Robustness_31112020_dTV_' + avg + '.json') as f:
             d = json.load(f)
 
             for output_dim in output_dims:
+                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
                 for alpha in alphas:
+                    GT_diff_norms = []
                     diff_norms = []
                     recons = []
 
