@@ -41,7 +41,8 @@ for i in range(num):
 
 f_coeff_list = f_coeff_list_grouped
 
-reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+#reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+reg_params = np.logspace(3., 4.5, num=20)
 output_dims = [int(32), int(64)]
 Li_fourier_coeffs =f_coeff_list
 
@@ -74,6 +75,6 @@ if run_exp:
                     [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
 
     json.dump(regularised_recons,
-              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_4096.json', 'w'))
+              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_4096_new.json', 'w'))
 
 

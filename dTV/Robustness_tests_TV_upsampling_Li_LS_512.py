@@ -35,7 +35,8 @@ for i in range(2, 34):
 # my_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs_averaged)))
 # image = np.abs(my_recon)
 
-reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+#reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+reg_params = np.logspace(3., 4.5, num=20)
 output_dims = [int(32), int(64)]
 Li_fourier_coeffs =f_coeff_list
 
@@ -68,7 +69,7 @@ if run_exp:
                     [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
 
     json.dump(regularised_recons,
-              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512_Li_LS.json', 'w'))
+              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512_Li_LS_new.json', 'w'))
 
 # with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512.json') as f:
 #     d = json.load(f)

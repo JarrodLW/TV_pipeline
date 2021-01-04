@@ -23,7 +23,7 @@ def unpacking_fourier_coeffs(arr):
 f_coeff_list = []
 
 for i in range(2, 34):
-    f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+    f_coeffs = np.reshape(np.fromfile(dir + 'Li_LS/'+str(i)+'/fid', dtype=np.int32), (64, 128))
     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
     f_coeff_list.append(f_coeffs_unpacked)
 
@@ -64,8 +64,6 @@ for avg_ind in range(len(avgs)):
         recon_upsampled = np.fft.fftshift(np.fft.ifft2(f_data_padded_shifted))
         recon_arr_upsampled[avg_ind, i, :, :] = recon_upsampled
 
-        #recon_dict['avgs=' + avgs[avg_ind]]['measurement=' + str(i)] =
-
 # plotting
 
 for avg_ind in range(len(avgs)):
@@ -78,6 +76,7 @@ for avg_ind in range(len(avgs)):
         axs[i // 4, i % 4].imshow(image, cmap=plt.cm.gray)
         axs[i // 4, i % 4].axis("off")
 
+
 for avg_ind in range(len(avgs)):
 
     fig, axs = plt.subplots(8, 4, figsize=(4, 10))
@@ -87,6 +86,8 @@ for avg_ind in range(len(avgs)):
 
         axs[i // 4, i % 4].imshow(image, cmap=plt.cm.gray)
         axs[i // 4, i % 4].axis("off")
+
+
 
 rec_all_averaged = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(np.average(f_coeff_arr_combined[0, :, :, :], axis=0))))
 

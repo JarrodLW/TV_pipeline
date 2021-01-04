@@ -6,7 +6,7 @@ from myOperators import RealFourierTransform
 
 plot_TV_results = True
 plot_dTV_results = False
-discrepancy_plots = False
+discrepancy_plots = True
 dTV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
@@ -114,12 +114,12 @@ if plot_TV_results:
 
                         recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                            ['output_size=' + str(output_dim)]).astype('float64')
-                        image = np.abs(recon[0] + 1j * recon[1])
                         #axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
                         #axs[i//4, i % 4].axis("off")
 
                         # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
                         recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
+                        image = np.abs(recon_rotated[0] + 1j * recon_rotated[1])
 
                         data = np.zeros((output_dim, output_dim), dtype='complex')
                         data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
@@ -195,6 +195,22 @@ if plot_TV_results:
         json.dump(stdevs,
                   open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '.json', 'w'))
 
+# plotting TV recons for full number of averages, small regularisation params
+with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_16384_lower_reg_params.json') as f:
+    d = json.load(f)
+
+d2 = d['measurement=0']
+reg_params = np.logspace(np.log10(1.), np.log10(2*10**3), num=10)
+
+for output_dim in output_dims:
+    for i, reg_param in enumerate(reg_params):
+
+        recon = np.asarray(d2['reg_param='+'{:.1e}'.format(reg_param)]['output_size='+str(output_dim)]).astype('float64')
+
+        plt.figure()
+        plt.imshow(np.abs(recon[0] + 1j*recon[1]), cmap=plt.cm.gray)
+
+
 # plotting data discrepancies
 
 if discrepancy_plots:
@@ -202,27 +218,44 @@ if discrepancy_plots:
     # with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
     #     d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
         d = json.load(f)
+
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_GT_fidelities_.json') as f:
+        D = json.load(f)
 
     for k, avg in enumerate(avgs):
 
+        GT_discrep_arr = np.zeros((len(reg_params), 32))
         discrep_arr = np.zeros((len(reg_params), 32))
         d3 = d['avgs='+avg]['output_dim=64']
+        D3 = D['avgs=' + avg]['output_dim=64']
 
         for i, reg_param in enumerate(reg_params):
 
             discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
             discrep_arr[i, :] = discrep
 
-        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
-                     label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(reg_params))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+            GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+            GT_discrep_arr[i, :] = GT_discrep
+
+
+        # plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
+        #              label=avg+'avgs', color="C"+str(k%10))
+        # plt.plot(np.log10(np.asarray(reg_params))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        # plt.legend()
+
+
+        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(GT_discrep_arr, axis=1),
+                     yerr=np.std(GT_discrep_arr, axis=1),
+                     label=avg + 'avgs', color="C" + str(k % 10))
+        plt.plot(np.log10(np.asarray(reg_params))[:10], 63000 * np.ones(10) / np.sqrt(2) ** k, color="C" + str(k % 10),
+                 linestyle=":")
         plt.legend()
 
 # stdev plots
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -336,7 +369,7 @@ if dTV_discrepancy_plots:
         plt.legend()
 
 
-with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
+with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
     d = json.load(f)
 
 for k, avg in enumerate(avgs):
