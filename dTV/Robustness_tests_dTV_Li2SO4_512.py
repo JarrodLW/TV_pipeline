@@ -51,9 +51,9 @@ sinfos['med_res'] = sinfo_med_res
 sinfos['low_res'] = sinfo_low_res
 
 #alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
-#alphas = np.logspace(2.5, 4.75, num=20)
-alphas = [10**3]   ### change this back
-f_coeff_list = [f_coeff_list[0]] ### delete this
+alphas = np.logspace(2.5, 4.75, num=20)
+#alphas = [10**3]   ### change this back
+#f_coeff_list = [f_coeff_list[0]] ### delete this
 eta = 0.01
 
 gamma = 0.995

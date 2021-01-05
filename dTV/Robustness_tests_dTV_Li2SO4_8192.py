@@ -170,4 +170,5 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 np.real(diff_shift_subsampled).tolist(),
                 np.imag(diff_shift_subsampled).tolist()]
 
-json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/Robustness_31112020_dTV_8192_new.json', 'w'))
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
+json.dump(dTV_regularised_recons, open(save_dir + '/Robustness_31112020_dTV_8192_new.json', 'w'))
