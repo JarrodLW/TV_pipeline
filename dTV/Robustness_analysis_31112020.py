@@ -392,3 +392,4 @@ if dTV_discrepancy_plots:
         plt.xlabel("log10(alpha)")
         plt.ylabel("recon. standard deviation")
         plt.legend()
+

@@ -51,7 +51,9 @@ sinfos['med_res'] = sinfo_med_res
 sinfos['low_res'] = sinfo_low_res
 
 #alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
-alphas = np.logspace(2.5, 4.75, num=20)
+#alphas = np.logspace(2.5, 4.75, num=20)
+alphas = [10**3]   ### change this back
+f_coeff_list = [f_coeff_list[0]] ### delete this
 eta = 0.01
 
 gamma = 0.995
@@ -160,4 +162,5 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 np.real(diff_shift_subsampled).tolist(),
                 np.imag(diff_shift_subsampled).tolist()]
 
-json.dump(dTV_regularised_recons, open('dTV/Results_MRI_dTV/Robustness_31112020_dTV_512_new.json', 'w'))
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
+json.dump(dTV_regularised_recons, open(save_dir + 'Robustness_31112020_dTV_512_new.json', 'w'))

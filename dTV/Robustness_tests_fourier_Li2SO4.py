@@ -93,3 +93,8 @@ rec_all_averaged = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(np.average(f_coe
 plt.imshow(np.abs(rec_all_averaged), cmap=plt.cm.gray)
 plt.axis("off")
 
+# stdev plots
+recon_arr_512 = recon_arr[0]
+stdev_arr_512 = np.std(np.abs(recon_arr_512), axis=0)
+np.sqrt(np.sum(np.square(stdev_arr_512)))
+
