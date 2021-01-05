@@ -36,12 +36,10 @@ for i in range(2, 34):
 # image = np.abs(my_recon)
 
 #reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
-#reg_params = np.logspace(3., 4.5, num=20)
-reg_params = [1]
-#output_dims = [int(32), int(64)]
-output_dims = [int(32)]
-#Li_fourier_coeffs =f_coeff_list
-Li_fourier_coeffs =[f_coeff_list[0]]
+reg_params = np.logspace(3., 4.5, num=20)
+output_dims = [int(32), int(64)]
+#output_dims = [int(32)]
+Li_fourier_coeffs =f_coeff_list
 
 run_exp = True
 #plot_results = True
