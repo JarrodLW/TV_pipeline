@@ -65,6 +65,8 @@ if plot_TV_results:
             with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
                 d = json.load(f)
 
+            print("read avgs" + avg)
+
             if k==0:
                 # getting the data
                 for i in range(2, 34):
