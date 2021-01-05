@@ -6,12 +6,14 @@ from myOperators import RealFourierTransform
 
 plot_TV_results = True
 plot_dTV_results = False
-discrepancy_plots = True
+plot_TV_results_full_avgs = False
+discrepancy_plots = False
 dTV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
-reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+#reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+reg_params = np.logspace(3., 4.5, num=20)
 output_dims = [int(32), int(64)]
 
 dir = '7Li_1H_MRI_Data_31112020/'
@@ -59,7 +61,7 @@ if plot_TV_results:
 
             f_coeff_list = []
 
-            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
+            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
                 d = json.load(f)
 
             if k==0:
@@ -156,7 +158,7 @@ if plot_TV_results:
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                     plt.close()
 
                     norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -176,39 +178,40 @@ if plot_TV_results:
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
                     plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + ".pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
                     plt.close()
 
                     plt.figure()
                     plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
                     plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + ".pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
                     plt.close()
 
-
         json.dump(norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(stdevs,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
 
-# plotting TV recons for full number of averages, small regularisation params
-with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_16384_lower_reg_params.json') as f:
-    d = json.load(f)
+if plot_TV_results_full_avgs:
 
-d2 = d['measurement=0']
-reg_params = np.logspace(np.log10(1.), np.log10(2*10**3), num=10)
+    # plotting TV recons for full number (16384) of averages, small regularisation params
+    with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_16384_lower_reg_params.json') as f:
+        d = json.load(f)
 
-for output_dim in output_dims:
-    for i, reg_param in enumerate(reg_params):
+    d2 = d['measurement=0']
+    reg_params = np.logspace(np.log10(1.), np.log10(2*10**3), num=10)
 
-        recon = np.asarray(d2['reg_param='+'{:.1e}'.format(reg_param)]['output_size='+str(output_dim)]).astype('float64')
+    for output_dim in output_dims:
+        for i, reg_param in enumerate(reg_params):
 
-        plt.figure()
-        plt.imshow(np.abs(recon[0] + 1j*recon[1]), cmap=plt.cm.gray)
+            recon = np.asarray(d2['reg_param='+'{:.1e}'.format(reg_param)]['output_size='+str(output_dim)]).astype('float64')
+
+            plt.figure()
+            plt.imshow(np.abs(recon[0] + 1j*recon[1]), cmap=plt.cm.gray)
 
 
 # plotting data discrepancies
@@ -369,20 +372,20 @@ if dTV_discrepancy_plots:
         plt.legend()
 
 
-with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
-    d = json.load(f)
+    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
+        d = json.load(f)
 
-for k, avg in enumerate(avgs):
+    for k, avg in enumerate(avgs):
 
-    stdev_arr = np.zeros(len(alphas))
-    d3 = d['avgs='+avg]['output_dim=64']
+        stdev_arr = np.zeros(len(alphas))
+        d3 = d['avgs='+avg]['output_dim=64']
 
-    for i, alpha in enumerate(alphas):
+        for i, alpha in enumerate(alphas):
 
-        stdev = d3['reg_param='+'{:.1e}'.format(alpha)]
-        stdev_arr[i] = stdev
+            stdev = d3['reg_param='+'{:.1e}'.format(alpha)]
+            stdev_arr[i] = stdev
 
-    plt.plot(np.log10(alphas), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
-    plt.xlabel("log10(alpha)")
-    plt.ylabel("recon. standard deviation")
-    plt.legend()
+        plt.plot(np.log10(alphas), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+        plt.xlabel("log10(alpha)")
+        plt.ylabel("recon. standard deviation")
+        plt.legend()
