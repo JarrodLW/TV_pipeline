@@ -71,8 +71,9 @@ if run_exp:
                 regularised_recons['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
                     [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
 
+    save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
     json.dump(regularised_recons,
-              open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512_new.json', 'w'))
+              open(save_dir + '/Robustness_31112020_TV_512_new.json', 'w'))
 
 # with open('dTV/Results_MRI_dTV/Robustness_31112020_TV_512.json') as f:
 #     d = json.load(f)
