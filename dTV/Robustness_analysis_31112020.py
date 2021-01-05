@@ -12,8 +12,8 @@ dTV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
-#reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
-reg_params = np.logspace(3., 4.5, num=20)
+reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+#reg_params = np.logspace(3., 4.5, num=20)
 output_dims = [int(32), int(64)]
 
 dir = '7Li_1H_MRI_Data_31112020/'
@@ -61,7 +61,7 @@ if plot_TV_results:
 
             f_coeff_list = []
 
-            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
+            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '.json') as f:
                 d = json.load(f)
 
             if k==0:
@@ -158,7 +158,7 @@ if plot_TV_results:
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
                     plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + ".pdf")
                     plt.close()
 
                     norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -178,23 +178,23 @@ if plot_TV_results:
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
                     plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + ".pdf")
                     plt.close()
 
                     plt.figure()
                     plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
                     plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
+                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + ".pdf")
                     plt.close()
 
         json.dump(norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '.json', 'w'))
 
         json.dump(stdevs,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
+                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
