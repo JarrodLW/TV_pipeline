@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
 
-plot_TV_results = True
-plot_dTV_results = False
+plot_TV_results = False
+plot_dTV_results = True
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
@@ -282,7 +282,7 @@ if discrepancy_plots:
 
 ## dTV results
 
-alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
+alphas = np.logspace(2.5, 4.75, num=20)
 
 if plot_dTV_results:
 
@@ -295,7 +295,7 @@ if plot_dTV_results:
         GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open('Results_MRI_dTV/Robustness_31112020_dTV_' + avg + '.json') as f:
+        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
             d = json.load(f)
 
             for output_dim in output_dims:
@@ -330,8 +330,8 @@ if plot_dTV_results:
                         recons.append(recon_image)
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                    plt.savefig("7Li_1H_MRI_Data_31112020/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + ".pdf")
+                    plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
 
                     norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                         'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
@@ -342,15 +342,15 @@ if plot_dTV_results:
                     plt.figure()
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
-                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot.pdf')
+                    plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                     plt.close()
 
     json.dump(norms_dict,
-              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_fidelities.json', 'w'))
+              open(save_dir + '/Robustness_31112020_dTV_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open('7Li_1H_MRI_Data_31112020/Robustness_31112020_dTV_aggregated_pixel_stds.json', 'w'))
+              open(save_dir + '/Robustness_31112020_dTV_aggregated_pixel_stds_new.json', 'w'))
 
 # plotting data discrepancies
 
