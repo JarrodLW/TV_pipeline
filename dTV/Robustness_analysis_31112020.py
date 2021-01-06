@@ -63,7 +63,7 @@ if plot_TV_results:
 
             f_coeff_list = []
 
-            with open('Results_MRI_dTV/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
+            with open(save_dir + '/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
                 d = json.load(f)
 
             print("read avgs" + avg)
@@ -161,7 +161,7 @@ if plot_TV_results:
                         recons.append(image)
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                     plt.close()
 
@@ -181,13 +181,13 @@ if plot_TV_results:
                     plt.figure()
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
-                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
                     plt.close()
 
                     plt.figure()
                     plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
                     plt.close()
 
