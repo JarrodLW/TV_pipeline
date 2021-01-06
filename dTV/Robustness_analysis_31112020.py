@@ -5,10 +5,10 @@ import odl
 from myOperators import RealFourierTransform
 
 plot_TV_results = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
-dTV_discrepancy_plots = False
+dTV_discrepancy_plots = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -221,21 +221,24 @@ if plot_TV_results_full_avgs:
 
 if discrepancy_plots:
 
-    # with open('/Users/jlw31/Desktop/Robustness_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS.json') as f:
-    #     d = json.load(f)
-
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities_.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS_new.json') as f:
         d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_GT_fidelities_.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_GT_fidelities__Li_LS_new.json') as f:
         D = json.load(f)
+
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities__new.json') as f:
+    #     d = json.load(f)
+    #
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_GT_fidelities__new.json') as f:
+    #     D = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         GT_discrep_arr = np.zeros((len(reg_params), 32))
         discrep_arr = np.zeros((len(reg_params), 32))
-        d3 = d['avgs='+avg]['output_dim=64']
-        D3 = D['avgs=' + avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=32']
+        D3 = D['avgs=' + avg]['output_dim=32']
 
         for i, reg_param in enumerate(reg_params):
 
@@ -248,26 +251,26 @@ if discrepancy_plots:
 
         # plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(reg_params))[:10], 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        # plt.plot(np.log10(np.asarray(reg_params))[:10], 68000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         # plt.legend()
 
-
+        #
         plt.errorbar(np.log10(np.asarray(reg_params)), np.average(GT_discrep_arr, axis=1),
                      yerr=np.std(GT_discrep_arr, axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(reg_params))[:10], 63000 * np.ones(10) / np.sqrt(2) ** k, color="C" + str(k % 10),
+        plt.plot(np.log10(np.asarray(reg_params))[:10], 68000 * np.ones(10) / np.sqrt(2) ** k, color="C" + str(k % 10),
                  linestyle=":")
         plt.legend()
 
 # stdev plots
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         stdev_arr = np.zeros(len(reg_params))
-        d3 = d['avgs='+avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=32']
 
         for i, reg_param in enumerate(reg_params):
 
@@ -356,7 +359,7 @@ if plot_dTV_results:
 
 if dTV_discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -371,11 +374,11 @@ if dTV_discrepancy_plots:
 
         plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
                      label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas)), 63000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        plt.plot(np.log10(np.asarray(alphas)), 68000*np.ones(20)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
 
-    with open('/Users/jlw31/Desktop/Robustness_results/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -388,7 +391,7 @@ if dTV_discrepancy_plots:
             stdev = d3['reg_param='+'{:.1e}'.format(alpha)]
             stdev_arr[i] = stdev
 
-        plt.plot(np.log10(alphas), stdev_arr, label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(alphas), np.log10(stdev_arr), label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(alpha)")
         plt.ylabel("recon. standard deviation")
         plt.legend()

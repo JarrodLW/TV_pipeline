@@ -98,3 +98,7 @@ recon_arr_512 = recon_arr[0]
 stdev_arr_512 = np.std(np.abs(recon_arr_512), axis=0)
 np.sqrt(np.sum(np.square(stdev_arr_512)))
 
+f_coeffs_arr_512 = f_coeff_arr_combined[0]
+f_coeffs_stdev_arr_512 = np.std(np.abs(f_coeffs_arr_512), axis=0)
+np.sqrt(np.sum(np.square(f_coeffs_stdev_arr_512)))
+

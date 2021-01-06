@@ -86,7 +86,7 @@ recon_XRF = FBP(forward_op.range.element(sino_Co_1.T))
 recon_XRD = FBP(forward_op.range.element(sino_XRD.T))
 
 plt.figure()
-plt.imshow(recon_XRF)
+plt.imshow(recon_XRF, cmap=plt.cm.gray)
 
 plt.figure()
 plt.imshow(recon_XRD, cmap=plt.cm.gray)
@@ -184,6 +184,9 @@ plt.imshow(recon_XRF.asarray(), cmap=plt.cm.gray)
 
 plt.figure()
 plt.imshow(sino_XRD, cmap=plt.cm.gray, aspect=0.1)
+
+plt.figure()
+plt.imshow(sino_Co_1, cmap=plt.cm.gray, aspect=0.1)
 
 plt.figure()
 plt.imshow(sino_XRD*subsampling_arr, cmap=plt.cm.gray, aspect=0.1)
