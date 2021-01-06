@@ -45,6 +45,7 @@ def unpacking_fourier_coeffs(arr):
 #     f_coeff_list_Li_LS.append(f_coeffs_unpacked)
 
 extensions = ['', '_Li_LS']
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
 
 if plot_TV_results:
 
@@ -160,7 +161,7 @@ if plot_TV_results:
                         recons.append(image)
 
                     fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                    plt.savefig("7Li_1H_MRI_Data_31112020/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                     plt.close()
 
@@ -180,24 +181,24 @@ if plot_TV_results:
                     plt.figure()
                     plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                     plt.colorbar()
-                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
                     plt.close()
 
                     plt.figure()
                     plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                    plt.savefig("7Li_1H_MRI_Data_31112020/stdev_plots/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    plt.savefig(save_dir + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                         output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
                     plt.close()
 
         json.dump(norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
+                  open(save_dir + '/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
+                  open(save_dir + '/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(stdevs,
-                  open('7Li_1H_MRI_Data_31112020/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
+                  open(save_dir + '/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
