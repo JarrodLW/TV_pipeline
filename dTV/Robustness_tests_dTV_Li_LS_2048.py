@@ -17,7 +17,7 @@ from processing import *
 
 dir_H = 'dTV/7Li_1H_MRI_Data_31112020/1H_Li_LS/'
 
-image_H = np.reshape(np.fromfile(dir_H+'6/pdata/1/2dseq', dtype=np.uint16), (128, 128))
+image_H = np.reshape(np.fromfile(dir_H+'3/pdata/1/2dseq', dtype=np.uint16), (128, 128))
 plt.figure()
 plt.imshow(np.abs(image_H), cmap=plt.cm.gray)
 
@@ -68,7 +68,7 @@ sinfos['low_res'] = sinfo_low_res
 
 #alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
 #alphas = [5*10**3]
-alphas = np.logspace(2.5, 4.75, num=20)
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 eta = 0.01
 
 gamma = 0.995
