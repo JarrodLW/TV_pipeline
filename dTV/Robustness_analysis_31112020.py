@@ -307,53 +307,53 @@ if plot_dTV_results:
         affine_param_dict['avgs=' + avg] = {mkey: {skey: {akey: aval['affine_params'] for akey, aval in sval.items()}
                                    for skey, sval in mval.items()} for mkey, mval in d.items()}
 
-            for output_dim in output_dims:
-                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
-                norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
-                stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+        for output_dim in output_dims:
+            GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+            norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+            stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
-                for alpha in alphas:
-                    GT_diff_norms = []
-                    diff_norms = []
-                    recons = []
+            for alpha in alphas:
+                GT_diff_norms = []
+                diff_norms = []
+                recons = []
 
-                    fig, axs = plt.subplots(16, 4, figsize=(4, 10))
-                    for i in range(32):
+                fig, axs = plt.subplots(16, 4, figsize=(4, 10))
+                for i in range(32):
 
-                        recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
-                            'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
+                    recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                        'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
 
-                        fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
-                            'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
+                    fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                        'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
-                        recon_image = np.abs(recon[0] + 1j * recon[1])
-                        fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
+                    recon_image = np.abs(recon[0] + 1j * recon[1])
+                    fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
-                        axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray)
-                        axs[2 * (i // 4), i % 4].axis("off")
+                    axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray)
+                    axs[2 * (i // 4), i % 4].axis("off")
 
-                        axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
-                        axs[1 + 2 * (i // 4), i % 4].axis("off")
+                    axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
+                    axs[1 + 2 * (i // 4), i % 4].axis("off")
 
-                        diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
-                        recons.append(recon_image)
+                    diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
+                    recons.append(recon_image)
 
-                    fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                    plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
+                fig.tight_layout(w_pad=0.4, h_pad=0.4)
+                plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
 
-                    norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                        'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
+                norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                    'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
 
-                    stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
-                    stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
+                stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
+                stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
 
-                    plt.figure()
-                    plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
-                    plt.colorbar()
-                    plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
-                    plt.close()
+                plt.figure()
+                plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
+                plt.colorbar()
+                plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
+                plt.close()
 
     json.dump(norms_dict,
               open(save_dir + '/Robustness_31112020_dTV_fidelities_new.json', 'w'))
