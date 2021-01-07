@@ -5,10 +5,10 @@ import odl
 from myOperators import RealFourierTransform
 
 plot_TV_results = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
-dTV_discrepancy_plots = True
+dTV_discrepancy_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -292,6 +292,7 @@ if plot_dTV_results:
     norms_dict = {}
     GT_norms_dict = {}
     stdevs = {}
+    affine_param_dict = {}
 
     for avg in avgs:
         norms_dict['avgs=' + avg] = {}
@@ -300,6 +301,11 @@ if plot_dTV_results:
 
         with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
             d = json.load(f)
+
+        # grabbing just the affine params, and putting into new dictionary
+
+        affine_param_dict['avgs=' + avg] = {mkey: {skey: {akey: aval['affine_params'] for akey, aval in sval.items()}
+                                   for skey, sval in mval.items()} for mkey, mval in d.items()}
 
             for output_dim in output_dims:
                 GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -354,6 +360,9 @@ if plot_dTV_results:
 
     json.dump(stdevs,
               open(save_dir + '/Robustness_31112020_dTV_aggregated_pixel_stds_new.json', 'w'))
+
+    json.dump(affine_param_dict,
+              open(save_dir + '/Robustness_31112020_dTV_affine_params_new.json', 'w'))
 
 # plotting data discrepancies
 

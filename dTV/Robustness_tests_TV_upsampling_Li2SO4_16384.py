@@ -31,11 +31,13 @@ for i in range(2, 34):
     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
     f_coeff_list.append(f_coeffs_unpacked)
 
-f_coeff_list = [sum(f_coeff_list)]
+f_coeff_list = [np.average(np.asarray(f_coeff_list), axis=0)]
 
-#reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
-reg_params = np.logspace(np.log10(1.), np.log10(2*10**3), num=10)
-output_dims = [int(32), int(64)]
+##reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
+#reg_params = np.logspace(np.log10(1.), np.log10(2*10**3), num=10)
+reg_params = [1000.]
+#output_dims = [int(32), int(64)]
+output_dims = [int(64)]
 Li_fourier_coeffs =f_coeff_list
 
 run_exp = True
