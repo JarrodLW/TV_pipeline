@@ -3,12 +3,16 @@ import json
 import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
+import dTV.myDeform
+from skimage.measure import block_reduce
+from dTV.myOperators import Embedding_Affine
 
 plot_TV_results = False
 plot_dTV_results = True
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
+affine_param_plots = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
@@ -405,3 +409,64 @@ if dTV_discrepancy_plots:
         plt.ylabel("recon. standard deviation")
         plt.legend()
 
+if affine_param_plots:
+
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_affine_params_new.json') as f:
+        d = json.load(f)
+
+    for output_dim in output_dims:
+
+        fig, axs = plt.subplots(3, 2, figsize=(2, 3))
+
+        for k in range(6):
+            for m, avg in enumerate(avgs):
+                affine_params = np.zeros((32, len(alphas)))
+                for l, alpha in enumerate(alphas):
+                    for i in range(32):
+                        affine_param = d['avgs=' + avg]['measurement=' + str(i)]['output_size=' + str(output_dim)]['alpha=' + '{:.1e}'.format(alpha)][k]
+
+                        affine_params[i, l] = affine_param
+
+                axs[k//2, k%2].errorbar(np.log10(alphas), np.average(affine_params, axis=0), yerr=np.std(affine_params, axis=0),
+                                        label=avg+'avgs', color="C"+str(m%10))
+
+            plt.legend()
+
+    ## Rough
+    # using some example affine params to deform a template (we take the H-MRI image, here), to get an idea of their variability
+
+    # template = np.zeros((32, 32))
+    # template[10:22, 15:17] = 1
+    # template[15:17, 10:22] = 1
+    # template = np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/Results_MRI_dTV/'
+    #                            'example_TV_recon_Li2SO4_16384_avgs_reg_param_1000.npy').T[:, ::-1]
+
+    image_H = np.reshape(np.fromfile('dTV/7Li_1H_MRI_Data_31112020/1H_Li2SO4/6/pdata/1/2dseq', dtype=np.uint16), (128, 128))
+    template = block_reduce(image_H.T, block_size=(4, 4), func=np.mean)
+    X = odl.uniform_discr([-1, -1], [1, 1], [32, 32], dtype='float32')
+    #deform_op = odl.deform.LinDeformFixedTempl(X.element(template))
+    deform_op = dTV.myDeform.LinDeformFixedTempl(X.element(template))
+
+    V = X.tangent_bundle
+    Y = odl.tensor_space(6)
+
+    embed = Embedding_Affine(Y, V)
+    transl_operator = deform_op * embed
+
+    alpha = alphas[len(alphas) // 2]
+    #alpha = alphas[-1]
+
+    fig, axs = plt.subplots(10, 5, figsize=(5, 10))
+
+    for m, avg in enumerate(avgs):
+        axs[0, m].imshow(template)
+        axs[0, m].axis("off")
+        for i, j in enumerate(np.random.choice(range(32), size=9, replace=False)):
+            affine_params = d['avgs=' + avg]['measurement=' + str(j)]['output_size=' + str(32)][
+                'alpha=' + '{:.1e}'.format(alpha)]
+
+            deformed_template = transl_operator(affine_params).asarray()
+
+            #axs[i, m].imshow(np.abs(deformed_template - template), cmap=plt.cm.gray)
+            axs[i+1, m].imshow(deformed_template)
+            axs[i+1, m].axis("off")

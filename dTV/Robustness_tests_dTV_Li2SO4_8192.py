@@ -61,7 +61,8 @@ sinfos['med_res'] = sinfo_med_res
 sinfos['low_res'] = sinfo_low_res
 
 #alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
-alphas = np.logspace(2.5, 4.75, num=20)
+#alphas = np.logspace(2.5, 4.75, num=20)
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 eta = 0.01
 
 gamma = 0.995
@@ -71,21 +72,26 @@ niter = 200
 
 Yaff = odl.tensor_space(6)
 
-dTV_regularised_recons = {}
+#dTV_regularised_recons = {}
 exp = 0
+
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
+
+with open(save_dir + '/Robustness_31112020_dTV_8192_new.json') as f:
+    d = json.load(f)
 
 for i, Li_fourier in enumerate(f_coeff_list):
 
     fourier_data_real = np.real(Li_fourier)
     fourier_data_im = np.imag(Li_fourier)
 
-    dTV_regularised_recons['measurement=' + str(i)] = {}
+    #dTV_regularised_recons['measurement=' + str(i)] = {}
 
     for dict_key in sinfos.keys():
 
         sinfo = sinfos[dict_key]
 
-        dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])] = {}
+        #dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])] = {}
 
         height, width = sinfo.shape
         complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
@@ -133,8 +139,8 @@ for i, Li_fourier in enumerate(f_coeff_list):
         f = fctls.DataFitL2Disp(X, data_odl, forward_op)
 
         for alpha in alphas:
-            dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
-
+            #dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
+            sub_dict = d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]
 
             print("Experiment_" + str(exp))
             exp += 1
@@ -164,11 +170,11 @@ for i, Li_fourier in enumerate(f_coeff_list):
             diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
                                     sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
 
-            dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
-            dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
-            dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
+            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
+            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
+            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
                 np.real(diff_shift_subsampled).tolist(),
                 np.imag(diff_shift_subsampled).tolist()]
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
-json.dump(dTV_regularised_recons, open(save_dir + '/Robustness_31112020_dTV_8192_new.json', 'w'))
+json.dump(d, open(save_dir + '/Robustness_31112020_dTV_8192_new.json', 'w'))

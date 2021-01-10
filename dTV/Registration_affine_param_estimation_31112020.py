@@ -14,6 +14,9 @@ import myOperators as ops
 from Utils import *
 from skimage.measure import block_reduce
 from processing import *
+from dTV.myOperators import Embedding_Affine
+import dTV.myDeform
+from skimage.transform import resize
 
 dir_H = 'dTV/7Li_1H_MRI_Data_31112020/1H_Li2SO4/'
 
@@ -57,73 +60,20 @@ plt.imshow(image_16384, cmap=plt.cm.gray)
 
 ## estimating affine registration params
 
+#img = sinfo_low_res/np.sqrt(np.sum(np.square(sinfo_low_res)))
+img = image_H.T/np.sqrt(np.sum(np.square(image_H.T)))
 
-# Define the embedding operator from the parameter space to the space
-# of deformation vectorfields
-
-class Embedding_Affine(odl.Operator):
-    def __init__(self, space_dom, space_range):
-        self.space_affine = space_dom
-        self.space_vf = space_range
-        super(Embedding_Affine, self).__init__(domain=space_dom,
-                                               range=space_range, linear=True)
-
-    def _call(self, inp, out):
-        shift = inp[0:2]
-        matrix = inp[2:6]
-        disp_vf = [
-            lambda x: matrix[0] * x[0] + matrix[1] * x[1] + shift[0],
-            lambda x: matrix[2] * x[0] + matrix[3] * x[1] + shift[1]]
-        v = self.space_vf.element(disp_vf)
-        out.assign(v)
-
-    @property
-    def adjoint(self):
-        op = self
-
-        class AuxOp(odl.Operator):
-            def __init__(self):
-                super(AuxOp, self).__init__(domain=op.range,
-                                            range=op.domain, linear=True)
-
-            def _call(self, phi, out):
-                phi0 = phi[0]
-                phi1 = phi[1]
-                space = phi0.space
-                aux_func0 = lambda x: x[0]
-                aux_func1 = lambda x: x[1]
-
-                x0 = space.element(aux_func0)
-                x1 = space.element(aux_func1)
-
-                mom00 = space.inner(x0, phi0)
-                mom10 = space.inner(x1, phi0)
-                mom01 = space.inner(x0, phi1)
-                mom11 = space.inner(x1, phi1)
-
-                mean0 = space.inner(phi0, space.one())
-                mean1 = space.inner(phi1, space.one())
-
-                ret = self.range.element([mean0, mean1,
-                                          mom00, mom10, mom01, mom11])
-                out.assign(ret)
-
-        return AuxOp()
-
-
-img = sinfo_low_res/np.sqrt(np.sum(np.square(sinfo_low_res)))
-
-X = odl.uniform_discr([-1, -1], [1, 1], [img.shape[0], img.shape[1]],
-                      dtype='float32', interp='linear')
+X = odl.uniform_discr([-1, -1], [1, 1], [img.shape[0], img.shape[1]], dtype='float32')
 x1 = X.element(img)
 #x0 = X.element(image_16384/np.sqrt(np.sum(np.square(image_16384))))
-x0 = X.element(TV_regularised_16384/np.sqrt(np.sum(np.square(TV_regularised_16384))))
+TV_regularised_16384_upsampled = resize(TV_regularised_16384, (128, 128))
+x0 = X.element(TV_regularised_16384_upsampled/np.sqrt(np.sum(np.square(TV_regularised_16384_upsampled))))
 x1.show()
 
 # Create a product space for displacement field and a shift space
 V = X.tangent_bundle
 Y = odl.tensor_space(6)
-deform_op = odl.deform.LinDeformFixedTempl(x0)
+deform_op = dTV.myDeform.LinDeformFixedTempl(x0)
 
 
 # deformed (target) image
@@ -138,14 +88,14 @@ transl_operator = deform_op * embed
 datafit = 0.5 * odl.solvers.L2NormSquared(X).translated(x1)
 f = datafit * transl_operator
 
-ls = 1e-1
+ls = 1e-2
 
 cb = (odl.solvers.CallbackPrintIteration(step=1, end=', ') &
       odl.solvers.CallbackPrintTiming(step=1, cumulative=True))
 
 v_recon = Y.zero()
-odl.solvers.steepest_descent(f, v_recon, line_search=ls, maxiter=10000,
-                             tol=1e-12, callback=cb)
+odl.solvers.steepest_descent(f, v_recon, line_search=ls, maxiter=5000,
+                             tol=1e-7, callback=cb)
 
 transl_operator(v_recon).show(title='estimated')
 x0.show()
@@ -187,3 +137,95 @@ affine_params_best = [c_best, d_best, b_best*np.cos(a_best)-1, -b_best*np.sin(a_
 transl_operator(affine_params_best).show(title='estimated')
 x0.show()
 x1.show(title='data')
+
+## trying with dTV
+
+alpha = 10**3
+eta = 0.01
+gamma = 0.995
+strong_cvx = 1e-5
+niter_prox = 20
+niter = 200
+
+sinfo = sinfo_low_res
+#sinfo = image_H.T
+
+X = odl.uniform_discr([-1, -1], [1, 1], [sinfo.shape[0], sinfo.shape[1]], dtype='float32')
+V = X.tangent_bundle
+Y = odl.tensor_space(6)
+prod_space = odl.ProductSpace(X, Y)
+
+prox_options = {}
+prox_options['name'] = 'FGP'
+prox_options['warmstart'] = True
+prox_options['p'] = None
+prox_options['tol'] = None
+prox_options['niter'] = niter_prox
+
+data_odl = X.element(TV_regularised_16384)
+reg_im = fctls.directionalTotalVariationNonnegative(X, alpha=alpha, sinfo=sinfo,
+                                                                            gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
+                                                                            prox_options=prox_options)
+
+forward_op = odl.operator.default_ops.IdentityOperator(X)
+reg_affine = odl.solvers.ZeroFunctional(Y)
+g = odl.solvers.SeparableSum(reg_im, reg_affine)
+f = fctls.DataFitL2Disp(prod_space, data_odl, forward_op)
+
+L = [1, 1e+2]
+ud_vars = [0, 1] # only doing registration updates
+
+p0 = prod_space.element([forward_op.adjoint(data_odl), Y.zero()])
+
+# %%
+palm = algs.PALM(f, g, ud_vars=ud_vars, x=p0.copy(), callback=None, L=L)
+palm.run(niter)
+
+recon = palm.x[0].asarray()
+affine_params = palm.x[1].asarray()
+
+
+deform_op_new = dTV.myDeform.LinDeformFixedTempl(data_odl)
+embed_new = Embedding_Affine(Y, V)
+transl_operator_new = deform_op_new * embed_new
+
+transl_operator_new(affine_params).show(title='estimated')
+data_odl.show()
+X.element(sinfo_low_res).show(title='data')
+
+
+# some plots
+np.abs(transl_operator_new(v_recon) - X.element(sinfo_low_res)).show("diff_sinfo_deformed_recon")
+np.abs(data_odl - X.element(sinfo_low_res)).show("diff_sinfo_deformed_recon")
+np.abs(transl_operator_new(v_recon) - data_odl).show("diff_recon_deformed_recon")
+
+transl_operator_new(v_recon).show()
+data_odl.show()
+X.element(sinfo_low_res).show()
+transl_operator_new(affine_params).show()
+
+deformed_im = transl_operator_new(v_recon).asarray()
+deformed_im_high_res = transl_operator(v_recon).asarray()
+
+plt.figure()
+plt.imshow(np.asarray([2*data_odl.asarray()/np.amax(data_odl.asarray()), np.zeros((32, 32)), sinfo_low_res/np.amax(sinfo_low_res)]).transpose((1,2,0)))
+
+plt.figure()
+plt.imshow(np.asarray([2*deformed_im/np.amax(deformed_im), np.zeros((32, 32)), sinfo_low_res/np.amax(sinfo_low_res)]).transpose((1,2,0)))
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(np.asarray([TV_regularised_16384_upsampled/np.amax(TV_regularised_16384_upsampled), np.zeros((128, 128)),
+                    np.zeros((128, 128))]).transpose((1,2,0)))
+axs[1].imshow(np.asarray([TV_regularised_16384_upsampled/np.amax(TV_regularised_16384_upsampled), np.zeros((128, 128)),
+                          image_H.T/np.amax(image_H.T)]).transpose((1,2,0)))
+axs[2].imshow(np.asarray([np.zeros((128, 128)), np.zeros((128, 128)),
+                          image_H.T/np.amax(image_H.T)]).transpose((1,2,0)))
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(np.asarray([deformed_im_high_res/np.amax(deformed_im_high_res), np.zeros((128, 128)),
+                          np.zeros((128, 128))]).transpose((1,2,0)))
+axs[1].imshow(np.asarray([deformed_im_high_res/np.amax(deformed_im_high_res), np.zeros((128, 128)),
+                          image_H.T/np.amax(image_H.T)]).transpose((1,2,0)))
+axs[2].imshow(np.asarray([np.zeros((128, 128)), np.zeros((128, 128)),
+                          image_H.T/np.amax(image_H.T)]).transpose((1,2,0)))
+

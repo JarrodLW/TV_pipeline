@@ -64,7 +64,7 @@ for avg_ind in range(len(avgs)):
         recon_upsampled = np.fft.fftshift(np.fft.ifft2(f_data_padded_shifted))
         recon_arr_upsampled[avg_ind, i, :, :] = recon_upsampled
 
-# plotting
+# plotting all reconstructions
 
 for avg_ind in range(len(avgs)):
 
@@ -87,10 +87,66 @@ for avg_ind in range(len(avgs)):
         axs[i // 4, i % 4].imshow(image, cmap=plt.cm.gray)
         axs[i // 4, i % 4].axis("off")
 
+# plotting a subset of reconstructions in a single array
 
+fig, axs = plt.subplots(8, 5, figsize=(5, 8))
+for k, avg in enumerate(avgs):
+
+    for i in range(8):
+
+        image = np.abs(recon_arr[k, i])
+
+        axs[i, k].imshow(image, cmap=plt.cm.gray)
+        axs[i, k].axis("off")
+
+fig.tight_layout(w_pad=0.4, h_pad=0.4)
+
+fig, axs = plt.subplots(8, 5, figsize=(5, 8))
+for k, avg in enumerate(avgs):
+
+    for i in range(8):
+
+        image = np.abs(recon_arr_upsampled[k, i])
+
+        axs[i, k].imshow(image, cmap=plt.cm.gray)
+        axs[i, k].axis("off")
+
+fig.tight_layout(w_pad=0.4, h_pad=0.4)
+
+# stdev images
+
+stdev_images = np.std(f_coeff_arr_combined, axis=1, ddof=1)
+fig, axs = plt.subplots(1, 5, figsize=(15, 3))
+for k, ax in enumerate(axs.flat):
+
+    pcm = ax.imshow(stdev_images[k], cmap=plt.cm.gray, vmin=np.amin(stdev_images), vmax=np.amax(stdev_images))
+    ax.axis("off")
+
+fig.colorbar(pcm, ax=axs, shrink=0.5)
+
+stdev_images = np.std(recon_arr, axis=1, ddof=1)
+fig, axs = plt.subplots(1, 5, figsize=(15, 3))
+for k, ax in enumerate(axs.flat):
+
+    pcm = ax.imshow(stdev_images[k], cmap=plt.cm.gray, vmin=np.amin(stdev_images), vmax=np.amax(stdev_images))
+    ax.axis("off")
+
+fig.colorbar(pcm, ax=axs, shrink=0.5)
+
+stdev_images = np.std(recon_arr_upsampled, axis=1, ddof=1)
+fig, axs = plt.subplots(1, 5, figsize=(15, 3))
+for k, ax in enumerate(axs.flat):
+
+    pcm = ax.imshow(stdev_images[k], cmap=plt.cm.gray, vmin=np.amin(stdev_images), vmax=np.amax(stdev_images))
+    ax.axis("off")
+
+fig.colorbar(pcm, ax=axs, shrink=0.5)
+
+# recon from averaged data
 
 rec_all_averaged = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(np.average(f_coeff_arr_combined[0, :, :, :], axis=0))))
 
 plt.imshow(np.abs(rec_all_averaged), cmap=plt.cm.gray)
+plt.colorbar()
 plt.axis("off")
 
