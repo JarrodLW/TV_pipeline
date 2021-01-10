@@ -80,6 +80,8 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 with open(save_dir + '/Robustness_31112020_dTV_1024_new.json') as f:
     d = json.load(f)
 
+f.close()
+
 for i, Li_fourier in enumerate(f_coeff_list):
 
     fourier_data_real = np.real(Li_fourier)
