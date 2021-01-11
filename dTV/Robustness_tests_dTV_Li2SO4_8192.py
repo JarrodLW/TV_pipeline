@@ -144,39 +144,41 @@ for i, Li_fourier in enumerate(f_coeff_list):
             #dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
             sub_dict = d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]
 
-            print("Experiment_" + str(exp))
-            exp += 1
+            if 'alpha=' + '{:.1e}'.format(alpha) not in sub_dict.keys():
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
 
-            reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
-                                                                            gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
-                                                                            prox_options=prox_options)
+                print("Experiment_" + str(exp))
+                exp += 1
 
-            g = odl.solvers.SeparableSum(reg_im, reg_affine)
+                reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
+                                                                                gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
+                                                                                prox_options=prox_options)
 
-            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                  odl.solvers.CallbackShow(step=5))
+                g = odl.solvers.SeparableSum(reg_im, reg_affine)
 
-            L = [1, 1e+2]
-            ud_vars = [0, 1]
+                cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                      odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                      odl.solvers.CallbackShow(step=5))
 
-            # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
-            palm.run(niter)
+                L = [1, 1e+2]
+                ud_vars = [0, 1]
 
-            recon = palm.x[0].asarray()
-            diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
-            diff = diff[0].asarray() + 1j * diff[1].asarray()
-            diff_shift = np.fft.ifftshift(diff)
-            diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
-                                    sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
+                # %%
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                palm.run(niter)
 
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
-                np.real(diff_shift_subsampled).tolist(),
-                np.imag(diff_shift_subsampled).tolist()]
+                recon = palm.x[0].asarray()
+                diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
+                diff = diff[0].asarray() + 1j * diff[1].asarray()
+                diff_shift = np.fft.ifftshift(diff)
+                diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
+                                        sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
 
-save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
+                    np.real(diff_shift_subsampled).tolist(),
+                    np.imag(diff_shift_subsampled).tolist()]
+
 json.dump(d, open(save_dir + '/Robustness_31112020_dTV_8192_new.json', 'w'))
