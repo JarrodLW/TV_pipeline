@@ -307,6 +307,8 @@ if plot_dTV_results:
         with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
             d = json.load(f)
 
+        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json')
+
         # grabbing just the affine params, and putting into new dictionary
 
         affine_param_dict['avgs=' + avg] = {mkey: {skey: {akey: aval['affine_params'] for akey, aval in sval.items()}
@@ -324,6 +326,10 @@ if plot_dTV_results:
 
                 fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                 for i in range(32):
+
+                    print('\noutput_dims_' + str(output_dim))
+                    print('measurement_' + str(i))
+                    print(d['measurement=' + str(i)]['output_size=' + str(output_dim)].keys())
 
                     recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
@@ -346,6 +352,7 @@ if plot_dTV_results:
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
                 plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
+                plt.close()
 
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
