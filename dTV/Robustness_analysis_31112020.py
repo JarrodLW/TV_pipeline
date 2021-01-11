@@ -349,7 +349,7 @@ if plot_dTV_results:
                     recons.append(recon_image)
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results_Li_LS" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results_Li_LS" + "/dTV_results_Li_LS" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_Li_LS_new.pdf")
                 plt.close()
 
@@ -362,7 +362,7 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results_Li_LS"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results_Li_LS"  + "/dTV_results_Li_LS" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_Li_LS_new.pdf')
                 plt.close()
 
