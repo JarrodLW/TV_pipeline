@@ -12,7 +12,7 @@ plot_dTV_results = True
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
-affine_param_plots = True
+affine_param_plots = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
