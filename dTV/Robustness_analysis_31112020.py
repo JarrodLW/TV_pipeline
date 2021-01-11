@@ -289,7 +289,8 @@ if discrepancy_plots:
 
 ## dTV results
 
-alphas = np.logspace(2.5, 4.75, num=20)
+#alphas = np.logspace(2.5, 4.75, num=20)
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 
 if plot_dTV_results:
 
