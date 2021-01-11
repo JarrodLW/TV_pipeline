@@ -289,7 +289,6 @@ if discrepancy_plots:
 
 ## dTV results
 
-#alphas = np.logspace(2.5, 4.75, num=20)
 alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 
 if plot_dTV_results:
@@ -304,10 +303,10 @@ if plot_dTV_results:
         GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
+        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_Li_LS_new.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json')
+        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_Li_LS_new.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
@@ -350,8 +349,8 @@ if plot_dTV_results:
                     recons.append(recon_image)
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
+                plt.savefig(save_dir + "/New/results_Li_LS" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_Li_LS_new.pdf")
                 plt.close()
 
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -363,18 +362,18 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
+                plt.savefig(save_dir + "/New/results_Li_LS"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_Li_LS_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/Robustness_31112020_dTV_fidelities_new.json', 'w'))
+              open(save_dir + '/Robustness_31112020_dTV_fidelities_Li_LS_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/Robustness_31112020_dTV_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + '/Robustness_31112020_dTV_aggregated_pixel_stds_Li_LS_new.json', 'w'))
 
     json.dump(affine_param_dict,
-              open(save_dir + '/Robustness_31112020_dTV_affine_params_new.json', 'w'))
+              open(save_dir + '/Robustness_31112020_dTV_affine_params_Li_LS_new.json', 'w'))
 
 # plotting data discrepancies
 
