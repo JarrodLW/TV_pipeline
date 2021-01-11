@@ -3,9 +3,9 @@ import json
 import matplotlib.pyplot as plt
 import odl
 from myOperators import RealFourierTransform
-import dTV.myDeform
+#import dTV.myDeform
 from skimage.measure import block_reduce
-from dTV.myOperators import Embedding_Affine
+#from dTV.myOperators import Embedding_Affine
 
 plot_TV_results = False
 plot_dTV_results = True
