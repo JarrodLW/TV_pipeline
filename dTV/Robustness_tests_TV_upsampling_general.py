@@ -55,11 +55,11 @@ Li_fourier_coeffs = [f_coeff_list[0]]
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
 
 if dataset=='Li2SO4':
-    with open(save_dir + '/Robustness_31112020_TV_' + str(n) + '_new.json') as f:
+    with open(save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json') as f:
         d = json.load(f)
 
 elif dataset=='Li_LS':
-    with open(save_dir + '/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json') as f:
+    with open(save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json') as f:
         d = json.load(f)
 
 f.close()
@@ -96,8 +96,8 @@ if run_exp:
 
     if dataset == 'Li2SO4':
         json.dump(d,
-                  open(save_dir + '/New/Robustness_31112020_TV_' + str(n) + '_new.json', 'w'))
+                  open(save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json', 'w'))
 
     elif dataset == 'Li_LS':
         json.dump(d,
-                  open(save_dir + '/New/Results_MRI_dTV/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json', 'w'))
+                  open(save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json', 'w'))
