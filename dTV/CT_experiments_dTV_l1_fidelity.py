@@ -86,7 +86,6 @@ Y = K.range
 #data_fit = odl.solvers.functional.default_functionals.Huber(Y, gamma=0.2).translated(data)
 data_fit = odl.solvers.L1Norm(Y).translated(data)
 
-
 grad = odl.Gradient(X)
 sinfo_grad = grad(sinfo)
 

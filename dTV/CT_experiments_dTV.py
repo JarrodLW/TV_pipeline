@@ -1,6 +1,7 @@
 #import astra
 import h5py
 import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 from processing import *
 import dTV.myFunctionals as fctls
@@ -21,7 +22,8 @@ data_XRD = np.array(f2['sino_XRD'])
 
 ## Selecting which recons are to run
 FBP_recon = 'False'
-TV_recon = 'True'
+TV_recon = 'False'
+masked_TV_recon = True
 dTV_recon = 'False'
 plotting = 'False'
 
@@ -60,7 +62,8 @@ if TV_recon:
     d_offset = 0
     d_width = 40
 
-    reg_params = [10.**(i-5) for i in np.arange(10)]
+    #reg_params = [10.**(i-5) for i in np.arange(10)]
+    reg_params = [1.]
 
     TV_regularised_recons = {'XRF': {}, 'XRD': {}}
 
@@ -81,6 +84,65 @@ if TV_recon:
     #hf = h5py.File('dTV/Results_CT_dTV/TV_regularised_recons.h5', 'w')
 
 
+## TV-regularised XRD reconstructions, masking out the spikes
+
+if masked_TV_recon:
+
+
+    model = VariationalRegClass('CT', 'TV')
+    a_offset = -np.pi
+    a_range = 2 * np.pi
+    d_offset = 0
+    d_width = 40
+
+    # figuring out what to mask
+
+    width, height = sino_0_XRD.shape
+
+    image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20], shape=[561, 561], dtype='float')
+    # Make a parallel beam geometry with flat detector
+    angle_partition = odl.uniform_partition(a_offset, a_offset + a_range, height)
+    # Detector: uniformly sampled
+    detector_partition = odl.uniform_partition(d_offset - d_width / 2, d_offset + d_width / 2, width)
+    geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
+
+    forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
+    FBP = odl.tomo.fbp_op(forward_op)
+
+    data = (sino_0_XRD < 0.1)*sino_0_XRD
+    #data = background_minus_buffer[:, :-1]*sino_0_XRD
+    #data = background[:, :-1] * sino_0_XRD
+
+    recon_XRD = FBP(forward_op.range.element(data.T))
+
+    # optimisation
+
+    reg_param = 1. #10. ** 0
+
+    subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)
+    masked_data = 10**4*sino_0_XRD*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
+    background = sino_Co_1 < 800
+    background_shifted_down = np.roll(background, 5, axis=0)
+    background_shifted_up = np.roll(background, -5, axis=0)
+    background_minus_buffer = background*background_shifted_down*background_shifted_up
+    masked_data = (1-background_minus_buffer)[:, :-1]*masked_data # this is ad-hoc!
+
+    recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561), subsampling_arr=((1-background_minus_buffer)[:, :-1]*subsampling_arr).T,
+                                                                  niter=50, a_offset=a_offset, enforce_positivity=True,
+                                                                  a_range=a_range, d_offset=0, d_width=40)[0]
+
+    recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
+                                                                  subsampling_arr=subsampling_arr.T,
+                                                                                   niter=50, a_offset=a_offset, enforce_positivity=True,
+                                                                  a_range=a_range, d_offset=0, d_width=40)[0]
+
+    # recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
+    #                                                               subsampling_arr=None,
+    #                                                               niter=50, a_offset=a_offset, enforce_positivity=True,
+    #                                                               a_range=a_range, d_offset=0, d_width=40)[0]
+
+
+
 ## dTV-regularised XRD recon with XRF sinfo
 
 if dTV_recon:
@@ -93,11 +155,11 @@ if dTV_recon:
     niter = 100
 
     #strong_cvxs = [1e1, 1e0, 1e-1, 1e-2, 1e-3]
-    strong_cvxs = [1e-2]
+    strong_cvxs = [1e-5]
 
     #alphas = [10.**(i-5) for i in np.arange(4, 8)]
     #etas = [10.**(-i) for i in np.arange(5)]
-    alphas = [10.**(-1)]
+    alphas = [10.**(-2)]
     etas = [10.**(-4)]
 
     Yaff = odl.tensor_space(6)
@@ -113,10 +175,14 @@ if dTV_recon:
     detector_partition = odl.uniform_partition(d_offset-d_width/2, d_offset+d_width/2, width)
     geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
 
+    subsampling_arr = (sino_0_XRD < 0.3) * np.ones(sino_0_XRD.shape)
+    masked_data = (subsampling_arr.T)*data
+
     # Create the forward operator
     forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
+    subsampled_forward_op = forward_op.range.element(subsampling_arr.T)*forward_op
 
-    data_odl = forward_op.range.element(data)
+    data_odl = forward_op.range.element(masked_data)
 
     # remembering to rotate so that orientations match
     with open('dTV/Results_CT_dTV/TV_regularised_recons.json') as f:
@@ -140,7 +206,7 @@ if dTV_recon:
     reg_affine = odl.solvers.ZeroFunctional(Yaff)
     x0 = X.zero()
 
-    f = fctls.DataFitL2Disp(X, data_odl, forward_op)
+    f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
 
     dTV_regularised_recons = {}
     for alpha in alphas:
@@ -157,7 +223,9 @@ if dTV_recon:
 
                 cb = (odl.solvers.CallbackPrintIteration(end=', ') &
                       odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True))
+                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                      odl.solvers.CallbackShow()
+                      )
 
                 L = [1, 1e+2]
                 ud_vars = [0]

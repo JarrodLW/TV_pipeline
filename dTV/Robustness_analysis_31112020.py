@@ -7,8 +7,8 @@ from myOperators import RealFourierTransform
 from skimage.measure import block_reduce
 #from dTV.myOperators import Embedding_Affine
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 plot_TV_results_full_avgs = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
@@ -375,11 +375,11 @@ if plot_dTV_results:
     json.dump(affine_param_dict,
               open(save_dir + '/Robustness_31112020_dTV_affine_params_Li_LS_new.json', 'w'))
 
-# plotting data discrepancies
+# plotting data discrepancies - this is done locally: need to copy above json files into local directory
 
 if dTV_discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_dTV_results/Robustness_31112020_dTV_fidelities_Li_LS_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -394,11 +394,11 @@ if dTV_discrepancy_plots:
 
         plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
                      label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas)), 68000*np.ones(20)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        plt.plot(np.log10(np.asarray(alphas)), 68000*np.ones(26)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
         plt.legend()
 
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds_Li_LS_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
@@ -418,7 +418,7 @@ if dTV_discrepancy_plots:
 
 if affine_param_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_affine_params_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_dTV_results/Robustness_31112020_dTV_affine_params_Li_LS_new.json') as f:
         d = json.load(f)
 
     for output_dim in output_dims:
