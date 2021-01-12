@@ -48,7 +48,8 @@ if n !=512:
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 output_dims = [int(32), int(64)]
-Li_fourier_coeffs = f_coeff_list
+#Li_fourier_coeffs = f_coeff_list
+Li_fourier_coeffs = [f_coeff_list[0]]
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
 
@@ -94,8 +95,8 @@ if run_exp:
 
     if dataset == 'Li2SO4':
         json.dump(d,
-                  open('dTV/Results_MRI_dTV/Robustness_31112020_TV_' + str(n) + '_new.json', 'w'))
+                  open(save_dir + '/New/Robustness_31112020_TV_' + str(n) + '_new.json', 'w'))
 
     elif dataset == 'Li_LS':
         json.dump(d,
-                  open('dTV/Results_MRI_dTV/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json', 'w'))
+                  open(save_dir + '/New/Results_MRI_dTV/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json', 'w'))
