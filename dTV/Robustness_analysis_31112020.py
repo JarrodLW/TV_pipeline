@@ -14,7 +14,8 @@ discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 
-avgs = ['512', '1024', '2048', '4096', '8192']
+#avgs = ['512', '1024', '2048', '4096', '8192']
+avgs = ['1024', '2048', '4096', '8192']
 #avgs = ['512']
 #reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 #reg_params = np.logspace(3., 4.5, num=20)

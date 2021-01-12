@@ -12,6 +12,8 @@ import odl
 import myOperators as ops
 from Utils import *
 import sys
+import datetime as dt
+
 
 dir = 'dTV/7Li_1H_MRI_Data_31112020/'
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
@@ -53,12 +55,16 @@ Li_fourier_coeffs = f_coeff_list
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
 
 if dataset=='Li2SO4':
-    with open(save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json') as f:
-        d = json.load(f)
-
+    filename = save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json'
 elif dataset=='Li_LS':
-    with open(save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json') as f:
-        d = json.load(f)
+    filename = save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json'
+else:
+    raise ValueError("dataset "+dataset+" not recognised")
+
+print("About to read previous datafile: "+filename+" at "+dt.datetime.now().isoformat())
+with open(filename, 'r') as f:
+    d = json.load(f)
+print("Loaded previous datafile at "+dt.datetime.now().isoformat())
 
 f.close()
 
@@ -93,9 +99,11 @@ if run_exp:
                         [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
 
     if dataset == 'Li2SO4':
-        json.dump(d,
-                  open(save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json', 'w'))
-
+        outputfile = save_dir + '/New/results/TV_results/Robustness_31112020_TV_' + str(n) + '_new.json'
     elif dataset == 'Li_LS':
-        json.dump(d,
-                  open(save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json', 'w'))
+        outputfile = save_dir + '/New/results_Li_LS/TV_results_Li_LS/Robustness_31112020_TV_' + str(n) + '_Li_LS_new.json'
+
+    print("About to write to datafile: " + outputfile + " at " + dt.datetime.now().isoformat())
+    json.dump(d, open(outputfile, 'w'))
+    print("Written outputfile at " + dt.datetime.now().isoformat())
+
