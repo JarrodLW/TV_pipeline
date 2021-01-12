@@ -14,8 +14,7 @@ discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 
-#avgs = ['512', '1024', '2048', '4096', '8192']
-avgs = ['1024', '2048', '4096', '8192']
+avgs = ['512', '1024', '2048', '4096', '8192']
 #avgs = ['512']
 #reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 #reg_params = np.logspace(3., 4.5, num=20)
@@ -100,101 +99,104 @@ if plot_TV_results:
 
             coeffs = f_coeff_list_grouped
 
-            # all the recons for each num of avgs for each reg parameter, in separate plots
-            for output_dim in output_dims:
+            try:
+                # all the recons for each num of avgs for each reg parameter, in separate plots
+                for output_dim in output_dims:
 
-                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
-                norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
-                stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
+                    stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
-                complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
-                                                  shape=[output_dim, output_dim], dtype='complex')
-                image_space = complex_space.real_space ** 2
-                forward_op = RealFourierTransform(image_space)
+                    complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                                      shape=[output_dim, output_dim], dtype='complex')
+                    image_space = complex_space.real_space ** 2
+                    forward_op = RealFourierTransform(image_space)
 
-                l2_norm = odl.solvers.L2Norm(forward_op.range)
+                    l2_norm = odl.solvers.L2Norm(forward_op.range)
 
-                for reg_param in reg_params:
+                    for reg_param in reg_params:
 
-                    GT_diff_norms = []
-                    diff_norms = []
-                    recons = []
+                        GT_diff_norms = []
+                        diff_norms = []
+                        recons = []
 
-                    fig, axs = plt.subplots(16, 4, figsize=(4, 10))
-                    for i in range(32):
+                        fig, axs = plt.subplots(16, 4, figsize=(4, 10))
+                        for i in range(32):
 
-                        recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
-                                           ['output_size=' + str(output_dim)]).astype('float64')
-                        #axs[i//4, i % 4].imshow(image, cmap=plt.cm.gray)
-                        #axs[i//4, i % 4].axis("off")
+                            recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
+                                               ['output_size=' + str(output_dim)]).astype('float64')
 
-                        # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
-                        recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
-                        image = np.abs(recon_rotated[0] + 1j * recon_rotated[1])
+                            # stupidly, my code (see "processing") is still rotating the reconstruction, so I have to correct here
+                            recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
+                            image = np.abs(recon_rotated[0] + 1j * recon_rotated[1])
 
-                        data = np.zeros((output_dim, output_dim), dtype='complex')
-                        data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
-                        data = np.fft.fftshift(data)
+                            data = np.zeros((output_dim, output_dim), dtype='complex')
+                            data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
+                            data = np.fft.fftshift(data)
 
-                        fully_averaged_data = np.zeros((output_dim, output_dim), dtype='complex')
-                        fully_averaged_data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = \
-                        fully_averaged_coeffs
-                        fully_averaged_data = np.fft.fftshift(fully_averaged_data)
+                            fully_averaged_data = np.zeros((output_dim, output_dim), dtype='complex')
+                            fully_averaged_data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = \
+                            fully_averaged_coeffs
+                            fully_averaged_data = np.fft.fftshift(fully_averaged_data)
 
-                        subsampling_matrix = np.zeros((output_dim, output_dim))
-                        subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
-                        output_dim // 2 - 16:output_dim // 2 + 16] = 1
-                        subsampling_matrix = np.fft.fftshift(subsampling_matrix)
+                            subsampling_matrix = np.zeros((output_dim, output_dim))
+                            subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
+                            output_dim // 2 - 16:output_dim // 2 + 16] = 1
+                            subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
-                        synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon_rotated[0], recon_rotated[1]]))
-                        diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
-                        diff_norm = l2_norm(diff)
-                        diff_norms.append(diff_norm)
+                            synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon_rotated[0], recon_rotated[1]]))
+                            diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
+                            diff_norm = l2_norm(diff)
+                            diff_norms.append(diff_norm)
 
-                        GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
-                        GT_diff_norm = l2_norm(GT_diff)
-                        GT_diff_norms.append(GT_diff_norm)
-                        #diff = diff[0].asarray() + 1j * diff[1].asarray()
-                        #diff_shift = np.fft.ifftshift(diff)probability
+                            GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
+                            GT_diff_norm = l2_norm(GT_diff)
+                            GT_diff_norms.append(GT_diff_norm)
+                            #diff = diff[0].asarray() + 1j * diff[1].asarray()
+                            #diff_shift = np.fft.ifftshift(diff)probability
 
-                        axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
-                        axs[2*(i // 4), i % 4].axis("off")
+                            axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
+                            axs[2*(i // 4), i % 4].axis("off")
 
-                        axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
-                        axs[1+2 * (i // 4), i % 4].axis("off")
+                            axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
+                            axs[1+2 * (i // 4), i % 4].axis("off")
 
-                        recons.append(image)
+                            recons.append(image)
 
-                    fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
-                    plt.close()
+                        fig.tight_layout(w_pad=0.4, h_pad=0.4)
+                        plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
+                        plt.close()
 
-                    norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                        'reg_param=' + '{:.1e}'.format(reg_param)] = diff_norms
+                        norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = diff_norms
 
-                    GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                        'reg_param=' + '{:.1e}'.format(reg_param)] = GT_diff_norms
+                        GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = GT_diff_norms
 
-                    # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
-                    #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
+                        # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
+                        #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
-                    stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
-                    stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
-                        'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
+                        stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
+                        stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
 
-                    plt.figure()
-                    plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
-                    plt.colorbar()
-                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
-                    plt.close()
+                        plt.figure()
+                        plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
+                        plt.colorbar()
+                        plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_plot_' + ext + "_new.pdf")
+                        plt.close()
 
-                    plt.figure()
-                    plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                    plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                        output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
-                    plt.close()
+                        plt.figure()
+                        plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
+                        plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + 'stdev_hist_' + ext + "_new.pdf")
+                        plt.close()
+
+            except KeyError:
+                print("failed to grab key (presumably)")
+                continue
 
         json.dump(norms_dict,
                   open(save_dir + '/New/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
