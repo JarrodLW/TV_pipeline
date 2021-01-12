@@ -78,11 +78,10 @@ if run_exp:
         #regularised_recons['measurement=' + str(i)] = {}
         model = VariationalRegClass('MRI', 'TV')
         for reg_param in reg_params:
+            for output_dim in output_dims:
 
-            if 'reg_param=' + '{:.1e}'.format(reg_param) not in d['measurement=' + str(i)].keys():
-                d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)] = {}
-
-                for output_dim in output_dims:
+                if 'output_size=' + str(output_dim) not in d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)].keys():
+                    #d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)] = {}
 
                     print("Experiment_" + str(exp))
                     exp+=1
