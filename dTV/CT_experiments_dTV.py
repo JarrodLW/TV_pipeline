@@ -60,21 +60,23 @@ if TV_recon:
     a_offset = -np.pi
     a_range = 2*np.pi
     d_offset = 0
-    d_width = 40
+    #d_width = 40
+    d_width = 2
 
     #reg_params = [10.**(i-5) for i in np.arange(10)]
-    reg_params = [1.]
+    #reg_params = [10**100]
+    reg_params = [10**2]
 
     TV_regularised_recons = {'XRF': {}, 'XRD': {}}
 
     for reg_param in reg_params:
         recons_XRF_TV = model.regularised_recons_from_subsampled_data(sino_Co_1.T, reg_param, recon_dims=(561, 561),
                                                                       niter=50, a_offset=a_offset, enforce_positivity=True,
-                                                                      a_range=a_range, d_offset=0, d_width=40)[0]
+                                                                      a_range=a_range, d_offset=0, d_width=d_width)[0]
 
         recons_XRD_TV = model.regularised_recons_from_subsampled_data(sino_0_XRD.T, reg_param, recon_dims=(561, 561),
                                                                       niter=50, a_offset=a_offset, enforce_positivity=True,
-                                                                      a_range=a_range, d_offset=0, d_width=40)[0]
+                                                                      a_range=a_range, d_offset=0, d_width=d_width)[0]
 
         TV_regularised_recons['XRF']['recon_param = '+'{:.1e}'.format(reg_param)] = recons_XRF_TV.tolist()
         TV_regularised_recons['XRD']['recon_param = '+'{:.1e}'.format(reg_param)] = recons_XRD_TV.tolist()
@@ -93,7 +95,7 @@ if masked_TV_recon:
     a_offset = -np.pi
     a_range = 2 * np.pi
     d_offset = 0
-    d_width = 40
+    d_width = 2
 
     # figuring out what to mask
 
@@ -117,29 +119,57 @@ if masked_TV_recon:
 
     # optimisation
 
-    reg_param = 1. #10. ** 0
+    #reg_param = 1. #10. ** 0
+    #reg_params = [10. ** (i - 5) for i in np.arange(20)]
+
+    reg_params = [10**-7]
 
     subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)
-    masked_data = 10**4*sino_0_XRD*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
-    background = sino_Co_1 < 800
-    background_shifted_down = np.roll(background, 5, axis=0)
-    background_shifted_up = np.roll(background, -5, axis=0)
-    background_minus_buffer = background*background_shifted_down*background_shifted_up
-    masked_data = (1-background_minus_buffer)[:, :-1]*masked_data # this is ad-hoc!
+    masked_data = 60000*sino_0_XRD*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
+    # background = sino_Co_1 < 800
+    # background_shifted_down = np.roll(background, 5, axis=0)
+    # background_shifted_up = np.roll(background, -5, axis=0)
+    # background_minus_buffer = background*background_shifted_down*background_shifted_up
+    # masked_data = (1-background_minus_buffer)[:, :-1]*masked_data # this is ad-hoc!
 
-    recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561), subsampling_arr=((1-background_minus_buffer)[:, :-1]*subsampling_arr).T,
-                                                                  niter=50, a_offset=a_offset, enforce_positivity=True,
-                                                                  a_range=a_range, d_offset=0, d_width=40)[0]
+    # recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561), subsampling_arr=((1-background_minus_buffer)[:, :-1]*subsampling_arr).T,
+    #                                                               niter=50, a_offset=a_offset, enforce_positivity=True,
+    #                                                               a_range=a_range, d_offset=0, d_width=40)[0]
 
-    recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
-                                                                  subsampling_arr=subsampling_arr.T,
-                                                                                   niter=50, a_offset=a_offset, enforce_positivity=True,
-                                                                  a_range=a_range, d_offset=0, d_width=40)[0]
+    TV_regularised_recons = {}
+    exp=0
+
+    for reg_param in reg_params:
+        exp += 1
+        print("Experiment " + str(exp))
+
+        recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
+                                                                      subsampling_arr=subsampling_arr.T,
+                                                                      niter=50, a_offset=a_offset,
+                                                                      enforce_positivity=True,
+                                                                      a_range=a_range, d_offset=0, d_width=d_width)[0]
+
+        TV_regularised_recons['recon_param = ' + '{:.1e}'.format(reg_param)] = recons_XRD_TV.tolist()
+
+    json.dump(TV_regularised_recons, open('dTV/Results_CT_dTV/TV_regularised_recons_XRD_with_masking.json', 'w'))
 
     # recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
     #                                                               subsampling_arr=None,
     #                                                               niter=50, a_offset=a_offset, enforce_positivity=True,
     #                                                               a_range=a_range, d_offset=0, d_width=40)[0]
+    with open('dTV/Results_CT_dTV/TV_regularised_recons_XRD_with_masking.json') as f:
+        d = json.load(f)
+
+    f.close()
+
+    fig, axs = plt.subplots(5, 4, figsize=(8, 6))
+    for i, reg_param in enumerate(reg_params):
+
+        recon = np.asarray(d['recon_param = ' + '{:.1e}'.format(reg_param)])
+        axs[i // 4, i % 4].imshow(recon, cmap=plt.cm.gray)
+        axs[i // 4, i % 4].axis("off")
+
+
 
 
 

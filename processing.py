@@ -77,8 +77,11 @@ class VariationalRegClass:
             assert d_width is not None, "detector width not provided"
 
             height, width = recon_dims
-            self.image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20],
-                                            shape=[height, width], dtype='float')
+            # self.image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20],
+            #                                 shape=[height, width], dtype='float')
+            self.image_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
+                                                 shape=[height, width], dtype='float')
+
             # Make a parallel beam geometry with flat detector
             angle_partition = odl.uniform_partition(a_offset, a_offset+a_range, data_stack.shape[1])
             # Detector: uniformly sampled

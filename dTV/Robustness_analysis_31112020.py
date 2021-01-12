@@ -67,7 +67,7 @@ if plot_TV_results:
 
             f_coeff_list = []
 
-            with open(save_dir + '/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
+            with open(save_dir + '/New/results'+ext+'/TV_results'+ext+'/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
                 d = json.load(f)
 
             print("read avgs" + avg)
