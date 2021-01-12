@@ -195,13 +195,13 @@ if plot_TV_results:
                     plt.close()
 
         json.dump(norms_dict,
-                  open(save_dir + '/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
+                  open(save_dir + '/New/Robustness_31112020_TV_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open(save_dir + '/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
+                  open(save_dir + '/New/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(stdevs,
-                  open(save_dir + '/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
+                  open(save_dir + '/New/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
