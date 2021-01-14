@@ -7,9 +7,10 @@ from myOperators import RealFourierTransform
 from skimage.measure import block_reduce
 #from dTV.myOperators import Embedding_Affine
 
-plot_TV_results = True
-plot_dTV_results = False
+plot_TV_results = False
+plot_dTV_results = True
 plot_TV_results_full_avgs = False
+plot_subset_TV_results = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
@@ -224,31 +225,54 @@ if plot_TV_results_full_avgs:
             plt.figure()
             plt.imshow(np.abs(recon[0] + 1j*recon[1]), cmap=plt.cm.gray)
 
+# if plot_subset_TV_results:
+#
+#     for j, avg in enumerate(avgs):
+#
+#         f_coeff_list = []
+#
+#         with open(
+#                 save_dir + '/New/results' + ext + '/TV_results' + ext + '/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
+#             d = json.load(f)
+
 
 # plotting data discrepancies
 
 if discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS_new.json') as f:
-        d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_GT_fidelities__Li_LS_new.json') as f:
-        D = json.load(f)
-
-    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities__new.json') as f:
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_fidelities__Li_LS_new.json') as f:
     #     d = json.load(f)
     #
-    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_GT_fidelities__new.json') as f:
+    # f.close()
+    #
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_TV_results/Robustness_31112020_TV_GT_fidelities__Li_LS_new.json') as f:
     #     D = json.load(f)
 
+    f.close()
+
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_fidelities__new.json') as f:
+        d = json.load(f)
+
+    f.close()
+
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_GT_fidelities__new.json') as f:
+        D = json.load(f)
+
+    l2_fourier_coeff_stdevs_Li_LS = [67357, 46945, 31978, 20836, 12030]
+    l2_fourier_coeff_stdevs_Li2SO4 = [68278, 47409, 32294, 21039, 12122]
+
     for k, avg in enumerate(avgs):
+        print("unpacking average " + avg)
 
         GT_discrep_arr = np.zeros((len(reg_params), 32))
         discrep_arr = np.zeros((len(reg_params), 32))
-        d3 = d['avgs='+avg]['output_dim=32']
-        D3 = D['avgs=' + avg]['output_dim=32']
+        output_dim = str(32)
+        d3 = d['avgs='+avg]['output_dim='+output_dim]
+        D3 = D['avgs=' + avg]['output_dim='+output_dim]
 
         for i, reg_param in enumerate(reg_params):
+            print("unpacking reg param " + '{:.1e}'.format(reg_param))
 
             discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(reg_param)]).astype('float64')
             discrep_arr[i, :] = discrep
@@ -256,18 +280,24 @@ if discrepancy_plots:
             GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
             GT_discrep_arr[i, :] = GT_discrep
 
-
-        # plt.errorbar(np.log10(np.asarray(reg_params)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
-        #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(reg_params))[:10], 68000*np.ones(10)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        # plt.errorbar(np.log10(np.asarray(reg_params))[1:], np.average(GT_discrep_arr[1:], axis=1),
+        #              yerr=np.std(GT_discrep_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.plot(np.log10(np.asarray(reg_params))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C" + str(k % 10),
+        #          linestyle=":")
+        # plt.xlabel("log(lambda)")
+        # plt.ylabel("l2-discrepancy")
+        # plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" TV-regularised recons\n and 16384-averaged data")
         # plt.legend()
 
-        #
-        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(GT_discrep_arr, axis=1),
-                     yerr=np.std(GT_discrep_arr, axis=1),
+        plt.errorbar(np.log10(np.asarray(reg_params))[1:], np.average(discrep_arr[1:], axis=1),
+                     yerr=np.std(discrep_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(reg_params))[:10], 68000 * np.ones(10) / np.sqrt(2) ** k, color="C" + str(k % 10),
+        plt.plot(np.log10(np.asarray(reg_params))[1:], l2_fourier_coeff_stdevs_Li2SO4[k]* np.ones(25) , color="C" + str(k % 10),
                  linestyle=":")
+        plt.xlabel("log(lambda)")
+        plt.ylabel("l2-discrepancy")
+        plt.title("L2 data discrepancy for "+output_dim+"-by-"+output_dim+" TV-regularised recons")
         plt.legend()
 
 # stdev plots
@@ -285,7 +315,7 @@ if discrepancy_plots:
             stdev = d3['reg_param='+'{:.1e}'.format(reg_param)]
             stdev_arr[i] = stdev
 
-        plt.plot(np.log10(reg_params), np.log10(stdev_arr), label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(reg_params)[1:], stdev_arr[1:], label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(lambda)")
         plt.ylabel("recon. standard deviation")
         plt.legend()
@@ -302,20 +332,38 @@ if plot_dTV_results:
     stdevs = {}
     affine_param_dict = {}
 
-    for avg in avgs:
+    for j, avg in enumerate(avgs):
         norms_dict['avgs=' + avg] = {}
         GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_Li_LS_new.json') as f:
+        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_Li_LS_new.json')
+        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
         affine_param_dict['avgs=' + avg] = {mkey: {skey: {akey: aval['affine_params'] for akey, aval in sval.items()}
                                    for skey, sval in mval.items()} for mkey, mval in d.items()}
+
+        # grabbing dataset again to compute GT diff
+        for i in range(2, 34):
+            f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/' + str(i) + '/fid', dtype=np.int32), (64, 128))
+            f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
+            f_coeff_list.append(f_coeffs_unpacked)
+
+        f_coeff_arr = np.asarray(f_coeff_list)
+        fully_averaged_coeffs = np.average(f_coeff_arr, axis=0)
+        f_coeff_list_grouped = []
+        num = int(2 ** j)
+        for i in range(num):
+            data_arr = np.roll(f_coeff_arr, i, axis=0)
+            for ele in range(len(f_coeff_list) // num):
+                f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
+
+        coeffs = f_coeff_list_grouped
+        coeffs_minus_GT = coeffs - np.average(coeffs, axis=0)
 
         for output_dim in output_dims:
             GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -340,6 +388,8 @@ if plot_dTV_results:
                     fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
+                    GT_fourier_diff = fourier_diff + coeffs_minus_GT[i, :, :]
+
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
@@ -351,14 +401,18 @@ if plot_dTV_results:
 
                     diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
                     recons.append(recon_image)
+                    GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results_Li_LS" + "/dTV_results_Li_LS" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_Li_LS_new.pdf")
+                plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
+
+                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim
+                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_diff_norms
 
                 stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
@@ -366,18 +420,21 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results_Li_LS"  + "/dTV_results_Li_LS" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_Li_LS_new.pdf')
+                plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                    output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/Robustness_31112020_dTV_fidelities_Li_LS_new.json', 'w'))
+              open(save_dir + '/New/Robustness_31112020_dTV_fidelities_new.json', 'w'))
+
+    json.dump(GT_norms_dict,
+              open(save_dir + '/New/Robustness_31112020_dTV_GT_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/Robustness_31112020_dTV_aggregated_pixel_stds_Li_LS_new.json', 'w'))
+              open(save_dir + '/New/Robustness_31112020_dTV_aggregated_pixel_stds_new.json', 'w'))
 
     json.dump(affine_param_dict,
-              open(save_dir + '/Robustness_31112020_dTV_affine_params_Li_LS_new.json', 'w'))
+              open(save_dir + '/New/Robustness_31112020_dTV_affine_params_new.json', 'w'))
 
 # plotting data discrepancies - this is done locally: need to copy above json files into local directory
 
