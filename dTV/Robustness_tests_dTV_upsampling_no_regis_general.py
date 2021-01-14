@@ -61,8 +61,8 @@ sinfos = {}
 sinfos['med_res'] = sinfo_med_res
 sinfos['low_res'] = sinfo_low_res
 
-#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([10**3])
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
+#alphas = np.asarray([10**3])
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
@@ -76,8 +76,6 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 run_exp = True
 
 d = {}
-
-f_coeff_list = f_coeff_list[:5]
 
 for i, Li_fourier in enumerate(f_coeff_list):
 
