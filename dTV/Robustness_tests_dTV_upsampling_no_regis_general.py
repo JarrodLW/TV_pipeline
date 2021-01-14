@@ -36,7 +36,7 @@ def unpacking_fourier_coeffs(arr):
 f_coeff_list = []
 
 for i in range(2, 34):
-    f_coeffs = np.reshape(np.fromfile(dir + dataset +'/'+str(i)+'/fid', dtype=np.int32), (64, 128))
+    f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/'+str(i)+'/fid', dtype=np.int32), (64, 128))
     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
     f_coeff_list.append(f_coeffs_unpacked)
 
