@@ -365,7 +365,7 @@ if plot_dTV_results:
                 f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
 
         coeffs = f_coeff_list_grouped
-        coeffs_minus_GT = coeffs - np.average(coeffs, axis=0)
+        coeffs_minus_GT = coeffs - fully_averaged_coeffs
 
         for output_dim in output_dims:
             GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
