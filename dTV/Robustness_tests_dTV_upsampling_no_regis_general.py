@@ -15,6 +15,7 @@ import datetime as dt
 from skimage.measure import block_reduce
 import dTV.myAlgorithms as algs
 import dTV.myFunctionals as fctls
+import datetime as dt
 
 dir = 'dTV/7Li_1H_MRI_Data_31112020/'
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
@@ -140,6 +141,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
             print("Experiment_" + str(exp))
             exp += 1
 
+            print("start: " + dt.datetime.now().isoformat())
             reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
                                                                             gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
                                                                             prox_options=prox_options)
@@ -157,6 +159,9 @@ for i, Li_fourier in enumerate(f_coeff_list):
             # %%
             palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
             palm.run(niter)
+
+            print("end: " + dt.datetime.now().isoformat())
+
 
             recon = palm.x[0].asarray()
             diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
