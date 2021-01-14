@@ -390,7 +390,7 @@ if plot_dTV_results:
                     fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
-                    GT_fourier_diff = fourier_diff + coeffs_minus_GT[i, :, :]
+                    GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
 
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
@@ -442,13 +442,13 @@ if plot_dTV_results:
 
 if dTV_discrepancy_plots:
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li_LS_results/Li_LS_dTV_results/Robustness_31112020_dTV_fidelities_Li_LS_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_GT_fidelities_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         discrep_arr = np.zeros((len(alphas), 32))
-        d3 = d['avgs='+avg]['output_dim=32']
+        d3 = d['avgs='+avg]['output_dim=64']
 
         for i, alpha in enumerate(alphas):
 
