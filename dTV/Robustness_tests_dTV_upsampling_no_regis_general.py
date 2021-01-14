@@ -76,6 +76,8 @@ run_exp = True
 
 d = {}
 
+f_coeff_list = [f_coeff_list[:5]]
+
 for i, Li_fourier in enumerate(f_coeff_list):
 
     fourier_data_real = np.real(Li_fourier)
