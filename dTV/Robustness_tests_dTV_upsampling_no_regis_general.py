@@ -76,7 +76,7 @@ run_exp = True
 
 d = {}
 
-f_coeff_list = [f_coeff_list[:5]]
+f_coeff_list = f_coeff_list[:5]
 
 for i, Li_fourier in enumerate(f_coeff_list):
 
