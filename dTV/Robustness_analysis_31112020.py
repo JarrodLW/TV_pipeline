@@ -411,7 +411,7 @@ if plot_dTV_results:
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = diff_norms
 
-                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim
+                GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = GT_diff_norms
 
                 stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
