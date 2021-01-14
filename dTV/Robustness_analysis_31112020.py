@@ -390,6 +390,9 @@ if plot_dTV_results:
                     fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
+                    print(np.shape(fourier_diff))
+                    print(np.shape(coeffs_minus_GT[i, :, :]))
+
                     GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
 
                     recon_image = np.abs(recon[0] + 1j * recon[1])
