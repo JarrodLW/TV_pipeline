@@ -337,10 +337,10 @@ if plot_dTV_results:
         GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json') as f:
+        with open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg + '_no_regis_new.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/Robustness_31112020_dTV_' + avg + '_new.json')
+        print(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg + '_no_regis_new.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
@@ -409,7 +409,7 @@ if plot_dTV_results:
                     GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results" + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
@@ -425,21 +425,21 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results"  + "/dTV_results" + "/" + avg +"_avgs/" + str(output_dim) +"/dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/"  + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/New/Robustness_31112020_dTV_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + '/New/Robustness_31112020_dTV_GT_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/New/Robustness_31112020_dTV_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_aggregated_pixel_stds_new.json', 'w'))
 
-    json.dump(affine_param_dict,
-              open(save_dir + '/New/Robustness_31112020_dTV_affine_params_new.json', 'w'))
+    #json.dump(affine_param_dict,
+     #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))
 
 # plotting data discrepancies - this is done locally: need to copy above json files into local directory
 
