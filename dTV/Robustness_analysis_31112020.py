@@ -11,6 +11,7 @@ import esda
 
 plot_TV_results = True
 plot_dTV_results = False
+plot_Moran = True
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
 discrepancy_plots = False
@@ -223,7 +224,7 @@ if plot_TV_results:
         json.dump(stdevs,
                   open(save_dir + '/New/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
 
-        json.dump(stdevs,
+        json.dump(morans_I_dict,
                   open(save_dir + '/New/Robustness_31112020_TV_morans_I' + ext + '_new.json', 'w'))
 
 if plot_TV_results_full_avgs:
@@ -337,6 +338,25 @@ if discrepancy_plots:
         plt.xlabel("log10(lambda)")
         plt.ylabel("recon. standard deviation")
         plt.legend()
+
+# Moran plots (for Li2SO4)
+
+if plot_Moran:
+
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Robustness_31112020_TV_morans_I_new.json') as f:
+        d = json.load(f)
+
+    for k, avg in enumerate(avgs):
+        print("unpacking average " + avg)
+
+        d3 = d['avgs='+avg]['output_dim=32']
+
+        for reg_param in reg_params:
+            print("unpacking reg param " + '{:.1e}'.format(reg_param))
+
+            Moran_I_val = np.asarray(d3['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+
+
 
 
 ## dTV results
