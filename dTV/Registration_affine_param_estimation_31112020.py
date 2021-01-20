@@ -86,6 +86,9 @@ embed = Embedding_Affine(Y, V)
 transl_operator = deform_op * embed
 
 datafit = 0.5 * odl.solvers.L2NormSquared(X).translated(x1)
+#datafit = fctls.directionalTotalVariationNonnegative(X, alpha=alpha, sinfo=sinfo,
+                                                                          #  gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
+                                                                           # prox_options=prox_options)
 f = datafit * transl_operator
 
 ls = 1e-2
@@ -145,10 +148,10 @@ eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
 niter_prox = 20
-niter = 200
+niter = 500
 
-sinfo = sinfo_low_res
-#sinfo = image_H.T
+#sinfo = sinfo_low_res
+sinfo = image_H.T
 
 X = odl.uniform_discr([-1, -1], [1, 1], [sinfo.shape[0], sinfo.shape[1]], dtype='float32')
 V = X.tangent_bundle
@@ -162,7 +165,7 @@ prox_options['p'] = None
 prox_options['tol'] = None
 prox_options['niter'] = niter_prox
 
-data_odl = X.element(TV_regularised_16384)
+data_odl = X.element(TV_regularised_16384_upsampled)
 reg_im = fctls.directionalTotalVariationNonnegative(X, alpha=alpha, sinfo=sinfo,
                                                                             gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
                                                                             prox_options=prox_options)
@@ -173,9 +176,12 @@ g = odl.solvers.SeparableSum(reg_im, reg_affine)
 f = fctls.DataFitL2Disp(prod_space, data_odl, forward_op)
 
 L = [1, 1e+2]
-ud_vars = [0, 1] # only doing registration updates
+ud_vars = [1] # only doing registration updates
 
-p0 = prod_space.element([forward_op.adjoint(data_odl), Y.zero()])
+p0 = prod_space.element([data_odl, Y.zero()])
+# p0 = prod_space.element([forward_op.adjoint(data_odl), v_recon])
+#p0 = prod_space.element([forward_op.adjoint(data_odl), Y.element([1., 1., 0., 0., 0., 0.])]) # should get crazy result
+
 
 # %%
 palm = algs.PALM(f, g, ud_vars=ud_vars, x=p0.copy(), callback=None, L=L)
@@ -229,3 +235,22 @@ axs[1].imshow(np.asarray([deformed_im_high_res/np.amax(deformed_im_high_res), np
 axs[2].imshow(np.asarray([np.zeros((128, 128)), np.zeros((128, 128)),
                           image_H.T/np.amax(image_H.T)]).transpose((1,2,0)))
 
+# checkerboard
+
+from skimage.util import compare_images
+
+TV_image_normalised = TV_regularised_16384_upsampled/np.amax(TV_regularised_16384_upsampled)
+comp_1 = compare_images(TV_image_normalised, image_H.T/np.amax(image_H.T), method='checkerboard', n_tiles=(16, 16))
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(TV_image_normalised, cmap=plt.cm.gray)
+axs[1].imshow(comp, cmap=plt.cm.gray)
+axs[2].imshow(image_H.T/np.amax(image_H.T), cmap=plt.cm.gray)
+
+deformed_im_high_res_normalised = deformed_im_high_res/np.amax(deformed_im_high_res)
+comp_2 = compare_images(deformed_im_high_res_normalised, image_H.T/np.amax(image_H.T), method='checkerboard', n_tiles=(16, 16))
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(deformed_im_high_res_normalised, cmap=plt.cm.gray)
+axs[1].imshow(comp_2, cmap=plt.cm.gray)
+axs[2].imshow(image_H.T/np.amax(image_H.T), cmap=plt.cm.gray)

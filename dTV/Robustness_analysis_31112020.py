@@ -6,9 +6,11 @@ from myOperators import RealFourierTransform
 #import dTV.myDeform
 from skimage.measure import block_reduce
 #from dTV.myOperators import Embedding_Affine
+import libpysal
+import esda
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
 discrepancy_plots = False
@@ -54,17 +56,21 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 
 if plot_TV_results:
 
+    w = libpysal.weights.lat2W(32, 32)
+
     for k, ext in enumerate(extensions):
 
         GT_norms_dict = {}
         norms_dict = {}
         stdevs = {}
+        morans_I_dict = {}
 
         for j, avg in enumerate(avgs):
 
             GT_norms_dict['avgs=' + avg] = {}
             norms_dict['avgs='+ avg] = {}
             stdevs['avgs=' + avg] = {}
+            morans_I_dict['avgs=' + avg] = {}
 
             f_coeff_list = []
 
@@ -107,6 +113,7 @@ if plot_TV_results:
                     GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
 
                     complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
                                                       shape=[output_dim, output_dim], dtype='complex')
@@ -120,6 +127,7 @@ if plot_TV_results:
                         GT_diff_norms = []
                         diff_norms = []
                         recons = []
+                        morans_I_vals = []
 
                         fig, axs = plt.subplots(16, 4, figsize=(4, 10))
                         for i in range(32):
@@ -149,6 +157,9 @@ if plot_TV_results:
                             diff = synth_data - forward_op.range.element([np.real(data), np.imag(data)])
                             diff_norm = l2_norm(diff)
                             diff_norms.append(diff_norm)
+
+                            morans_I = esda.Moran(np.abs(diff), w).I
+                            morans_I_vals.appedn(morans_I)
 
                             GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
                             GT_diff_norm = l2_norm(GT_diff)
@@ -182,6 +193,9 @@ if plot_TV_results:
                         stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = stdev
 
+                        morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = morans_I_vals
+
                         plt.figure()
                         plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                         plt.colorbar()
@@ -207,6 +221,9 @@ if plot_TV_results:
 
         json.dump(stdevs,
                   open(save_dir + '/New/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))
+
+        json.dump(stdevs,
+                  open(save_dir + '/New/Robustness_31112020_TV_morans_I' + ext + '_new.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
@@ -445,6 +462,12 @@ if plot_dTV_results:
 
 if dTV_discrepancy_plots:
 
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json') as f:
+    #     d = json.load(f)
+    #
+    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
+    #     D = json.load(f)
+
     with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities_new.json') as f:
         d = json.load(f)
 
@@ -472,16 +495,16 @@ if dTV_discrepancy_plots:
 
         # plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(alphas)), l2_fourier_coeff_stdevs_Li2SO4[k]*np.ones(26)/np.sqrt(2)**k, color="C"+str(k%10), linestyle=":")
+        # plt.plot(np.log10(np.asarray(alphas)), l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(26), color="C"+str(k%10), linestyle=":")
         # plt.xlabel("log(lambda)")
         # plt.ylabel("l2-discrepancy")
         # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
         # plt.legend()
 
-        plt.errorbar(np.log10(np.asarray(reg_params)), np.average(GT_discrep_arr, axis=1),
+        plt.errorbar(np.log10(np.asarray(alphas)), np.average(GT_discrep_arr, axis=1),
                      yerr=np.std(GT_discrep_arr, axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(reg_params)), l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(26), color="C" + str(k % 10),
+        plt.plot(np.log10(np.asarray(alphas)), l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(26), color="C" + str(k % 10),
                  linestyle=":")
         plt.xlabel("log(lambda)")
         plt.ylabel("l2-discrepancy")
