@@ -56,7 +56,6 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 
 if plot_TV_results:
 
-    w = libpysal.weights.lat2W(32, 32)
 
     for k, ext in enumerate(extensions):
 
@@ -121,6 +120,8 @@ if plot_TV_results:
                     forward_op = RealFourierTransform(image_space)
 
                     l2_norm = odl.solvers.L2Norm(forward_op.range)
+
+                    w = libpysal.weights.lat2W(output_dim, output_dim) # this will change to 32x32 when I correct the Fourier diff dimensions
 
                     for reg_param in reg_params:
 
