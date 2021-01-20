@@ -159,8 +159,8 @@ if plot_TV_results:
                             diff_norm = l2_norm(diff)
                             diff_norms.append(diff_norm)
 
-                            morans_I = esda.Moran(np.abs(diff.asarray()), w).I
-                            morans_I_vals.append(morans_I)
+                            morans_I = esda.Moran(np.abs(diff.asarray()), w)
+                            morans_I_vals.append(morans_I.I)
 
                             GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
                             GT_diff_norm = l2_norm(GT_diff)
