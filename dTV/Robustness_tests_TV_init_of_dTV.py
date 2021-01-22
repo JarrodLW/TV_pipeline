@@ -65,7 +65,7 @@ if n !=512:
 f_coeff_list = [f_coeff_list[10]] #### Need to remove this
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/' \
-           'Results_MRI_dTV/New/results/TV_results'
+           'Results_MRI_dTV/New/results'
 
 with open(save_dir+'/Robustness_31112020_TV_'+str(n)+'_new.json') as f:
     D=json.load(f)
@@ -206,7 +206,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 np.real(diff_shift_subsampled).tolist(),
                 np.imag(diff_shift_subsampled).tolist()]
 
-outputfile = save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + str(n) + '.json'
+outputfile = save_dir + '/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + str(n) + '.json'
 
 print("About to write to datafile: " + outputfile + " at " + dt.datetime.now().isoformat())
 json.dump(d, open(outputfile, 'w'))
