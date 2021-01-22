@@ -46,6 +46,7 @@ for avg_ind in range(len(avgs)):
 #recon_dict = {}
 recon_arr = np.zeros((len(avgs), 32, 32, 32), dtype='complex')
 recon_arr_upsampled = np.zeros((len(avgs), 32, 64, 64), dtype='complex')
+recon_arr_cropped_fourier = np.zeros((len(avgs), 32, 28, 28), dtype='complex')
 
 for avg_ind in range(len(avgs)):
     #recon_dict['avgs='+avgs[avg_ind]] = {}
@@ -63,6 +64,12 @@ for avg_ind in range(len(avgs)):
 
         recon_upsampled = np.fft.fftshift(np.fft.ifft2(f_data_padded_shifted))
         recon_arr_upsampled[avg_ind, i, :, :] = recon_upsampled
+
+        f_data_cropped = f_coeff_arr_combined[avg_ind, i, 3:-1, 3:-1]
+        f_data_cropped_shifted = np.fft.fftshift(f_data_cropped)
+        recon = np.fft.fftshift(np.fft.ifft2(f_data_cropped_shifted))
+
+        recon_arr_cropped_fourier[avg_ind, i, :, :] = recon
 
         #recon_dict['avgs=' + avgs[avg_ind]]['measurement=' + str(i)] =
 
@@ -137,6 +144,15 @@ for k, ax in enumerate(axs.flat):
 fig.colorbar(pcm, ax=axs, shrink=0.5)
 
 stdev_images = np.std(recon_arr_upsampled, axis=1, ddof=1)
+fig, axs = plt.subplots(1, 5, figsize=(15, 3))
+for k, ax in enumerate(axs.flat):
+
+    pcm = ax.imshow(stdev_images[k], cmap=plt.cm.gray, vmin=np.amin(stdev_images), vmax=np.amax(stdev_images))
+    ax.axis("off")
+
+fig.colorbar(pcm, ax=axs, shrink=0.5)
+
+stdev_images = np.std(recon_arr_cropped_fourier, axis=1, ddof=1)
 fig, axs = plt.subplots(1, 5, figsize=(15, 3))
 for k, ax in enumerate(axs.flat):
 

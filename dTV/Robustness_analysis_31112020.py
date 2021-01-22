@@ -349,13 +349,19 @@ if plot_Moran:
     for k, avg in enumerate(avgs):
         print("unpacking average " + avg)
 
+        Moran_arr = np.zeros((len(reg_params), 32))
         d3 = d['avgs='+avg]['output_dim=32']
 
-        for reg_param in reg_params:
+        for i, reg_param in enumerate(reg_params):
             print("unpacking reg param " + '{:.1e}'.format(reg_param))
 
-            Moran_I_val = np.asarray(d3['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+            Moran_I_vals = np.asarray(d3['reg_param=' + '{:.1e}'.format(reg_param)]).astype('float64')
+            Moran_arr[i, :] = Moran_I_vals
 
+        plt.errorbar(np.log10(np.asarray(reg_params))[1:], np.average(Moran_arr, axis=1)[1:],
+                     yerr=np.std(Moran_arr, axis=1)[1:],
+                     label=avg + 'avgs', color="C" + str(k % 10))
+        plt.legend()
 
 
 

@@ -3,7 +3,6 @@
 
 import numpy as np
 import dTV.myFunctionals as fctls
-import dTV.myAlgorithms as algs
 import json
 import dTV.myAlgorithms as algs
 import matplotlib.pyplot as plt
