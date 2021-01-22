@@ -59,16 +59,11 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-#reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-#output_dims = [int(32)]
-#output_dims = [int(32), int(64)]
-f_coeff_list = [f_coeff_list[10]] #### Need to remove this
-
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/' \
            'Results_MRI_dTV/New/results'
 
 with open(save_dir+'/TV_results/Robustness_31112020_TV_'+str(n)+'_new.json') as f:
-    D=json.load(f)
+    D = json.load(f)
 
 f.close()
 
@@ -81,10 +76,7 @@ sinfos = {}
 sinfos['med_res'] = sinfo_med_res
 sinfos['low_res'] = sinfo_low_res
 
-#alphas = [50, 10**2, 5*10**2, 10**3, 5*10**3, 10**4, 5*10**4, 10**5, 5*10**5, 10**6]
-#alphas = np.logspace(2.5, 4.75, num=20)
-#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = [2.1*10**3]
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 eta = 0.01
 
 gamma = 0.995
@@ -144,9 +136,6 @@ for i, Li_fourier in enumerate(f_coeff_list):
 
         data_odl = forward_op.range.element([np.fft.fftshift(padded_fourier_data_real), np.fft.fftshift(padded_fourier_data_im)])
 
-        #forward_op = fourier_transf
-        #data_odl = forward_op.range.element([np.fft.fftshift(fourier_data_real), np.fft.fftshift(fourier_data_im)])
-
         # Set some parameters and the general TV prox options
         prox_options = {}
         prox_options['name'] = 'FGP'
@@ -156,9 +145,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
         prox_options['niter'] = niter_prox
 
         reg_affine = odl.solvers.ZeroFunctional(Yaff)
-        #x0 = X.zero()
         x0 = X.element([forward_op.domain.element(init_recon), X[1].zero()])
-
         f = fctls.DataFitL2Disp(X, data_odl, forward_op)
 
         for alpha in alphas:
