@@ -114,7 +114,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
         sinfo = sinfos[dict_key]
         height, width = sinfo.shape
 
-        init_recon = np.asarray(D3['output_size='+height])
+        init_recon = np.asarray(D3['output_size='+str(height)])
         d['measurement=' + str(i)]['output_size=' + str(height)] = {}
 
         complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
