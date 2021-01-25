@@ -383,10 +383,10 @@ if plot_dTV_results:
         GT_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/New/results/TV_initialised_TV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json') as f:
+        with open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/New/results/TV_initialised_TV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json')
+        print(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
