@@ -455,7 +455,7 @@ if plot_dTV_results:
                     GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results/TV_initialised_TV_results/" + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/TV_initialised_dTV_results/" + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
@@ -471,18 +471,18 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results/TV_initialised_TV_results/"  + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/TV_initialised_dTV_results/"  + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/New/results/TV_initialised_TV_results/Robustness_31112020_TV_init_dTV_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_fidelities_new.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + '/New/results/TV_initialised_TV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/New/results/TV_initialised_TV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json', 'w'))
 
     #json.dump(affine_param_dict,
      #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))
