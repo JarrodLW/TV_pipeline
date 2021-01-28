@@ -37,9 +37,10 @@ for i in range(2, 34):
 
 #reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 #reg_params = np.logspace(3., 4.5, num=20)
-reg_params = [10**3]
+#reg_params = [10**3]
+reg_params = np.logspace(2., np.log10(5*10**3), num=15)
 #output_dims = [int(32), int(64)]
-output_dims = [int(64)]
+output_dims = [int(32)]
 Li_fourier = np.average(np.asarray(f_coeff_list), axis=0)
 
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -47,13 +48,15 @@ naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
 run_exp = True
 #plot_results = True
 
+recon_arr = np.zeros((15, 32, 32))
+
 if run_exp:
 
     regularised_recons = {}
     exp = 0
 
     model = VariationalRegClass('MRI', 'TV')
-    for reg_param in reg_params:
+    for k, reg_param in enumerate(reg_params):
         for output_dim in output_dims:
 
             print("Experiment_" + str(exp))
@@ -68,6 +71,7 @@ if run_exp:
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
 
+            recon_arr[k, :, :] = recons[0]
 
             # regularised_recons['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]['output_size=' + str(output_dim)] = \
             #     [np.real(recons[0]).tolist(), np.imag(recons[0]).tolist()]
@@ -75,6 +79,17 @@ if run_exp:
     # save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
     # json.dump(regularised_recons,
     #           open(save_dir + '/Robustness_31112020_TV_512_new.json', 'w'))
+
+np.save('/Users/jlw31/Desktop/Presentations:Reports/dTV results/31112020_results/TV_regularised_recons_Li2SO4.npy', recon_arr)
+
+recon_arr_16384 = np.load('/Users/jlw31/Desktop/Presentations:Reports/dTV results/31112020_results/TV_regularised_recons_Li2SO4.npy')
+
+fig, axs = plt.subplots(5, 3, figsize=(6, 10))
+
+for k in range(15):
+
+    axs[k // 3, k % 3].imshow(np.abs(recon_arr_16384[k, :, :]), cmap=plt.cm.gray)
+    axs[k // 3, k % 3].axis("off")
 
 plt.figure()
 plt.imshow(np.abs(recons[0]).T[:, ::-1], cmap=plt.cm.gray)

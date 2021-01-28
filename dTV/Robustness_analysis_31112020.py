@@ -9,8 +9,8 @@ from skimage.measure import block_reduce
 import libpysal
 import esda
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -197,6 +197,9 @@ if plot_TV_results:
 
                         morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = morans_I_vals
+
+                        np.save(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+'stdev_arr_' + ext + "_new.npy", np.std(recons, axis=0))
 
                         plt.figure()
                         plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
@@ -497,10 +500,10 @@ if dTV_discrepancy_plots:
     # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
     #     D = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_fidelities_new.json') as f:
         d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_GT_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json') as f:
         D = json.load(f)
 
     l2_fourier_coeff_stdevs_Li_LS = [67357, 46945, 31978, 20836, 12030]
@@ -510,7 +513,7 @@ if dTV_discrepancy_plots:
 
         discrep_arr = np.zeros((len(alphas), 32))
         GT_discrep_arr = np.zeros((len(alphas), 32))
-        output_dim = str(64)
+        output_dim = str(32)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
 
@@ -522,18 +525,18 @@ if dTV_discrepancy_plots:
             GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             GT_discrep_arr[i, :] = GT_discrep
 
-        # plt.errorbar(np.log10(np.asarray(alphas)), np.average(discrep_arr, axis=1), yerr=np.std(discrep_arr, axis=1),
-        #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(alphas)), l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(26), color="C"+str(k%10), linestyle=":")
-        # plt.xlabel("log(lambda)")
-        # plt.ylabel("l2-discrepancy")
-        # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
-        # plt.legend()
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
+                     label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
+        plt.xlabel("log(lambda)")
+        plt.ylabel("l2-discrepancy")
+        plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
+        plt.legend()
 
-        plt.errorbar(np.log10(np.asarray(alphas)), np.average(GT_discrep_arr, axis=1),
-                     yerr=np.std(GT_discrep_arr, axis=1),
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
+                     yerr=np.std(GT_discrep_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(alphas)), l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(26), color="C" + str(k % 10),
+        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C" + str(k % 10),
                  linestyle=":")
         plt.xlabel("log(lambda)")
         plt.ylabel("l2-discrepancy")
@@ -541,13 +544,13 @@ if dTV_discrepancy_plots:
         plt.legend()
 
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results/Robustness_31112020_dTV_aggregated_pixel_stds_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         stdev_arr = np.zeros(len(alphas))
-        d3 = d['avgs='+avg]['output_dim=32']
+        d3 = d['avgs='+avg]['output_dim=64']
 
         for i, alpha in enumerate(alphas):
 
@@ -557,7 +560,7 @@ if dTV_discrepancy_plots:
         plt.plot(np.log10(alphas)[1:], stdev_arr[1:]/32, label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(lambda)")
         plt.ylabel("mean-squared stdev")
-        plt.title("Mean-squared standard deviation of dTV-regularised \n reconstructions, 32-by-32")
+        plt.title("Mean-squared standard deviation of dTV-regularised \n reconstructions, 64-by-64")
         plt.legend()
 
 if affine_param_plots:
