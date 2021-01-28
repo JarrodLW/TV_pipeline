@@ -50,6 +50,8 @@ run_exp = True
 
 recon_arr = np.zeros((15, 32, 32))
 
+reg_params = [1000.]
+
 if run_exp:
 
     regularised_recons = {}

@@ -52,15 +52,18 @@ def unpacking_fourier_coeffs(arr):
 #     f_coeffs_unpacked = unpacking_fourier_coeffs(f_coeffs)
 #     f_coeff_list_Li_LS.append(f_coeffs_unpacked)
 
-extensions = ['', '_Li_LS']
+#extensions = ['', '_Li_LS']
+extensions = ['']
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_MRI_dTV'
 
 if plot_TV_results:
 
+    GT_TV_data = np.load('/Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
 
     for k, ext in enumerate(extensions):
 
         GT_norms_dict = {}
+        GT_TV_norms_dict = {}
         norms_dict = {}
         stdevs = {}
         morans_I_dict = {}
@@ -68,6 +71,7 @@ if plot_TV_results:
         for j, avg in enumerate(avgs):
 
             GT_norms_dict['avgs=' + avg] = {}
+            GT_TV_norms_dict['avgs=' + avg] = {}
             norms_dict['avgs='+ avg] = {}
             stdevs['avgs=' + avg] = {}
             morans_I_dict['avgs=' + avg] = {}
@@ -111,6 +115,7 @@ if plot_TV_results:
                 for output_dim in output_dims:
 
                     GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -127,6 +132,7 @@ if plot_TV_results:
                     for reg_param in reg_params:
 
                         GT_diff_norms = []
+                        GT_TV_diff_norms = []
                         diff_norms = []
                         recons = []
                         morans_I_vals = []
@@ -169,6 +175,11 @@ if plot_TV_results:
                             #diff = diff[0].asarray() + 1j * diff[1].asarray()
                             #diff_shift = np.fft.ifftshift(diff)probability
 
+                            # comparison with the cleaned up data from TV reconstruction
+                            GT_TV_diff = synth_data - GT_TV_data
+                            GT_TV_diff_norm = l2_norm(GT_TV_diff)
+                            GT_TV_diff_norms.append(GT_TV_diff_norm)
+
                             axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
                             axs[2*(i // 4), i % 4].axis("off")
 
@@ -187,6 +198,9 @@ if plot_TV_results:
 
                         GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = GT_diff_norms
+
+                        GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_diff_norms
 
                         # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
                         #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
@@ -223,6 +237,9 @@ if plot_TV_results:
 
         json.dump(GT_norms_dict,
                   open(save_dir + '/New/Robustness_31112020_TV_GT_fidelities_' + ext + '_new.json', 'w'))
+
+        json.dump(GT_TV_norms_dict,
+                  open(save_dir + '/New/Robustness_31112020_TV_GT_from_TV_fidelities_' + ext + '_new.json', 'w'))
 
         json.dump(stdevs,
                   open(save_dir + '/New/Robustness_31112020_TV_aggregated_pixel_stds' + ext + '_new.json', 'w'))

@@ -178,3 +178,52 @@ f_coeffs_arr_512 = f_coeff_arr_combined[0]
 f_coeffs_stdev_arr_512 = np.std(np.abs(f_coeffs_arr_512), axis=0)
 np.sqrt(np.sum(np.square(f_coeffs_stdev_arr_512)))
 
+
+
+# data fidelity for TV-regularised recon from 16384 averages
+
+
+height=32
+width=32
+complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.], shape=[height, width], dtype='complex')
+image_space = complex_space.real_space ** 2
+forward_op = RealFourierTransform(image_space)
+
+f_data_fully_averaged = np.average(f_coeff_arr_combined[0, :, :, :], axis=0)
+rec = np.load('dTV/Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000.npy')
+rec_complex = rec[0] + 1j*rec[1]
+rec_rotated = rec_complex.T[:, ::-1]
+
+synthetic_data = forward_op(image_space.element([np.real(rec_rotated), np.imag(rec_rotated)]))
+synth_data_arr = synthetic_data.asarray()[0] + 1j*synthetic_data.asarray()[1]
+f_data_fully_averaged_shifted = np.fft.ifftshift(f_data_fully_averaged)
+
+plt.figure()
+plt.imshow(np.abs(f_data_fully_averaged_shifted),cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(synth_data_arr), cmap=plt.cm.gray)
+plt.colorbar()
+
+l2_norm = odl.solvers.L2Norm(forward_op.range)
+
+l2_norm(forward_op.range.element([np.real(f_data_fully_averaged_shifted), np.imag(f_data_fully_averaged_shifted)]) - synthetic_data)
+np.sqrt(np.sum(np.square(np.abs(f_data_fully_averaged_shifted - synth_data_arr))))
+
+
+
+plt.figure()
+plt.imshow(np.roll(np.abs(f_data_fully_averaged), -2, axis=1), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.fft.fftshift(np.abs(synth_data_arr)), cmap=plt.cm.gray)
+plt.colorbar()
+
+rec_from_rolled = np.fft.fftshift(np.fft.ifft2(f_data_fully_averaged_shifted_rolled))
+
+np.sqrt(np.sum(np.square(np.real(rec_from_rolled))))
+np.sqrt(np.sum(np.square(np.imag(rec_from_rolled))))
+
+
