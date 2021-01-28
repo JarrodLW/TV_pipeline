@@ -58,7 +58,7 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 
 if plot_TV_results:
 
-    GT_TV_data = np.load('/Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
+    GT_TV_data = np.load('Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
 
     for k, ext in enumerate(extensions):
 
