@@ -431,10 +431,10 @@ if plot_dTV_results:
         GT_TV_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json') as f:
+        with open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg +'_no_regis_new.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_' + avg +'.json')
+        print(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg +'_no_regis_new.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
@@ -508,7 +508,7 @@ if plot_dTV_results:
                     GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results/TV_initialised_dTV_results/" + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
@@ -527,21 +527,21 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results/TV_initialised_dTV_results/"  + avg +"_avgs/" + str(output_dim) +"/TV_init_dTV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/"  + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json', 'w'))
 
     json.dump(GT_TV_norms_dict,
-              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_from_TV_fidelities_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/New/results/TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_aggregated_pixel_stds_new.json', 'w'))
 
     #json.dump(affine_param_dict,
      #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))
@@ -562,6 +562,9 @@ if dTV_discrepancy_plots:
     with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json') as f:
         D = json.load(f)
 
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_from_TV_fidelities_new.json') as f:
+        DD = json.load(f)
+
     l2_fourier_coeff_stdevs_Li_LS = [67357, 46945, 31978, 20836, 12030]
     l2_fourier_coeff_stdevs_Li2SO4 = [68278, 47409, 32294, 21039, 12122]
 
@@ -569,9 +572,11 @@ if dTV_discrepancy_plots:
 
         discrep_arr = np.zeros((len(alphas), 32))
         GT_discrep_arr = np.zeros((len(alphas), 32))
+        GT_TV_discrep_arr = np.zeros((len(alphas), 32))
         output_dim = str(32)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
+        DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
 
         for i, alpha in enumerate(alphas):
 
@@ -581,22 +586,37 @@ if dTV_discrepancy_plots:
             GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             GT_discrep_arr[i, :] = GT_discrep
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
-                     label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
-        plt.xlabel("log(lambda)")
-        plt.ylabel("l2-discrepancy")
-        plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
-        plt.legend()
+            GT_TV_discrep = np.asarray(DD3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            GT_TV_discrep_arr[i, :] = GT_TV_discrep
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
-                     yerr=np.std(GT_discrep_arr[1:], axis=1),
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
+        #              label=avg+'avgs', color="C"+str(k%10))
+        # plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
+        # plt.xlabel("log(lambda)")
+        # plt.ylabel("l2-discrepancy")
+        # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
+        # plt.legend()
+        #
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
+        #              yerr=np.std(GT_discrep_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C" + str(k % 10),
+        #          linestyle=":")
+        # plt.xlabel("log(lambda)")
+        # plt.ylabel("l2-discrepancy")
+        # plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
+        # plt.legend()
+
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_TV_discrep_arr, axis=1)[1:],
+                     yerr=np.std(GT_TV_discrep_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C" + str(k % 10),
+        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25),
+                 color="C" + str(k % 10),
                  linestyle=":")
         plt.xlabel("log(lambda)")
         plt.ylabel("l2-discrepancy")
-        plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
+        plt.title(
+            "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
         plt.legend()
 
 
