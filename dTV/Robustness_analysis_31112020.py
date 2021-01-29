@@ -9,8 +9,9 @@ from skimage.measure import block_reduce
 import libpysal
 import esda
 
-plot_TV_results = False
-plot_dTV_results = True
+plot_TV_results = True
+best_TV_recons = False
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -191,7 +192,7 @@ if plot_TV_results:
 
                         fig.tight_layout(w_pad=0.4, h_pad=0.4)
                         plt.savefig(save_dir + "/New/results" + ext + "/TV_results" + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
-                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
+                            output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.png")
                         plt.close()
 
                         norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -274,6 +275,18 @@ if plot_TV_results_full_avgs:
 #         with open(
 #                 save_dir + '/New/results' + ext + '/TV_results' + ext + '/Robustness_31112020_TV_' + avg + ext + '_new.json') as f:
 #             d = json.load(f)
+
+# grabbing example recons
+
+if best_TV_recons:
+
+    with open(save_dir + '/New/results/TV_results/Robustness_31112020_TV_2048_new.json') as f:
+        d = json.load(f)
+
+    reg_param = 2.1*10**3
+
+    recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
+                       ['output_size=' + str(32)]).astype('float64')
 
 
 # plotting data discrepancies
@@ -556,13 +569,13 @@ if dTV_discrepancy_plots:
     # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
     #     D = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json') as f:
         d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
         D = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_GT_from_TV_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json') as f:
         DD = json.load(f)
 
     l2_fourier_coeff_stdevs_Li_LS = [67357, 46945, 31978, 20836, 12030]
