@@ -519,7 +519,7 @@ if plot_dTV_results:
                     'reg_param=' + '{:.1e}'.format(alpha)] = GT_diff_norms
 
                 GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                    'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_diff_norms
+                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_diff_norms
 
                 stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
