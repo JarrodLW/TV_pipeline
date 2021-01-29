@@ -182,10 +182,10 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
-                            axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray)
+                            axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray, interpolation='none')
                             axs[2*(i // 4), i % 4].axis("off")
 
-                            axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray)
+                            axs[1+2 * (i // 4), i % 4].imshow(np.fft.fftshift(np.abs(diff.asarray()[0] + 1j*diff.asarray()[1])), cmap=plt.cm.gray, interpolation='none')
                             axs[1+2 * (i // 4), i % 4].axis("off")
 
                             recons.append(image)
