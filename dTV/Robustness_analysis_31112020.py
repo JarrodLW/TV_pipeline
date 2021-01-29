@@ -9,9 +9,9 @@ from skimage.measure import block_reduce
 import libpysal
 import esda
 
-plot_TV_results = True
+plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -509,10 +509,10 @@ if plot_dTV_results:
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
-                    axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray)
+                    axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray, interpolation='none')
                     axs[2 * (i // 4), i % 4].axis("off")
 
-                    axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray)
+                    axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray, interpolation='none')
                     axs[1 + 2 * (i // 4), i % 4].axis("off")
 
                     diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
@@ -522,7 +522,7 @@ if plot_dTV_results:
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
                 plt.savefig(save_dir + "/New/results/dTV_results_no_regis/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
+                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.png")
                 plt.close()
 
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
