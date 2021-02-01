@@ -24,8 +24,8 @@ avgs = ['512', '1024', '2048', '4096', '8192']
 #reg_params = np.logspace(np.log10(2e3), np.log10(1e5), num=20)
 #reg_params = np.logspace(3., 4.5, num=20)
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-output_dims = [int(32), int(64)]
-#output_dims = [int(32)]
+#output_dims = [int(32), int(64)]
+output_dims = [int(32)]
 
 dir = '7Li_1H_MRI_Data_31112020/'
 
