@@ -9,9 +9,9 @@ from skimage.measure import block_reduce
 import libpysal
 import esda
 
-plot_TV_results = True
+plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -522,7 +522,7 @@ if plot_dTV_results:
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
                 plt.savefig(save_dir + "/New/results/dTV_results_no_regis/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
-                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.png")
+                    output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
                 norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
