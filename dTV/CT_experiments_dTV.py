@@ -7,6 +7,7 @@ from processing import *
 import dTV.myFunctionals as fctls
 import dTV.myAlgorithms as algs
 import json
+from time import time
 
 # pre-processing of data
 filename = 'dTV/Experiment1_XRF.hdf5'
@@ -53,6 +54,9 @@ if FBP_recon:
     np.save('recon_XRD_FBP', recon_XRD_FBP)
 
 
+sino_Co_1_normalised = sino_Co_1/np.sqrt(np.sum(np.square(sino_Co_1)))
+sino_0_XRD_normalised = sino_0_XRD/np.sqrt(np.sum(np.square(sino_0_XRD)))
+
 ## TV-regularised reconstructions
 if TV_recon:
 
@@ -60,22 +64,22 @@ if TV_recon:
     a_offset = -np.pi
     a_range = 2*np.pi
     d_offset = 0
-    #d_width = 40
-    d_width = 2
+    d_width = 40
+    #d_width = 2
 
     #reg_params = [10.**(i-5) for i in np.arange(10)]
     #reg_params = [10**100]
-    reg_params = [10**2]
+    reg_params = [10**(-5)]
 
     TV_regularised_recons = {'XRF': {}, 'XRD': {}}
 
     for reg_param in reg_params:
-        recons_XRF_TV = model.regularised_recons_from_subsampled_data(sino_Co_1.T, reg_param, recon_dims=(561, 561),
+        recons_XRF_TV = model.regularised_recons_from_subsampled_data(sino_Co_1_normalised.T, reg_param, recon_dims=(561, 561),
                                                                       niter=50, a_offset=a_offset, enforce_positivity=True,
                                                                       a_range=a_range, d_offset=0, d_width=d_width)[0]
 
-        recons_XRD_TV = model.regularised_recons_from_subsampled_data(sino_0_XRD.T, reg_param, recon_dims=(561, 561),
-                                                                      niter=50, a_offset=a_offset, enforce_positivity=True,
+        recons_XRD_TV = model.regularised_recons_from_subsampled_data(sino_0_XRD_normalised.T, reg_param, recon_dims=(561, 561),
+                                                                      niter=100, a_offset=a_offset, enforce_positivity=True,
                                                                       a_range=a_range, d_offset=0, d_width=d_width)[0]
 
         TV_regularised_recons['XRF']['recon_param = '+'{:.1e}'.format(reg_param)] = recons_XRF_TV.tolist()
@@ -88,6 +92,25 @@ if TV_recon:
 
 ## TV-regularised XRD reconstructions, masking out the spikes
 
+# generating a mask that picks out only the "interior" of the sinogram
+
+from scipy import ndimage
+
+arr = ndimage.binary_fill_holes((sino_0_XRD<0.06)*sino_0_XRD).astype(int)
+
+arr_lower_half = arr[arr.shape[0]//2:, :]
+arr_upper_half = arr[:arr.shape[0]//2, :]
+
+mask_exterior_signal = np.zeros(arr.shape)
+
+for k in range(arr.shape[1]):
+
+    I = np.nonzero(arr_lower_half[:, k])[0][0] + arr.shape[0]//2
+    J = np.nonzero(arr_upper_half[:, k])[0][-1]
+
+    mask_exterior_signal[J:I, k] = 1
+
+
 if masked_TV_recon:
 
 
@@ -95,7 +118,8 @@ if masked_TV_recon:
     a_offset = -np.pi
     a_range = 2 * np.pi
     d_offset = 0
-    d_width = 2
+    #d_width = 2
+    d_width=40
 
     # figuring out what to mask
 
@@ -111,7 +135,8 @@ if masked_TV_recon:
     forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
     FBP = odl.tomo.fbp_op(forward_op)
 
-    data = (sino_0_XRD < 0.1)*sino_0_XRD
+    data = (sino_0_XRD < 0.18)*sino_0_XRD
+
     #data = background_minus_buffer[:, :-1]*sino_0_XRD
     #data = background[:, :-1] * sino_0_XRD
 
@@ -122,15 +147,22 @@ if masked_TV_recon:
     #reg_param = 1. #10. ** 0
     #reg_params = [10. ** (i - 5) for i in np.arange(20)]
 
-    reg_params = [10**-7]
+    reg_params = [10**(-4)]
 
-    subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)
-    masked_data = 60000*sino_0_XRD*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
-    # background = sino_Co_1 < 800
-    # background_shifted_down = np.roll(background, 5, axis=0)
-    # background_shifted_up = np.roll(background, -5, axis=0)
+    #subsampling_arr = (sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
+    spike_subsampling_arr = (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)
+    subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)*mask_exterior_signal
+    #subsampling_arr = (sino_0_XRD > 0.06)*(sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
+    #masked_data = sino_0_XRD_normalised*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
+    masked_data = sino_0_XRD_normalised*subsampling_arr
+    #background = synth_data.T < 1.5
+    # background = sino_0_XRD < 0.06
+    # background_shifted_down = np.roll(background, 0, axis=0)
+    # background_shifted_up = np.roll(background, 0, axis=0)
     # background_minus_buffer = background*background_shifted_down*background_shifted_up
-    # masked_data = (1-background_minus_buffer)[:, :-1]*masked_data # this is ad-hoc!
+    # masked_data_new = (1-background_minus_buffer)*masked_data # this is ad-hoc!
+    #
+    # new_subsampling_arr = (1-background_minus_buffer)*subsampling_arr
 
     # recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561), subsampling_arr=((1-background_minus_buffer)[:, :-1]*subsampling_arr).T,
     #                                                               niter=50, a_offset=a_offset, enforce_positivity=True,
@@ -144,10 +176,14 @@ if masked_TV_recon:
         print("Experiment " + str(exp))
 
         recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
-                                                                      subsampling_arr=subsampling_arr.T,
+                                                                      subsampling_arr=spike_subsampling_arr.T,
                                                                       niter=50, a_offset=a_offset,
                                                                       enforce_positivity=True,
                                                                       a_range=a_range, d_offset=0, d_width=d_width)[0]
+
+        model = VariationalRegClass('STEM', 'TV')
+        recon = model.regularised_recons_from_subsampled_data(recons_XRD_TV, 0.0001, recon_dims=(561, 561), niter=200,
+                                                                      enforce_positivity=True)
 
         TV_regularised_recons['recon_param = ' + '{:.1e}'.format(reg_param)] = recons_XRD_TV.tolist()
 
@@ -171,8 +207,6 @@ if masked_TV_recon:
 
 
 
-
-
 ## dTV-regularised XRD recon with XRF sinfo
 
 if dTV_recon:
@@ -181,20 +215,21 @@ if dTV_recon:
     #strong_cvx = 1e-2
     #strong_cvx = 1e-1
     niter_prox = 20
+    #niter_prox = 1
     #niter = 250
-    niter = 100
+    niter = 50
 
     #strong_cvxs = [1e1, 1e0, 1e-1, 1e-2, 1e-3]
     strong_cvxs = [1e-5]
 
     #alphas = [10.**(i-5) for i in np.arange(4, 8)]
     #etas = [10.**(-i) for i in np.arange(5)]
-    alphas = [10.**(-2)]
-    etas = [10.**(-4)]
+    alphas = [10.**(-5)]
+    etas = [10.**(-3)]
 
     Yaff = odl.tensor_space(6)
 
-    data = sino_0_XRD.T
+    data = sino_0_XRD_normalised.T
     #data = sino_Co_1.T
     height, width = data.shape
 
@@ -205,21 +240,35 @@ if dTV_recon:
     detector_partition = odl.uniform_partition(d_offset-d_width/2, d_offset+d_width/2, width)
     geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
 
-    subsampling_arr = (sino_0_XRD < 0.3) * np.ones(sino_0_XRD.shape)
+    subsampling_arr = (sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
     masked_data = (subsampling_arr.T)*data
 
+    # temp
+    # background = synth_data.T < 1.5
+    # background_shifted_down = np.roll(background, 0, axis=0)
+    # background_shifted_up = np.roll(background, 0, axis=0)
+    # background_minus_buffer = background * background_shifted_down * background_shifted_up
+    # masked_data_new = ((1 - background_minus_buffer)[:, :-1]).T * masked_data  # this is ad-hoc!
+    #
+    # new_subsampling_arr = (1 - background_minus_buffer)[:, :-1] * subsampling_arr
+
+    ##
+
     # Create the forward operator
-    forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
-    subsampled_forward_op = forward_op.range.element(subsampling_arr.T)*forward_op
+    forward_op_CT = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
+    subsampled_forward_op = forward_op_CT.range.element(subsampling_arr.T)*forward_op_CT
 
-    data_odl = forward_op.range.element(masked_data)
+    #data_odl = forward_op.range.element(masked_data)
+    data_odl = forward_op_CT.range.element(masked_data)
 
-    # remembering to rotate so that orientations match
-    with open('dTV/Results_CT_dTV/TV_regularised_recons.json') as f:
-        d = json.load(f)
-
-    recon_XRF = np.asarray(d['XRF']['recon_param = 1.0e-02']).T[:, ::-1]
-    sinfo = image_space.element(recon_XRF)
+    #remembering to rotate so that orientations match
+    # with open('dTV/Results_CT_dTV/TV_regularised_recons.json') as f:
+    #     d = json.load(f)
+    #
+    # f.close()
+    #
+    # recon_XRF = np.asarray(d['XRF']['recon_param = 1.0e-02']).T[:, ::-1]
+    sinfo = image_space.element(pre_registered_recon_XRF.T[:, ::-1])
     #sinfo = recons_XRF[0]
 
     # space of optimised variables
@@ -236,6 +285,7 @@ if dTV_recon:
     reg_affine = odl.solvers.ZeroFunctional(Yaff)
     x0 = X.zero()
 
+    f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
     f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
 
     dTV_regularised_recons = {}
@@ -270,7 +320,13 @@ if dTV_recon:
 
     json.dump(dTV_regularised_recons, open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json', 'w'))
 
+np.save('/Users/jlw31/Desktop/dTV_example_pre_registered_raw_data.npy', recon.T[::-1, :])
 
+# FBP reconstructions
+
+FBP = odl.tomo.fbp_op(forward_op_CT)
+FBP_XRD = FBP(forward_op.range.element(sino_0_XRD.T))
+FBP_XRD_background = FBP(forward_op.range.element(((sino_0_XRD<0.08)*sino_0_XRD).T))
 
 if plotting:
 
@@ -320,3 +376,187 @@ for i, alpha in enumerate(alphas):
             plt.subplot(1,5,k+1)
             plt.imshow(np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]['strong_cvx=' +'{:.1e}'.format(strong_cvx)]).T[::-1, :], cmap=plt.cm.gray)
             plt.axis("off")
+
+
+# registration stuff
+
+from scipy import io
+from skimage.util import compare_images
+
+with open('dTV/Results_CT_dTV/TV_regularised_recons.json') as f:
+    d = json.load(f)
+
+f.close()
+
+example_XRD_TV_recon = np.load('dTV/Results_CT_dTV/example_XRD_recon_TV_with_masking.npy')
+
+f.close()
+
+recon_XRF = np.asarray(d['XRF']['recon_param = 1.0e-02'])
+
+pre_registered_recon_XRF = io.loadmat('/Users/jlw31/Desktop/XRF_example_TV_recon_registered.mat')['movingRegistered']
+
+plt.figure()
+plt.imshow(example_XRD_TV_recon, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(recon_XRF, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(pre_registered_recon_XRF, cmap=plt.cm.gray)
+
+comp_1 = compare_images(example_XRD_TV_recon/np.amax(example_XRD_TV_recon), recon_XRF/np.amax(recon_XRF), method='checkerboard', n_tiles=(16, 16))
+comp_2 = compare_images(example_XRD_TV_recon/np.amax(example_XRD_TV_recon), pre_registered_recon_XRF/np.amax(pre_registered_recon_XRF), method='checkerboard', n_tiles=(16, 16))
+
+plt.figure()
+plt.imshow(comp_1, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(comp_2, cmap=plt.cm.gray)
+
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(np.asarray([example_XRD_TV_recon/np.amax(example_XRD_TV_recon), np.zeros((561, 561)),
+                          np.zeros((561, 561))]).transpose((1,2,0)))
+axs[1].imshow(np.asarray([example_XRD_TV_recon/np.amax(example_XRD_TV_recon), np.zeros((561, 561)),
+                          recon_XRF/np.amax(recon_XRF)]).transpose((1,2,0)))
+axs[2].imshow(np.asarray([np.zeros((561, 561)), np.zeros((561, 561)),
+                          recon_XRF/np.amax(recon_XRF)]).transpose((1,2,0)))
+
+fig, axs = plt.subplots(1, 3, figsize=(10, 3))
+axs[0].imshow(np.asarray([example_XRD_TV_recon/np.amax(example_XRD_TV_recon), np.zeros((561, 561)),
+                          np.zeros((561, 561))]).transpose((1,2,0)))
+axs[1].imshow(np.asarray([example_XRD_TV_recon/np.amax(example_XRD_TV_recon), np.zeros((561, 561)),
+                          pre_registered_recon_XRF/np.amax(pre_registered_recon_XRF)]).transpose((1,2,0)))
+axs[2].imshow(np.asarray([np.zeros((561, 561)), np.zeros((561, 561)),
+                          pre_registered_recon_XRF/np.amax(pre_registered_recon_XRF)]).transpose((1,2,0)))
+
+
+synth_data = forward_op_CT(pre_registered_recon_XRF.T[:,::-1]).asarray()
+
+plt.figure()
+plt.imshow(synth_data.T, cmap=plt.cm.gray, aspect=0.1, vmax=2)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(sino_Co_1, cmap=plt.cm.gray, aspect=0.1, vmax=2000)
+plt.colorbar()
+
+plt.figure()
+plt.imshow((sino_0_XRD<0.06)*sino_0_XRD, cmap=plt.cm.gray, aspect=0.1)#, vmin=0.06, vmax=0.1)
+plt.colorbar()
+
+
+# dTV-assisted recon but at level of images
+
+gamma = 0.995
+#strong_cvx = 1e-2
+#strong_cvx = 1e-1
+niter_prox = 20
+#niter = 250
+niter = 100
+strong_cvx = 1e-5
+
+#alphas = [10.**(i-5) for i in np.arange(4, 8)]
+#etas = [10.**(-i) for i in np.arange(5)]
+#alphas = [10.**(-1)]
+#etas = [10.**(-3)]
+
+alphas = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
+etas = [0.1, 0.01, 0.001, 0.0001]
+
+Yaff = odl.tensor_space(6)
+
+data = example_XRD_TV_recon/np.amax(example_XRD_TV_recon)*10
+#data = (FBP_XRD.asarray()).T[::-1, :]
+height, width = data.shape
+
+image_space = odl.uniform_discr(min_pt=[0, 0], max_pt=[1, 1], shape=[561, 561], dtype='float')
+
+forward_op = odl.operator.default_ops.IdentityOperator(image_space)
+
+data_odl = forward_op.range.element(data)
+sinfo = image_space.element(pre_registered_recon_XRF)
+
+# space of optimised variables
+X = odl.ProductSpace(image_space, Yaff)
+
+# Set some parameters and the general TV prox options
+prox_options = {}
+prox_options['name'] = 'FGP'
+prox_options['warmstart'] = True
+prox_options['p'] = None
+prox_options['tol'] = None
+prox_options['niter'] = niter_prox
+
+reg_affine = odl.solvers.ZeroFunctional(Yaff)
+x0 = X.zero()
+#x = image_space.zero()
+
+f = fctls.DataFitL2Disp(X, data_odl, forward_op)
+#f = fctls.DataFitL2Disp(image_space, data_odl, forward_op)
+#f = odl.solvers.L2NormSquared(image_space).translated(data_odl)
+exp=0
+
+
+dTV_regularised_recons = {}
+    for alpha in alphas:
+        dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)] = {}
+        for eta in etas:
+
+            print("Experiment "+str(exp))
+            exp+=1
+
+            t0 = time()
+
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = {}
+
+            reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
+                                                                gamma=gamma, eta=eta, NonNeg=True, strong_convexity=strong_cvx,
+                                                                prox_options=prox_options)
+
+            g = odl.solvers.SeparableSum(reg_im, reg_affine)
+            #g = odl.solvers.SeparableSum(reg_im)
+
+            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                  odl.solvers.CallbackShow()
+                  )
+
+            L = [1, 1e+2]
+            ud_vars = [0]
+
+            # %%
+            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+            palm.run(niter)
+
+            # op_norm = 1.1 * odl.power_method_opnorm(forward_op)
+            # tau = 1.0 / op_norm  # Step size for the primal variable
+            # sigma = 1.0 / op_norm
+            #
+            # odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma)
+
+            recon = palm.x[0].asarray()
+            #recon = x[0].asarray()
+
+            dt = time() - t0
+            print('done in %.2fs.' % dt)
+
+            dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = recon.tolist()
+
+json.dump(dTV_regularised_recons, open('dTV/Results_CT_dTV/dTV_at_image_level.json', 'w'))
+
+with open('dTV/Results_CT_dTV/dTV_at_image_level.json') as f:
+    d = json.load(f)
+
+f.close()
+
+fig, axs = plt.subplots(5, 4, figsize=(8, 10))
+for i, alpha in enumerate(alphas[:5]):
+    for j, eta in enumerate(etas):
+        recon = np.asarray(dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)])
+        axs[i, j].imshow(recon, cmap=plt.cm.gray)
+        axs[i, j].axis("off")
+
+plt.tight_layout()
