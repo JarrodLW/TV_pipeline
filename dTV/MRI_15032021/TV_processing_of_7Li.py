@@ -15,9 +15,7 @@ import sys
 import datetime as dt
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-#n = int(sys.argv[1]) # 512, 1024, 2048, etc
-#dataset = sys.argv[2] # string, has to be either 'Li2SO4' or 'Li_LS'
-n = 2048
+n = int(sys.argv[1]) # 512, 1024, 2048, etc
 
 f_coeff_list = []
 
@@ -38,8 +36,8 @@ if n !=512:
     f_coeff_list = f_coeff_list_grouped
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-#output_dims = [int(32), int(64)]
-output_dims = [int(32)]
+output_dims = [int(32), int(64)]
+# output_dims = [int(32)]
 Li_fourier_coeffs = f_coeff_list
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
