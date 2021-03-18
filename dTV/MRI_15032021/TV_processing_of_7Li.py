@@ -38,14 +38,14 @@ if n !=512:
     f_coeff_list = f_coeff_list_grouped
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-output_dims = [int(32), int(64)]
-#output_dims = [int(32)]
+#output_dims = [int(32), int(64)]
+output_dims = [int(32)]
 Li_fourier_coeffs = f_coeff_list
 
-# save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-#            'Experiments/MRI_birmingham/Results_15032021/TV_results'
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
+           'Experiments/MRI_birmingham/Results_15032021/TV_results'
 
-save_dir = 'dTV/MRI_15032021/Results_15032021'
+# save_dir = 'dTV/MRI_15032021/Results_15032021'
 filename = save_dir + '/TV_7Li_15032021_' + str(n) + '.json'
 
 if os.path.isfile(filename):
