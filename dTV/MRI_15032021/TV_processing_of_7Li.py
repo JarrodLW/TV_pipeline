@@ -47,6 +47,7 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 
 # save_dir = 'dTV/MRI_15032021/Results_15032021'
 filename = save_dir + '/TV_7Li_15032021_' + str(n) + '.json'
+print("Looking for file: "+filename)
 
 if os.path.isfile(filename):
 
@@ -58,6 +59,7 @@ if os.path.isfile(filename):
     f.close()
 
 else:
+    print("Could not find: "+filename)
     d = {}
 
 run_exp = True
