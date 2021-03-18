@@ -113,17 +113,19 @@ for k in range(arr.shape[1]):
 
 if masked_TV_recon:
 
-
     model = VariationalRegClass('CT', 'TV')
     a_offset = -np.pi
     a_range = 2 * np.pi
+    #a_range = np.pi
     d_offset = 0
     #d_width = 2
     d_width=40
 
     # figuring out what to mask
 
-    width, height = sino_0_XRD.shape
+    # width, height = sino_0_XRD.shape
+    sino_0_XRD_subsampled = sino_0_XRD[::10, :]
+    width, height = sino_0_XRD_subsampled.shape
 
     image_space = odl.uniform_discr(min_pt=[-20, -20], max_pt=[20, 20], shape=[561, 561], dtype='float')
     # Make a parallel beam geometry with flat detector
@@ -135,7 +137,8 @@ if masked_TV_recon:
     forward_op = odl.tomo.RayTransform(image_space, geometry, impl='skimage')
     FBP = odl.tomo.fbp_op(forward_op)
 
-    data = (sino_0_XRD < 0.18)*sino_0_XRD
+    #data = (sino_0_XRD < 0.18)*sino_0_XRD
+    data = (sino_0_XRD_subsampled < 0.18) * sino_0_XRD_subsampled
 
     #data = background_minus_buffer[:, :-1]*sino_0_XRD
     #data = background[:, :-1] * sino_0_XRD
@@ -147,14 +150,14 @@ if masked_TV_recon:
     #reg_param = 1. #10. ** 0
     #reg_params = [10. ** (i - 5) for i in np.arange(20)]
 
-    reg_params = [10**(-4)]
+    reg_params = [10**(-2.5)]
 
     #subsampling_arr = (sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
-    spike_subsampling_arr = (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)
-    subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)*mask_exterior_signal
+    spike_subsampling_arr = (sino_0_XRD_subsampled < 0.18)*np.ones(sino_0_XRD_subsampled.shape)
+    #subsampling_arr =  (sino_0_XRD < 0.18)*np.ones(sino_0_XRD.shape)*mask_exterior_signal
     #subsampling_arr = (sino_0_XRD > 0.06)*(sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
     #masked_data = sino_0_XRD_normalised*subsampling_arr # I don't remember whether or not I have to do this explicitly.... check!
-    masked_data = sino_0_XRD_normalised*subsampling_arr
+    #masked_data = sino_0_XRD_normalised*subsampling_arr
     #background = synth_data.T < 1.5
     # background = sino_0_XRD < 0.06
     # background_shifted_down = np.roll(background, 0, axis=0)
@@ -175,9 +178,9 @@ if masked_TV_recon:
         exp += 1
         print("Experiment " + str(exp))
 
-        recons_XRD_TV = model.regularised_recons_from_subsampled_data(masked_data.T, reg_param, recon_dims=(561, 561),
+        recons_XRD_TV = model.regularised_recons_from_subsampled_data(data.T, reg_param, recon_dims=(width, width),
                                                                       subsampling_arr=spike_subsampling_arr.T,
-                                                                      niter=50, a_offset=a_offset,
+                                                                      niter=1000, a_offset=a_offset,
                                                                       enforce_positivity=True,
                                                                       a_range=a_range, d_offset=0, d_width=d_width)[0]
 
@@ -222,10 +225,8 @@ if dTV_recon:
     #strong_cvxs = [1e1, 1e0, 1e-1, 1e-2, 1e-3]
     strong_cvxs = [1e-5]
 
-    #alphas = [10.**(i-5) for i in np.arange(4, 8)]
-    #etas = [10.**(-i) for i in np.arange(5)]
-    alphas = [10.**(-5)]
-    etas = [10.**(-3)]
+    alphas = np.logspace(-5, -3, num=10)
+    etas = [1. , 0.1, 0.01, 0.001, 0.0001, 0.00001]
 
     Yaff = odl.tensor_space(6)
 
@@ -240,7 +241,10 @@ if dTV_recon:
     detector_partition = odl.uniform_partition(d_offset-d_width/2, d_offset+d_width/2, width)
     geometry = odl.tomo.Parallel2dGeometry(angle_partition, detector_partition)
 
-    subsampling_arr = (sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
+    subsampling_arr = (sino_0_XRD < 0.25) * np.ones(sino_0_XRD.shape)
+    #every_other_angle_mask = np.zeros(sino_0_XRD.shape)
+    #every_other_angle_mask[:, ::2] = 1
+    #subsampling_arr = every_other_angle_mask*subsampling_arr
     masked_data = (subsampling_arr.T)*data
 
     # temp
@@ -268,8 +272,8 @@ if dTV_recon:
     # f.close()
     #
     # recon_XRF = np.asarray(d['XRF']['recon_param = 1.0e-02']).T[:, ::-1]
-    sinfo = image_space.element(pre_registered_recon_XRF.T[:, ::-1])
     #sinfo = recons_XRF[0]
+    sinfo = image_space.element(pre_registered_recon_XRF.T[:, ::-1])
 
     # space of optimised variables
     X = odl.ProductSpace(image_space, Yaff)
@@ -286,14 +290,20 @@ if dTV_recon:
     x0 = X.zero()
 
     f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
-    f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
+    #f = fctls.DataFitL2Disp(X, data_odl, subsampled_forward_op)
 
     dTV_regularised_recons = {}
+    exp=0
     for alpha in alphas:
         dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)] = {}
         for eta in etas:
             dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)] = {}
             for strong_cvx in strong_cvxs:
+                dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]['strong_cvx=' + '{:.1e}'.format(strong_cvx)] = {}
+                start = time()
+
+                print("Experiment "+str(exp))
+                exp+=1
 
                 reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
                                                                     gamma=gamma, eta=eta, NonNeg=True, strong_convexity=strong_cvx,
@@ -311,22 +321,99 @@ if dTV_recon:
                 ud_vars = [0]
 
                 # %%
-                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
                 palm.run(niter)
 
                 recon = palm.x[0].asarray()
+                fidelity = f(palm.x)
 
-                dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)]['strong_cvx=' + '{:.1e}'.format(strong_cvx)] = recon.tolist()
+                print("Data fidelity: "+str(fidelity))
 
-    json.dump(dTV_regularised_recons, open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json', 'w'))
+                end = time()
+                diff = end - start
+                print("Done in "+str(diff))
+
+                dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][
+                    'strong_cvx=' + '{:.1e}'.format(strong_cvx)]['recon'] = recon.tolist()
+                dTV_regularised_recons['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][
+                    'strong_cvx=' + '{:.1e}'.format(strong_cvx)]['fidelity'] = fidelity
+
+    json.dump(dTV_regularised_recons, open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_alpha_eta.json', 'w'))
+
+with open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_alpha_eta.json') as f:
+    d = json.load(f)
+
+f.close()
+
+fig, axs = plt.subplots(10, 6)
+
+for i, alpha in enumerate(alphas):
+    for j, eta in enumerate(etas):
+        for k, strong_cvx in enumerate(strong_cvxs):
+
+            recon = np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][
+                    'strong_cvx=' + '{:.1e}'.format(strong_cvx)]['recon'])
+
+            axs[i, j].imshow(recon.T[::-1, :], cmap=plt.cm.gray)
+            axs[i, j].axis("off")
+
+plt.tight_layout(w_pad=0.1, rect=[0.2, 0, 0.2, 1])
+
+for j, eta in enumerate(etas):
+    fidelities = []
+    for i, alpha in enumerate(alphas):
+
+
+        fidelity = np.asarray(d['alpha=' + '{:.1e}'.format(alpha)]['eta=' + '{:.1e}'.format(eta)][
+                'strong_cvx=' + '{:.1e}'.format(1e-5)]['fidelity'])
+
+        # fidelity was defined as half of squared L2 norm
+        fidelities.append(np.sqrt(2*fidelity)/np.sqrt(np.sum(np.square(masked_data))))
+
+    plt.plot(alphas, fidelities, label="eta: "+'{:.1e}'.format(eta))#, color="C"+str(k%10))
+    plt.legend()
+
 
 np.save('/Users/jlw31/Desktop/dTV_example_pre_registered_raw_data.npy', recon.T[::-1, :])
 
 # FBP reconstructions
 
 FBP = odl.tomo.fbp_op(forward_op_CT)
-FBP_XRD = FBP(forward_op.range.element(sino_0_XRD.T))
-FBP_XRD_background = FBP(forward_op.range.element(((sino_0_XRD<0.08)*sino_0_XRD).T))
+FBP_XRD = FBP(forward_op_CT.range.element(sino_0_XRD.T))
+FBP_XRD_background = FBP(forward_op_CT.range.element(((sino_0_XRD<0.08)*sino_0_XRD).T))
+
+# SIRT reconstruction code - doesn't currently run on local machine
+
+# import astra
+#
+# subsampling_arr = (sino_0_XRD < 0.18) * np.ones(sino_0_XRD.shape)
+#
+# proj_geom = astra.create_proj_geom('parallel', 1, 561, np.linspace(0, 2*np.pi, 59))
+# vol_geom = astra.create_vol_geom(561, 561)
+# proj_id = astra.creators.create_projector('line', proj_geom, vol_geom)
+#
+# sino_id = astra.data2d.create('-sino', proj_geom, sino_0_XRD.T)
+# rec_id = astra.data2d.create('-vol', vol_geom)
+# cfg = astra.astra_dict('SIRT');
+# #cfg.ProjectorId = proj_id;
+# #cfg.ProjectionDataId = sino_id;
+# #cfg.ReconstructionDataId = rec_id;
+# cfg['ProjectionDataId'] = sino_id
+# cfg['ProjectorId'] = proj_id # new code
+# cfg['ReconstructionDataId'] = rec_id
+# #cfg.option.MinConstraint = 0;
+# #cfg.option.MaxConstraint = 561;
+# #cfg.option.SinogramMaskId = subsampling_arr
+# cfg.option['MinConstraint'] = 0;
+# cfg['MaxConstraint'] = 561;
+# cfg['SinogramMaskId'] = subsampling_arr
+# #sirt_id = astra.astra_mex_algorithm('create', cfg);
+# #astra.astra_mex_algorithm('iterate', sirt_id, 100);
+# alg_id = astra.algorithm.create(cfg)
+# astra.algorithm.run(alg_id, 100)
+# rec = astra.data2d.get(rec_id)
+#V = astra.astra_mex_data2d('get', rec_id);
+#imshow(V, [])
 
 if plotting:
 
@@ -344,8 +431,6 @@ if plotting:
             plt.axis('off')
             plt.savefig('dTV/Results_CT_dTV/TV_'+imaging_type+'_reg_param_'+'{:.1e}'.format(reg_param)+'.png')
             plt.close()
-
-
 
     with open('dTV/Results_CT_dTV/dTV_regularised_recons_varying_strong_cvx.json') as f:
         d = json.load(f)

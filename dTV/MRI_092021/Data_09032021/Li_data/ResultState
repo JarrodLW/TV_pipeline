@@ -1,0 +1,34 @@
+##TITLE=Parameter List, ParaVision 6.0.1
+##JCAMPDX=4.24
+##DATATYPE=Parameter Values
+##ORIGIN=Bruker BioSpin MRI GmbH
+##OWNER=pxk
+$$ 2021-03-05 16:48:16.428 +0000  pxk@CZC7148FSD
+$$ /opt/PV6.0.1/data/pxk/20210305_162951_7Li_UoBa_P_7Li_UoBa_P_1_1/ResultState
+$$ process /opt/PV6.0.1/prog/mod/pipe
+##$AdjResultParStates=( 7 )
+(<FREQ_Standard>, <PVM_FrqAdj1H>, <Bruker:AdjSf>, <>, <2021-03-05T16:47:12,
+938+0000>, <2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<FREQ_Standard>, <PVM_FrqAdj1HPpm>, <Bruker:AdjSf>, <>, <2021-03-05T16:47:12,
+938+0000>, <2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<FREQ_Standard>, <PVM_NucleiPpmRef>, <Bruker:AdjSf>, <>, 
+<2021-03-05T16:47:12,938+0000>, 
+<2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<FREQ_Standard>, <PVM_NAdjShimsets>, <Bruker:AdjSf>, <>, 
+<2021-03-05T16:47:12,938+0000>, 
+<2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<FREQ_Standard>, <PVM_AdjShimsets>, <Bruker:AdjSf>, <>, <2021-03-05T16:47:12,
+938+0000>, <2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<FREQ_Standard>, <PVM_AdjActShimset>, <Bruker:AdjSf>, <>, 
+<2021-03-05T16:47:12,938+0000>, 
+<2.16.756.5.5.100.3278643094.81511.1614962832.1161>, <>, 0, Yes) 
+(<TRANSM_Standard>, <PVM_StudyRefPow>, <Bruker:AdjRefG>, <>, 
+<2021-03-05T16:47:56,154+0000>, 
+<2.16.756.5.5.100.3278643094.81511.1614962876.1166>, <>, 0, Yes)
+##$AdjResultHwChainNdxs=( 7 )
+(0, 0) (0, 0) (0, 0) (0, 0) (0, 0) (0, 0) (0, 1)
+##$AdjResultStateHwChains=( 1 )
+((TRANS_CHAIN, -1), <2.16.756.5.5.100.8323328.71148.1512052533.17 -1 1 1 1 0 
+1 7Li  0>)
+##END=
+$$ File finished by PARX at 2021-03-05 16:48:16.428 +0000

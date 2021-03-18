@@ -1,0 +1,13 @@
+##TITLE=Parameter List, ParaVision 6.0.1
+##JCAMPDX=4.24
+##DATATYPE=Parameter Values
+##ORIGIN=Bruker BioSpin MRI GmbH
+##OWNER=pxk
+$$ 2021-03-08 09:10:12.706 +0000  pxk@CZC7148FSD
+$$ /opt/PV6.0.1/data/pxk/20210308_083644_1H_UoBa_PK_1H_UoBa_PK_1_1/10/pdata/1/procs
+$$ process /opt/PV6.0.1/prog/bin/parxserver
+##$OFFSET=166.591991502474
+##$SF=300.134475547448
+##$YMAX_p=32766
+##$YMIN_p=3
+##END=

@@ -13,6 +13,7 @@ from myOperators import RealFourierTransform, Complex2Real, Real2Complex
 #import astra
 from scipy.ndimage import interpolation
 from Utils import *
+from odl_implementation_CT_KL import CTKullbackLeibler
 
 class VariationalRegClass:
 
@@ -32,13 +33,16 @@ class VariationalRegClass:
                                                 reg_param, recon_dims=None,
                                                 subsampling_arr=None, niter=200, recon_init=None,
                                                 enforce_positivity=False, a_offset=None, a_range=None,
-                                                d_offset=None, d_width=None, reg_param_2=1):
+                                                d_offset=None, d_width=None, reg_param_2=1, datafit=None,
+                                                datafit_options={}):
+
         # data_stack: a rank 3 numpy array
         # measurement_type: string 'MRI', 'CT', 'STEM'
         # reg_type: string 'TV', 'TGV'
         # reg_param: float
         # recon_dims: tuple, only needed for CT
         # subsampling_array: a rank 2 numpy array of the same dimensions as the data
+        # to use the 'CT_KL' datafit, you have to pass it the correct darkfield data
 
         self.reg_param = reg_param
         self.reg_param_2 = reg_param_2
@@ -153,10 +157,21 @@ class VariationalRegClass:
                 data_odl = forward_op.range.element(data)
 
             # l2-squared data matching
-            l2_norm_squared = odl.solvers.L2NormSquared(forward_op.range).translated(data_odl)
+            if datafit == None:
+                datafit_func = odl.solvers.L2NormSquared(forward_op.range).translated(data_odl)
+
+            if datafit == 'CT_KL':
+                prior = data_odl
+                max_intens = datafit_options.get('max_intens', None)
+
+                if max_intens == None:
+                    raise ValueError('No max_intens key given in datafit_options')
+
+                else:
+                    datafit_func = CTKullbackLeibler(forward_op.range, prior=prior, max_intens=max_intens)
 
             # Make separable sum of functionals, order must be the same as in `op`
-            g = odl.solvers.SeparableSum(l2_norm_squared, *reg_norms)
+            g = odl.solvers.SeparableSum(datafit_func, *reg_norms)
 
             # print(l2_norm_squared(data_odl))
             # naive_recon = forward_op.inverse(data_odl).asarray()
@@ -209,8 +224,9 @@ class VariationalRegClass:
                     #reconstructions[i, :, :] = x.asarray()
 
             # rotating the reconstructed image 90 degrees anticlockwise
-            recon_rotated = recon.T[::-1, :]
-            reconstructions[i, :, :] = recon_rotated
+            #recon_rotated = recon.T[::-1, :]
+            #reconstructions[i, :, :] = recon_rotated
+            reconstructions[i, :, :] = recon
 
         return reconstructions
 

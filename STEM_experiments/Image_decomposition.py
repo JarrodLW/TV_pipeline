@@ -147,15 +147,67 @@ fourier = fourier_transf(texture_part).asarray()
 plt.imshow(np.log(np.abs(fourier)), cmap=plt.cm.gray)
 plt.colorbar()
 
+# shearlet denoising
+import pyshearlab
+
+X = texture_part.asarray()
+sigma=30
+scales=4
+thresholdingFactor=3
+
+shearletSystem = pyshearlab.SLgetShearletSystem2D(0, X.shape[0], X.shape[1], scales)
+coeffs = pyshearlab.SLsheardec2D(X, shearletSystem)
+
+oldCoeffs = coeffs.copy()
+weights = np.ones(coeffs.shape)
+
+for j in range(len(shearletSystem["RMS"])):
+    weights[:, :, j] = shearletSystem["RMS"][j] * np.ones((X.shape[0], X.shape[1]))
+
+coeffs = np.real(coeffs)
+zero_indices = np.abs(coeffs) / (thresholdingFactor * weights * sigma) < 1
+coeffs[zero_indices] = 0
+
+Xrec = pyshearlab.SLshearrec2D(coeffs, shearletSystem)
+
+plt.figure()
+plt.imshow(X, cmap=plt.cm.gray)
+plt.colorbar()
+plt.show()
+
+plt.figure()
+plt.imshow(Xrec, cmap=plt.cm.gray)
+plt.colorbar()
+plt.show()
+
+plt.figure()
+plt.imshow(np.abs(Xrec), cmap=plt.cm.gray)
+plt.colorbar()
+plt.show()
+
 
 # automating retrieval plane separation distance
 x[1].show()
-gradients = grad(denoised_texture_part)
+#gradients = grad(denoised_texture_part)
+gradients = grad(data)
 gradients[0].show()
+gradients[1].show()
 np.abs(gradients[0]).show()
 
+denoised_texture_part_shifted = denoised_texture_part - np.amin(denoised_texture_part)
 
+denoised_texture_part_shifted.show()
 
+#np.exp(gradients[0]).show()
+
+x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
+u = gradients[0].asarray()[::(data.shape[0]//50), ::(data.shape[1]//50)]
+v = gradients[1].asarray()[::(data.shape[0]//50), ::(data.shape[1]//50)]
+# u_normalised = u/np.sqrt(u**2+v**2)
+# v_normalised = v/np.sqrt(u**2+v**2)
+# plt.quiver(x, y, u_normalised, v_normalised)
+plt.quiver(x, y, u, v)
+plt.show()
 
 # rough
 wavelet_transf = odl.trafos.wavelet.WaveletTransform(image_space, 'haar')
@@ -205,7 +257,7 @@ comparison(geometric_part+wavelet_denoised_texture_odl)
 # Fourier stuff
 
 plane_patch_orig = barbara[150:300, 150:300]
-plane_patch_text = texture_part.asarray()[150:300, 150:300]
+plane_patch_text = denoised_texture_part.asarray()[150:300, 150:300]
 
 fourier_plane_patch_orig = np.fft.fft2(plane_patch_orig)
 fourier_plane_patch_orig_vis = np.fft.fftshift(np.abs(fourier_plane_patch_orig))
@@ -282,3 +334,97 @@ plt.colorbar()
 
 plt.figure()
 plt.imshow(np.real(filtered_salt_patch_text), cmap=plt.cm.gray)
+
+# playing around with Fourier transformation
+
+checkerboard = np.zeros((20, 20))
+stripes = np.zeros((20, 20))
+checkerboard[1::2, ::2]=1
+checkerboard[::2, 1::2]=1
+checkerboard -= 1/2
+stripes[::2, :]=1
+stripes -= 1/2
+
+f_coeffs_checkerboard = np.fft.fftshift(np.fft.fft2(checkerboard))
+f_coeffs_stripes = np.fft.fftshift(np.fft.fft2(stripes))
+
+plt.figure()
+plt.imshow(checkerboard, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(stripes, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(np.abs(f_coeffs_checkerboard), vmax=1, cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(f_coeffs_stripes), cmap=plt.cm.gray)
+plt.colorbar()
+
+
+# plt.figure()
+# plt.imshow(np.abs(np.real(f_coeffs_checkerboard)), cmap=plt.cm.gray)
+#
+# plt.figure()
+# plt.imshow(np.abs(np.imag(f_coeffs_checkerboard)), cmap=plt.cm.gray)
+#
+# plt.figure()
+# plt.imshow(np.abs(np.real(f_coeffs_stripes)), cmap=plt.cm.gray)
+#
+# plt.figure()
+# plt.imshow(np.abs(np.imag(f_coeffs_stripes)), cmap=plt.cm.gray)
+
+# shearlet transform of salt/plane
+scales=2
+
+plane_patch_text = denoised_texture_part.asarray()[150:300, 150:300]
+salt_patch_text = denoised_texture_part.asarray()[375:525, 150:300]
+
+#plane_patch_text = denoised_texture_part.asarray()[150:200, 150:200]
+#salt_patch_text = denoised_texture_part.asarray()[375:425, 150:200]
+
+shearletSystem = pyshearlab.SLgetShearletSystem2D(0, plane_patch_text.shape[0], plane_patch_text.shape[1], scales)
+
+coeffs_plane = pyshearlab.SLsheardec2D(plane_patch_text, shearletSystem)
+coeffs_salt = pyshearlab.SLsheardec2D(salt_patch_text, shearletSystem)
+
+fourier_salt_patch_text = np.fft.fft2(salt_patch_text)
+fourier_plane_patch_text = np.fft.fft2(plane_patch_text)
+#fourier_salt_patch_text_vis = np.fft.fftshift(np.abs(fourier_salt_patch_text))
+
+threshold=30000
+
+plt.figure()
+plt.imshow(np.abs(np.fft.fftshift(fourier_salt_patch_text)), vmin=5000, cmap=plt.cm.gray)
+plt.axis("off")
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(np.fft.fftshift(fourier_salt_patch_text))[50:100, 50:100], vmin=threshold, cmap=plt.cm.gray)
+plt.axis("off")
+plt.colorbar()
+
+
+f_plane_filtered=fourier_plane_patch_text*(np.abs(fourier_plane_patch_text)>threshold)
+f_plane_filtered_recon = np.fft.ifft2(f_plane_filtered)
+
+f_salt_filtered=fourier_salt_patch_text*(np.abs(fourier_salt_patch_text)>threshold)
+f_salt_filtered_recon = np.fft.ifft2(f_salt_filtered)
+
+plt.figure()
+plt.imshow(np.real(f_plane_filtered_recon), cmap=plt.cm.gray)
+plt.axis("off")
+
+plt.figure()
+plt.imshow(np.real(f_salt_filtered_recon), cmap=plt.cm.gray)
+plt.axis("off")
+
+plt.figure()
+plt.imshow(plane_patch_text, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(salt_patch_text, cmap=plt.cm.gray)
+
+
+

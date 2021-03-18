@@ -247,6 +247,17 @@ def recon_error(im_recon, im_ref):
 
     return l2_error, psnr_val, ssim_val
 
+def unpacking_fourier_coeffs_15032021(arr):
+
+    fourier_real_im = arr[:, :64]
+    fourier_real_im = fourier_real_im[::2, :]
+
+    fourier_real = fourier_real_im[:, 1::2]
+    fourier_im = fourier_real_im[:, ::2]
+    fourier = fourier_real + fourier_im * 1j
+
+    return fourier
+
 # def create_synthetic_data(im_stack, measurement_type):
 #     # takes a stack of images (given as numpy array) and produces synthetic data
 #     # by applying the appropriate forward operator

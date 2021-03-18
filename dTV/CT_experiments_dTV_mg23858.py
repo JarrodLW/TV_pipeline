@@ -95,16 +95,26 @@ plt.imshow(recon_XRD, cmap=plt.cm.gray)
 from odl_implementation_CT_KL import CTKullbackLeibler
 
 max_intens = 1.
-beta = 0.05
-data = max_intens*np.exp(-beta*forward_op.range.element(sino_XRD.T))
-#data_odl = forward_op.range(data)
+beta=1.
+mask = sino_XRD.T<4
+data_XRD = max_intens*np.exp(-beta*forward_op.range.element(sino_XRD.T))*mask
 
-op_norm = 1.1 * odl.power_method_opnorm(forward_op)
+# beta = 0.0001
+# data = 10*np.exp(-beta*forward_op.range.element(sino_Co_1.T))
+# noisy_data = odl.phantom.poisson_noise(data, seed=16)
+# noisy_data /= 10
+# noisy_sinogram = -(1/beta)*np.log(noisy_data)
+
+
+subsampled_forward_op = forward_op.range.element(mask)*forward_op
+
+#op_norm = 1.1 * odl.power_method_opnorm(forward_op)
+op_norm = 1.1 * odl.power_method_opnorm(subsampled_forward_op)
 tau = 1.0 / op_norm  # Step size for the primal variable
 sigma = 1.0 / op_norm  # Step size for the dual variable
 niter = 200
 
-g = CTKullbackLeibler(forward_op.range, prior=data, max_intens=max_intens)
+g = CTKullbackLeibler(forward_op.range, prior=data_XRD, max_intens=max_intens)
 
 #f = odl.solvers.ZeroFunctional(image_space)
 #f = 0.01*odl.solvers.L2NormSquared(image_space)
@@ -116,7 +126,75 @@ cb = (odl.solvers.CallbackPrintIteration(end=', ') &
                       odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
                       odl.solvers.CallbackShow(step=10))
 
-odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma, callback=cb)
+#odl.solvers.pdhg(x, f, g, forward_op, niter=niter, tau=tau, sigma=sigma, callback=cb)
+odl.solvers.pdhg(x, f, g, subsampled_forward_op, niter=niter, tau=tau, sigma=sigma, callback=cb)
+
+## Doing the same as above but using the updated modular framewrk from "processing"
+
+max_intens = 1.
+beta=1.
+mask = sino_XRD.T<4
+data_XRD = max_intens*np.exp(-beta*forward_op.range.element(sino_XRD.T))*mask
+
+model = VariationalRegClass('CT', 'TV')
+reg_param = 0.001
+datafit_options={}
+datafit_options['max_intens'] = max_intens
+
+# determining beta
+beta = 0.0008
+data = 100*np.exp(-beta*forward_op.range.element(sino_Co_1.T))
+data_array = data.asarray()
+#data_inner = data_array*(sino_Co_1.T > 700)
+data_inner = data_array[:, 60:-60]
+#np.sum(data_inner)/(100*np.sum(sino_Co_1.T > 700))
+np.average(data_inner)/100
+
+# plt.figure()
+# plt.imshow(sino_Co_1 > 700, cmap=plt.cm.gray, aspect=0.1)
+# plt.figure()
+# plt.imshow(data_inner.T, cmap=plt.cm.gray, aspect=0.1)
+# plt.colorbar()
+
+plt.figure()
+plt.imshow(data_array.T, cmap=plt.cm.gray, aspect=0.1, vmax=10)
+plt.colorbar()
+
+beta = 0.0005
+#max_intens=1000
+#max_intens=500
+#max_intens=100
+max_intens=50
+data = max_intens*np.exp(-beta*forward_op.range.element(sino_Co_1.T))
+noisy_data = forward_op.range.element(np.minimum(odl.phantom.poisson_noise(data, seed=16).asarray(), max_intens*np.ones(data.shape)))
+#noisy_sinogram = -(1/beta)*np.log(noisy_data/max_intens)
+noisy_sinogram = -(1/beta)*np.log(np.maximum(noisy_data, np.ones(noisy_data.shape))/max_intens)
+noisy_sinogram_rescaled = noisy_sinogram/max_intens
+noisy_data_rescaled = noisy_data/max_intens  # datafit is 1-homog. to we can normalise the beam intensity ---> more "natural" numbers
+max_intens=1 # I have to pass the algorithm unit max intensity, consistent twith normalised dark-field data
+
+plt.figure()
+plt.hist(data.asarray().ravel(), bins=max_intens)
+
+plt.figure()
+plt.hist(noisy_data.asarray().ravel(), bins=max_intens)
+
+FBP(noisy_sinogram).show()
+#FBP(np.minimum(noisy_sinogram, 9000*np.ones(noisy_sinogram.shape))).show()
+FBP(sino_Co_1.T).show()
+
+recons_XRD_CT_KL_TV = model.regularised_recons_from_subsampled_data(noisy_data_rescaled.asarray(), 0.005, recon_dims=(230, 230),
+                                                              subsampling_arr=None, niter=400, a_offset=a_offset,
+                                              enforce_positivity=True, a_range=a_range, d_offset=d_offset, d_width=d_width,
+                                              datafit='CT_KL', datafit_options=datafit_options)
+
+recons_XRD_L2_TV = model.regularised_recons_from_subsampled_data(noisy_sinogram_rescaled.asarray(), 5., recon_dims=(230, 230),
+                                                              subsampling_arr=None, niter=400, a_offset=a_offset,
+                                              enforce_positivity=True, a_range=a_range, d_offset=d_offset, d_width=d_width)
+
+recons_XRD = model.regularised_recons_from_subsampled_data((sino_Co_1/np.sqrt(np.sum(np.square(sino_Co_1)))).T, 0.00001, recon_dims=(230, 230),
+                                                              subsampling_arr=None, niter=400, a_offset=a_offset,
+                                              enforce_positivity=True, a_range=a_range, d_offset=d_offset, d_width=d_width)
 
 ## TV recon
 
@@ -141,6 +219,8 @@ subsampling_arr=((sino_XRD>np.percentile(sino_XRD, percentile_lower))*(sino_XRD<
 #sino_XRD_normalised = sino_XRD/np.amax(sino_XRD)
 #subsampling_arr = np.exp(-np.square(sino_XRD_normalised - sino_XRF_normalised))
 
+subsampling_arr = sino_XRD<4
+
 ## TV-regularised reconstructions
 if TV_recon:
 
@@ -150,14 +230,21 @@ if TV_recon:
     d_offset = 0
     d_width = 40
 
-    reg_params = [10.**(-1)]
+    reg_params = [10.**(-2)]
 
     TV_regularised_recons = {'XRF': {}, 'XRD': {}}
 
     for reg_param in reg_params:
-        recons_XRD_TV = model.regularised_recons_from_subsampled_data((sino_XRD * subsampling_arr).T, reg_param,
+        # recons_XRD_TV = model.regularised_recons_from_subsampled_data((sino_XRD * subsampling_arr).T, reg_param,
+        #                                                               recon_dims=(230, 230),
+        #                                                               subsampling_arr=subsampling_arr.T,
+        #                                                               niter=500, a_offset=a_offset,
+        #                                                               enforce_positivity=True,
+        #                                                               a_range=a_range, d_offset=d_offset,
+        #                                                               d_width=d_width)
+
+        recons_XRD_TV = model.regularised_recons_from_subsampled_data(sino_XRD.T, reg_param,
                                                                       recon_dims=(230, 230),
-                                                                      subsampling_arr=subsampling_arr.T,
                                                                       niter=500, a_offset=a_offset,
                                                                       enforce_positivity=True,
                                                                       a_range=a_range, d_offset=d_offset,
