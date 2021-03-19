@@ -117,8 +117,8 @@ if plot_TV_results:
                             #fully_averaged_data = np.fft.fftshift(fully_averaged_coeffs)
 
                             GT_proxy = np.zeros((output_dim, output_dim), dtype='complex')
-                            GT_proxy[output_dim // 2 - 16: output_dim // 2 + 16, output_dim // 2 - 16: output_dim // 2 + 16] =
-                            np.fft.ifftshift(GT_TV_data)
+                            GT_proxy[output_dim // 2 - 16: output_dim // 2 + 16, output_dim // 2 - 16: output_dim // 2 + 16]=\
+                                np.fft.ifftshift(GT_TV_data)
                             GT_proxy = np.fft.fftshift(GT_proxy)
 
                             subsampling_matrix = np.zeros((output_dim, output_dim))
