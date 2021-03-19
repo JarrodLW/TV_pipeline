@@ -86,7 +86,6 @@ synth_data_complex = synth_data[0] + 1j*synth_data[1]
 np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021_synth_data.npy', synth_data)
 np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021.npy', np.asarray([np.real(example_rec), np.imag(example_rec)]))
 
-
 plt.figure()
 plt.imshow(np.abs(synth_data_complex), cmap=plt.cm.gray)
 plt.colorbar()
@@ -94,3 +93,6 @@ plt.colorbar()
 plt.figure()
 plt.imshow(np.abs(Li_fourier), cmap=plt.cm.gray)
 plt.colorbar()
+
+l2_norm = odl.solvers.L2Norm(forward_op.range)
+l2_norm(synth_data)

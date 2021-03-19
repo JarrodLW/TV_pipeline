@@ -87,7 +87,6 @@ if plot_TV_results:
                     forward_op = RealFourierTransform(image_space)
 
                     l2_norm = odl.solvers.L2Norm(forward_op.range)
-
                     w = libpysal.weights.lat2W(output_dim, output_dim) # this will change to 32x32 when I correct the Fourier diff dimensions
 
                     for reg_param in reg_params:
@@ -104,18 +103,23 @@ if plot_TV_results:
                             recon = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(reg_param)]
                                                ['output_size=' + str(output_dim)]).astype('float64')
 
-                            #recon_rotated = np.asarray([recon[0].T[:, ::-1], recon[1].T[:, ::-1]])
-                            #image = np.abs(recon_rotated[0] + 1j * recon_rotated[1])
                             image = np.abs(recon[0] + 1j*recon[1])
 
                             data = np.zeros((output_dim, output_dim), dtype='complex')
                             data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
                             data = np.fft.fftshift(data)
+                            #data = np.fft.fftshift(coeffs[i])
 
                             fully_averaged_data = np.zeros((output_dim, output_dim), dtype='complex')
                             fully_averaged_data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = \
                             fully_averaged_coeffs
                             fully_averaged_data = np.fft.fftshift(fully_averaged_data)
+                            #fully_averaged_data = np.fft.fftshift(fully_averaged_coeffs)
+
+                            GT_proxy = np.zeros((output_dim, output_dim), dtype='complex')
+                            GT_proxy[output_dim // 2 - 16: output_dim // 2 + 16, output_dim // 2 - 16: output_dim // 2 + 16] =
+                            np.fft.ifftshift(GT_TV_data)
+                            GT_proxy = np.fft.fftshift(GT_proxy)
 
                             subsampling_matrix = np.zeros((output_dim, output_dim))
                             subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
@@ -133,11 +137,10 @@ if plot_TV_results:
                             GT_diff = synth_data - forward_op.range.element([np.real(fully_averaged_data), np.imag(fully_averaged_data)])
                             GT_diff_norm = l2_norm(GT_diff)
                             GT_diff_norms.append(GT_diff_norm)
-                            #diff = diff[0].asarray() + 1j * diff[1].asarray()
-                            #diff_shift = np.fft.ifftshift(diff)probability
 
                             # comparison with the cleaned up data from TV reconstruction
-                            GT_TV_diff = synth_data - GT_TV_data
+
+                            GT_TV_diff = synth_data - GT_proxy
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
@@ -162,9 +165,6 @@ if plot_TV_results:
 
                         GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_diff_norms
-
-                        # np.save("7Li_1H_MRI_Data_31112020/norms_"+ avg + "_avgs_32_to_" + str(
-                        #     output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext, diff_norms)
 
                         stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                         stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
