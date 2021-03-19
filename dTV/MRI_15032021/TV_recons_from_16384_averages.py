@@ -83,7 +83,9 @@ rec_odl = image_space.element([np.real(example_rec), np.imag(example_rec)])
 synth_data = forward_op(rec_odl).asarray()
 synth_data_complex = synth_data[0] + 1j*synth_data[1]
 
-np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021.npy', synth_data)
+np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021_synth_data.npy', synth_data)
+np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021.npy', np.asarray([np.real(example_rec), np.imag(example_rec)]))
+
 
 plt.figure()
 plt.imshow(np.abs(synth_data_complex), cmap=plt.cm.gray)

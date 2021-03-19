@@ -12,3 +12,5 @@ Rough_tests.py
 Temp_data_manipulation/
 dTV/7Li_1H_MRI_Data_31112020/
 dTV/Checking_dTV_on_H_data.py
+
+!example_TV_recon_15032021_synth_data.npy
