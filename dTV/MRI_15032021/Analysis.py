@@ -118,7 +118,7 @@ if plot_TV_results:
 
                             GT_proxy = np.zeros((output_dim, output_dim), dtype='complex')
                             GT_proxy[output_dim // 2 - 16: output_dim // 2 + 16, output_dim // 2 - 16: output_dim // 2 + 16]=\
-                                np.fft.ifftshift(GT_TV_data)
+                                np.fft.ifftshift(GT_TV_data[0]+1j*GT_TV_data[1])
                             GT_proxy = np.fft.fftshift(GT_proxy)
 
                             subsampling_matrix = np.zeros((output_dim, output_dim))
@@ -140,7 +140,7 @@ if plot_TV_results:
 
                             # comparison with the cleaned up data from TV reconstruction
 
-                            GT_TV_diff = synth_data - GT_proxy
+                            GT_TV_diff = synth_data - forward_op.range.element([np.real(GT_proxy), np.imag(GT_proxy)])
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
