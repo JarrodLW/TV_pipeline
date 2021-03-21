@@ -18,7 +18,7 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-n = int(sys.argv[1]) # 512, 1024, 2048, etc
+#n = int(sys.argv[1]) # 512, 1024, 2048, etc
 #n = 2048
 
 image_H = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
@@ -49,13 +49,13 @@ sinfos = {}
 #sinfos['low_res'] = sinfo_low_res
 sinfos['low_res'] = image_H
 
-alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-#alphas = np.asarray([1.])
+#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
+alphas = np.asarray([6000.])
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
 niter_prox = 20
-niter = 200
+niter = 300
 
 Yaff = odl.tensor_space(6)
 exp = 0
@@ -143,7 +143,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
             ud_vars = [0]
 
             # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
             palm.run(niter)
 
             print("end: " + dt.datetime.now().isoformat())
