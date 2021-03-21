@@ -17,6 +17,7 @@ import dTV.myAlgorithms as algs
 import dTV.myFunctionals as fctls
 import datetime as dt
 
+
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
 #n = 2048
