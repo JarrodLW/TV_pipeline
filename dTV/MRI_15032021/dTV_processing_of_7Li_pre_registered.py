@@ -19,8 +19,8 @@ import datetime as dt
 
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-#n = int(sys.argv[1]) # 512, 1024, 2048, etc
-n = 2048
+n = int(sys.argv[1]) # 512, 1024, 2048, etc
+#n = 2048
 
 image_H = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
 
@@ -42,7 +42,7 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-f_coeff_list = f_coeff_list[0:5]  # DELETE THIS!!!!
+#f_coeff_list = f_coeff_list[0:5]  # DELETE THIS!!!!
 
 sinfos = {}
 #sinfos['high_res'] = sinfo_high_res
@@ -50,8 +50,8 @@ sinfos = {}
 #sinfos['low_res'] = sinfo_low_res
 sinfos['low_res'] = image_H
 
-#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([6000.])
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
+#alphas = np.asarray([6000.])
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
