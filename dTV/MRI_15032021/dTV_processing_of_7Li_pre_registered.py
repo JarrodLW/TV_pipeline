@@ -18,7 +18,7 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-#n = int(sys.argv[1]) # 512, 1024, 2048, etc
+n = int(sys.argv[1]) # 512, 1024, 2048, etc
 #n = 2048
 
 image_H = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
