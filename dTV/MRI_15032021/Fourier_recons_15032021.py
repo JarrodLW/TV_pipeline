@@ -159,3 +159,53 @@ for k, ax in enumerate(axs.flat):
 
 fig.colorbar(pcm, ax=axs, shrink=0.5)
 
+# stdev plots
+recon_arr_512 = recon_arr[0]
+stdev_arr_512 = np.std(np.abs(recon_arr_512), axis=0)
+np.sqrt(np.sum(np.square(stdev_arr_512)))
+
+f_coeffs_arr_512 = f_coeff_arr_combined[0]
+f_coeffs_stdev_arr_512 = np.std(np.abs(f_coeffs_arr_512), axis=0)
+np.sqrt(np.sum(np.square(f_coeffs_stdev_arr_512)))
+
+# Morozov discrepancies
+diff_512 = f_coeff_arr_combined[0] - np.average(f_coeff_arr_combined[0], axis=0)
+Morozov_512 = np.sqrt(np.sum(np.square(np.abs(diff_512))))/np.sqrt(32)
+
+diff_1024 = f_coeff_arr_combined[1] - np.average(f_coeff_arr_combined[1], axis=0)
+Morozov_1024 = np.sqrt(np.sum(np.square(np.abs(diff_1024))))/np.sqrt(32)
+
+diff_2048 = f_coeff_arr_combined[2] - np.average(f_coeff_arr_combined[2], axis=0)
+Morozov_2048 = np.sqrt(np.sum(np.square(np.abs(diff_2048))))/np.sqrt(32)
+
+diff_4096 = f_coeff_arr_combined[3] - np.average(f_coeff_arr_combined[3], axis=0)
+Morozov_4096 = np.sqrt(np.sum(np.square(np.abs(diff_4096))))/np.sqrt(32)
+
+diff_8192 = f_coeff_arr_combined[4] - np.average(f_coeff_arr_combined[4], axis=0)
+Morozov_8192 = np.sqrt(np.sum(np.square(np.abs(diff_8192))))/np.sqrt(32)
+
+# comparing magnitude of Fourier recons using numpy and using RealFourierTransform
+f_data = np.average(f_coeff_arr_combined[0, :, :, :], axis=0)
+rec_all_averaged = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_data)))
+
+height, width = rec_all_averaged.shape
+complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                  shape=[height, width], dtype='complex')
+image_space = complex_space.real_space ** 2
+forward_op = RealFourierTransform(image_space)
+
+f_data_shifted = np.fft.fftshift(f_data)
+rec_odl = forward_op.inverse(forward_op.range.element([np.real(f_data_shifted), np.imag(f_data_shifted)]))
+
+plt.figure()
+plt.imshow(np.abs(rec_all_averaged), cmap=plt.cm.gray)
+plt.colorbar()
+plt.axis("off")
+
+plt.figure()
+plt.imshow(np.abs(rec_odl.asarray()[0]+1j*rec_odl.asarray()[1]), cmap=plt.cm.gray)
+plt.colorbar()
+
+l2_np = np.sqrt(np.sum(np.square(np.abs(rec_all_averaged))))
+l2_odl = np.sqrt(np.sum(np.square(np.abs(rec_odl.asarray()[0]+1j*rec_odl.asarray()[1]))))
+
