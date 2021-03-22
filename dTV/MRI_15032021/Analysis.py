@@ -145,7 +145,7 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
-                            if k==0 and j==2 and output_dim=int(32) and reg_param=reg_params[15] and i=5:
+                            if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
 
                                 data_array = np.asarray([synth_data, [np.real(fully_averaged_data), np.imag(fully_averaged_data)],
                                                          [np.real(GT_proxy), np.imag(GT_proxy)]])
