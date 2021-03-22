@@ -147,7 +147,7 @@ if plot_TV_results:
 
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
 
-                                data_array = np.asarray([synth_data, [np.real(fully_averaged_data), np.imag(fully_averaged_data)],
+                                data_array = np.asarray([synth_data.asarray(), [np.real(fully_averaged_data), np.imag(fully_averaged_data)],
                                                          [np.real(GT_proxy), np.imag(GT_proxy)]])
 
                                 np.save('dTV/Results_MRI_dTV/debugging_fft_shifts.npy', data_array)
