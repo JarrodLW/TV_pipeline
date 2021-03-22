@@ -8,9 +8,9 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = False
+plot_TV_results = True
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
