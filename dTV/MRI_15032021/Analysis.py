@@ -368,7 +368,7 @@ alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), 
 if plot_dTV_results:
 
     #GT_TV_data = np.load('Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
-    GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+    GT_TV_data = np.fft.fftshift(np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy'))
 
     norms_dict = {}
     GT_norms_dict = {}
@@ -483,16 +483,16 @@ if plot_dTV_results:
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_fidelities.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_fidelities.json', 'w'))
 
     json.dump(GT_TV_norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_aggregated_pixel_stds.json', 'w'))
 
     #json.dump(affine_param_dict,
      #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))
@@ -501,30 +501,23 @@ if plot_dTV_results:
 
 if dTV_discrepancy_plots:
 
-    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json') as f:
-    #     d = json.load(f)
-    #
-    # with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
-    #     D = json.load(f)
-
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_fidelities.json') as f:
         d = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_fidelities.json') as f:
         D = json.load(f)
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json') as f:
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json') as f:
         DD = json.load(f)
 
-    l2_fourier_coeff_stdevs_Li_LS = [67357, 46945, 31978, 20836, 12030]
-    l2_fourier_coeff_stdevs_Li2SO4 = [68278, 47409, 32294, 21039, 12122]
+    Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
 
     for k, avg in enumerate(avgs):
 
         discrep_arr = np.zeros((len(alphas), 32))
         GT_discrep_arr = np.zeros((len(alphas), 32))
         GT_TV_discrep_arr = np.zeros((len(alphas), 32))
-        output_dim = str(64)
+        output_dim = str(32)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
         DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
@@ -542,26 +535,26 @@ if dTV_discrepancy_plots:
 
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
+        # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
         # plt.xlabel("log(lambda)")
         # plt.ylabel("l2-discrepancy")
         # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
         # plt.legend()
-        #
-        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
-        #              yerr=np.std(GT_discrep_arr[1:], axis=1),
-        #              label=avg + 'avgs', color="C" + str(k % 10))
-        # plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25), color="C" + str(k % 10),
-        #          linestyle=":")
-        # plt.xlabel("log(lambda)")
-        # plt.ylabel("l2-discrepancy")
-        # plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
-        # plt.legend()
+
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
+                     yerr=np.std(GT_discrep_arr[1:], axis=1),
+                     label=avg + 'avgs', color="C" + str(k % 10))
+        plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
+                 linestyle=":")
+        plt.xlabel("log(lambda)")
+        plt.ylabel("l2-discrepancy")
+        plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
+        plt.legend()
 
         plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_TV_discrep_arr, axis=1)[1:],
                      yerr=np.std(GT_TV_discrep_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(alphas))[1:], l2_fourier_coeff_stdevs_Li2SO4[k] * np.ones(25),
+        plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25),
                  color="C" + str(k % 10),
                  linestyle=":")
         plt.xlabel("log(lambda)")
