@@ -145,6 +145,16 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
+                            if k==0 and j==2 and output_dim=int(32) and reg_param=reg_params[15] and i=5:
+
+                                data_array = np.asarray([synth_data, [np.real(fully_averaged_data), np.imag(fully_averaged_data)],
+                                                         [np.real(GT_proxy), np.imag(GT_proxy)]])
+
+                                np.save('dTV/Results_MRI_dTV/debugging_fft_shifts.npy', data_array)
+
+
+
+
                             axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray, interpolation='none')
                             axs[2*(i // 4), i % 4].axis("off")
 
@@ -541,15 +551,15 @@ if dTV_discrepancy_plots:
         # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
         # plt.legend()
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
-                     yerr=np.std(GT_discrep_arr[1:], axis=1),
-                     label=avg + 'avgs', color="C" + str(k % 10))
-        plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
-                 linestyle=":")
-        plt.xlabel("log(lambda)")
-        plt.ylabel("l2-discrepancy")
-        plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
-        plt.legend()
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
+        #              yerr=np.std(GT_discrep_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
+        #          linestyle=":")
+        # plt.xlabel("log(lambda)")
+        # plt.ylabel("l2-discrepancy")
+        # plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
+        # plt.legend()
 
         plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_TV_discrep_arr, axis=1)[1:],
                      yerr=np.std(GT_TV_discrep_arr[1:], axis=1),
