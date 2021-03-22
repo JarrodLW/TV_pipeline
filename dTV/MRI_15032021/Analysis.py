@@ -394,8 +394,8 @@ if plot_dTV_results:
         # grabbing dataset again to compute GT diff
 
         f_coeff_list = []
-        for i in range(2, 34):
-            f_coeffs = np.reshape(np.fromfile(dir + 'Li2SO4/' + str(i) + '/fid', dtype=np.int32), (64, 128))
+        for i in range(3, 35):
+            f_coeffs = np.reshape(np.fromfile(dir + 'Data_15032021/Li_data/' + str(i) + '/fid', dtype=np.int32), (64, 128))
             f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
             f_coeff_list.append(f_coeffs_unpacked)
 
