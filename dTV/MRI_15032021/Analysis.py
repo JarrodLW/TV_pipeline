@@ -458,7 +458,7 @@ if plot_dTV_results:
                     # example data, just to check consistency of fftshifts etc....
                     if j == 2 and output_dim == int(32) and alpha == alphas[15] and i == 5:
                         data_array = np.asarray(
-                            [coeffs[i, :, :], fourier_diff, [np.real(coeffs_minus_GT[i, :, :]), np.imag(coeffs_minus_GT[i, :, :])],
+                            [[np.real(coeffs[i, :, :]), no.imag(coeffs[i, :, :])], fourier_diff, [np.real(coeffs_minus_GT[i, :, :]), np.imag(coeffs_minus_GT[i, :, :])],
                              [np.real(coeffs_minus_GT_TV[i, :, :]), np.imag(coeffs_minus_GT_TV[i, :, :])],
                              [GT_TV_data[0], GT_TV_data[1]]])
 
