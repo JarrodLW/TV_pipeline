@@ -8,13 +8,13 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = True
+plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
-discrepancy_plots = True
+discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 
@@ -24,7 +24,7 @@ output_dims = [int(32), int(64)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
-save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_15032021/TV_results/'
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_15032021/'
 
 if plot_TV_results:
 
@@ -153,7 +153,7 @@ if plot_TV_results:
                             recons.append(image)
 
                         fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                        plt.savefig(save_dir + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                         plt.close()
 
@@ -173,19 +173,19 @@ if plot_TV_results:
                         morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = morans_I_vals
 
-                        np.save(save_dir + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        np.save(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_arr.npy", np.std(recons, axis=0))
 
                         plt.figure()
                         plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                         plt.colorbar()
-                        plt.savefig(save_dir + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_plot.pdf")
                         plt.close()
 
                         plt.figure()
                         plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                        plt.savefig(save_dir + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + "stdev_hist.pdf")
                         plt.close()
 
@@ -194,19 +194,19 @@ if plot_TV_results:
                 continue
 
         json.dump(norms_dict,
-                  open(save_dir + 'TV_fidelities.json', 'w'))
+                  open(save_dir + "TV_results/" + 'TV_fidelities.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open(save_dir + 'TV_GT_fidelities.json', 'w'))
+                  open(save_dir + "TV_results/" + 'TV_GT_fidelities.json', 'w'))
 
         json.dump(GT_TV_norms_dict,
-                  open(save_dir + 'TV_GT_proxy_fidelities.json', 'w'))
+                  open(save_dir + "TV_results/" + 'TV_GT_proxy_fidelities.json', 'w'))
 
         json.dump(stdevs,
-                  open(save_dir + 'TV_aggregated_pixel_stds.json', 'w'))
+                  open(save_dir + "TV_results/" + 'TV_aggregated_pixel_stds.json', 'w'))
 
         json.dump(morans_I_dict,
-                  open(save_dir + 'TV_morans_I.json', 'w'))
+                  open(save_dir + "TV_results/" + 'TV_morans_I.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
@@ -380,10 +380,10 @@ if plot_dTV_results:
         GT_TV_norms_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg +'_no_regis_new.json') as f:
+        with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg +'_pre_registered.json') as f:
             d = json.load(f)
 
-        print(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_' + avg +'_no_regis_new.json')
+        print(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg +'_pre_registered.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
@@ -457,7 +457,7 @@ if plot_dTV_results:
                     GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
@@ -476,21 +476,21 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "/New/results/dTV_results_no_regis/"  + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_fidelities_new.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_GT_fidelities_new.json', 'w'))
 
     json.dump(GT_TV_norms_dict,
-              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_GT_from_TV_fidelities_new.json', 'w'))
 
     json.dump(stdevs,
-              open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_no_regis_aggregated_pixel_stds_new.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/Robustness_31112020_dTV_no_regis_aggregated_pixel_stds_new.json', 'w'))
 
     #json.dump(affine_param_dict,
      #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))

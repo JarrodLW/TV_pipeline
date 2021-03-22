@@ -62,7 +62,7 @@ Yaff = odl.tensor_space(6)
 exp = 0
 
 save_dir = save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-           'Experiments/MRI_birmingham/Results_15032021/dTV_results'
+           'Experiments/MRI_birmingham/Results_15032021/dTV_results_pre_registered'
 run_exp = True
 
 d = {}
