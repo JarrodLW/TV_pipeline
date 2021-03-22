@@ -8,9 +8,9 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = True
+plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -145,15 +145,13 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
+                            # example data, just to check consistency of fftshifts etc....
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
 
                                 data_array = np.asarray([synth_data.asarray(), [np.real(fully_averaged_data), np.imag(fully_averaged_data)],
                                                          [np.real(GT_proxy), np.imag(GT_proxy)]])
 
                                 np.save('dTV/Results_MRI_dTV/debugging_fft_shifts.npy', data_array)
-
-
-
 
                             axs[2*(i // 4), i % 4].imshow(image, cmap=plt.cm.gray, interpolation='none')
                             axs[2*(i // 4), i % 4].axis("off")
@@ -456,6 +454,14 @@ if plot_dTV_results:
 
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
+
+                    # example data, just to check consistency of fftshifts etc....
+                    if j == 2 and output_dim == int(32) and alpha == alphas[15] and i == 5:
+                        data_array = np.asarray(
+                            [fourier_diff, coeffs_minus_GT[i, :, :],
+                             coeffs_minus_GT_TV[i, :, :]])
+
+                        np.save('dTV/Results_MRI_dTV/dTV_debugging_fft_shifts.npy', data_array)
 
                     axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray, interpolation='none')
                     axs[2 * (i // 4), i % 4].axis("off")
