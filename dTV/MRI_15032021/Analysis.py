@@ -8,9 +8,9 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = False
+plot_TV_results = True
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -606,10 +606,10 @@ if plot_dTV_results:
               open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json', 'w'))
 
     json.dump(GT_SSIM_dict,
-              open(save_dir + "TV_results/" + 'dTV_7Li_15032021_pre_registered_GT_SSIM_vals.json', 'w'))
+              open(save_dir + "dTV_results/" + 'dTV_7Li_15032021_pre_registered_GT_SSIM_vals.json', 'w'))
 
     json.dump(GT_TV_SSIM_dict,
-              open(save_dir + "TV_results/" + 'dTV_7Li_15032021_pre_registered_GT_proxy_SSIM_vals.json', 'w'))
+              open(save_dir + "dTV_results/" + 'dTV_7Li_15032021_pre_registered_GT_proxy_SSIM_vals.json', 'w'))
 
     json.dump(stdevs,
               open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_aggregated_pixel_stds.json', 'w'))
@@ -630,6 +630,12 @@ if dTV_discrepancy_plots:
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json') as f:
         DD = json.load(f)
 
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_fidelities.json') as f:
+        D_SSIM = json.load(f)
+
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json') as f:
+        DD_SSIM = json.load(f)
+
     Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
 
     for k, avg in enumerate(avgs):
@@ -637,10 +643,14 @@ if dTV_discrepancy_plots:
         discrep_arr = np.zeros((len(alphas), 32))
         GT_discrep_arr = np.zeros((len(alphas), 32))
         GT_TV_discrep_arr = np.zeros((len(alphas), 32))
+        GT_SSIM_arr = np.zeros((len(alphas), 32))
+        GT_proxy_SSIM_arr = np.zeros((len(alphas), 32))
         output_dim = str(32)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
         DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
+        D_SSIM3 = D_SSIM['avgs=' + avg]['output_dim=' + output_dim]
+        DD_SSIM3 = DD_SSIM['avgs=' + avg]['output_dim=' + output_dim]
 
         for i, alpha in enumerate(alphas):
 
@@ -652,6 +662,12 @@ if dTV_discrepancy_plots:
 
             GT_TV_discrep = np.asarray(DD3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             GT_TV_discrep_arr[i, :] = GT_TV_discrep
+
+            GT_SSIM_vals = np.asarray(D_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            GT_SSIM_arr[i, :] = GT_SSIM_vals
+
+            GT_proxy_SSIM_vals = np.asarray(DD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            GT_proxy_SSIM_arr[i, :] = GT_proxy_SSIM_vals
 
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
