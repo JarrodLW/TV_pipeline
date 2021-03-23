@@ -8,9 +8,9 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = False
+plot_TV_results = True
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -30,11 +30,15 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
 if plot_TV_results:
 
     GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+    GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
+    GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
 
     for k, ext in enumerate(extensions):
 
         GT_norms_dict = {}
         GT_TV_norms_dict = {}
+        GT_SSIM_dict = {}
+        GT_TV_SSIM_dict = {}
         norms_dict = {}
         stdevs = {}
         morans_I_dict = {}
@@ -43,6 +47,8 @@ if plot_TV_results:
 
             GT_norms_dict['avgs=' + avg] = {}
             GT_TV_norms_dict['avgs=' + avg] = {}
+            GT_SSIM_dict['avgs=' + avg] = {}
+            GT_TV_SSIM_dict['avgs=' + avg] = {}
             norms_dict['avgs='+ avg] = {}
             stdevs['avgs=' + avg] = {}
             morans_I_dict['avgs=' + avg] = {}
@@ -63,6 +69,10 @@ if plot_TV_results:
 
             f_coeff_arr = np.asarray(f_coeff_list)
             fully_averaged_coeffs = np.average(f_coeff_arr, axis=0)
+            fully_averaged_shifted = np.fft.fftshift(fully_averaged_coeffs)
+            recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
+            GT_image = np.abs(recon_fully_averaged)
+
             f_coeff_list_grouped = []
             num = int(2 ** j)
             for i in range(num):
@@ -78,6 +88,8 @@ if plot_TV_results:
 
                     GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -94,6 +106,8 @@ if plot_TV_results:
 
                         GT_diff_norms = []
                         GT_TV_diff_norms = []
+                        GT_SSIM_vals = []
+                        GT_TV_SSIM_vals = []
                         diff_norms = []
                         recons = []
                         morans_I_vals = []
@@ -145,6 +159,12 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
+                            # SSIM vals
+                            GT_SSIM = recon_error(image, GT_image)
+                            GT_TV_SSIM = recon_error(image, GT_TV_image)
+                            GT_SSIM_vals.append(GT_SSIM)
+                            GT_TV_SSIM_vals.append(GT_TV_SSIM)
+
                             # example data, just to check consistency of fftshifts etc....
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
 
@@ -174,6 +194,12 @@ if plot_TV_results:
 
                         GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_diff_norms
+
+                        GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = GT_SSIM_vals
+
+                        GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_SSIM_vals
 
                         stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                         stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -210,6 +236,12 @@ if plot_TV_results:
 
         json.dump(GT_TV_norms_dict,
                   open(save_dir + "TV_results/" + 'TV_GT_proxy_fidelities.json', 'w'))
+
+        json.dump(GT_SSIM_dict,
+                  open(save_dir + "TV_results/" + 'TV_GT_SSIM_vals.json', 'w'))
+
+        json.dump(GT_TV_SSIM_dict,
+                  open(save_dir + "TV_results/" + 'TV_GT_proxy_SSIM_vals.json', 'w'))
 
         json.dump(stdevs,
                   open(save_dir + "TV_results/" + 'TV_aggregated_pixel_stds.json', 'w'))
