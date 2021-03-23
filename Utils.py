@@ -243,7 +243,7 @@ def recon_error(im_recon, im_ref):
     psnr_val = psnr(im_recon, im_ref, data_range=im_recon.max() - im_recon.min())
     ssim_val = ssim(im_ref, im_recon, data_range=im_recon.max() - im_recon.min())
 
-    print('l2_error:'+str(l2_error))
+    #print('l2_error:'+str(l2_error))
 
     return l2_error, psnr_val, ssim_val
 
