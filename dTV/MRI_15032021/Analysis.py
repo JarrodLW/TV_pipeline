@@ -160,8 +160,8 @@ if plot_TV_results:
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
                             # SSIM vals
-                            GT_SSIM = recon_error(image, GT_image)
-                            GT_TV_SSIM = recon_error(image, GT_TV_image)
+                            GT_SSIM = recon_error(image, GT_image)[2]
+                            GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
                             GT_SSIM_vals.append(GT_SSIM)
                             GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
