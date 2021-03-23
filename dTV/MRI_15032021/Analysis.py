@@ -376,7 +376,9 @@ alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), 
 if plot_dTV_results:
 
     #GT_TV_data = np.load('Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
-    GT_TV_data = np.fft.fftshift(np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy'))
+    #GT_TV_data = np.fft.fftshift(np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy'))
+    GT_TV_data_arr = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+    GT_TV_data = np.fft.fftshift(GT_TV_data_arr[0] + 1j*GT_TV_data_arr[1])
 
     norms_dict = {}
     GT_norms_dict = {}
@@ -419,7 +421,8 @@ if plot_dTV_results:
 
         coeffs = f_coeff_list_grouped
         coeffs_minus_GT = coeffs - fully_averaged_coeffs
-        coeffs_minus_GT_TV = coeffs - (GT_TV_data[0] + 1j*GT_TV_data[1])
+        #coeffs_minus_GT_TV = coeffs - (GT_TV_data[0] + 1j*GT_TV_data[1])
+        coeffs_minus_GT_TV = coeffs - GT_TV_data
 
         for output_dim in output_dims:
             GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -460,7 +463,7 @@ if plot_dTV_results:
                         data_array = np.asarray(
                             [[np.real(coeffs[i]), np.imag(coeffs[i])], fourier_diff, [np.real(coeffs_minus_GT[i, :, :]), np.imag(coeffs_minus_GT[i, :, :])],
                              [np.real(coeffs_minus_GT_TV[i, :, :]), np.imag(coeffs_minus_GT_TV[i, :, :])],
-                             [GT_TV_data[0], GT_TV_data[1]]])
+                             [np.real(GT_TV_data), np.imag(GT_TV_data)]])
 
                         np.save('dTV/Results_MRI_dTV/dTV_debugging_fft_shifts.npy', data_array)
 
