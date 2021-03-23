@@ -17,12 +17,12 @@ import dTV.myAlgorithms as algs
 import dTV.myFunctionals as fctls
 import datetime as dt
 
-
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
 #n = 2048
 
-image_H = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
 
 f_coeff_list = []
 
@@ -48,7 +48,8 @@ sinfos = {}
 #sinfos['high_res'] = sinfo_high_res
 #sinfos['med_res'] = sinfo_med_res
 #sinfos['low_res'] = sinfo_low_res
-sinfos['low_res'] = image_H
+#sinfos['high_res'] = image_H_high_res
+sinfos['low_res'] = image_H_low_res
 
 alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
 #alphas = np.asarray([6000.])
@@ -65,20 +66,38 @@ save_dir = save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1
            'Experiments/MRI_birmingham/Results_15032021/dTV_results_pre_registered'
 run_exp = True
 
-d = {}
+outputfile = save_dir + '/dTV_7Li_15032021_' + str(n) + '_pre_registered.json'
+
+if os.path.isfile(outputfile):
+
+    print("About to read previous datafile: " + outputfile + " at "+dt.datetime.now().isoformat())
+    with open(outputfile, 'r') as f:
+        d = json.load(f)
+    print("Loaded previous datafile at "+dt.datetime.now().isoformat())
+
+    f.close()
+
+else:
+    print("Could not find: " + outputfile)
+    d = {}
+
 
 for i, Li_fourier in enumerate(f_coeff_list):
 
     fourier_data_real = np.real(Li_fourier)
     fourier_data_im = np.imag(Li_fourier)
 
-    d['measurement=' + str(i)] = {}
+    if 'measurement=' + str(i) not in d.keys():
+        d['measurement=' + str(i)] = {}
+
+    #d['measurement=' + str(i)] = {}
 
     for dict_key in sinfos.keys():
 
         sinfo = sinfos[dict_key]
 
-        d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])] = {}
+        if 'output_size=' + str(sinfo.shape[0]) not in d['measurement=' + str(i)].keys():
+            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])] = {}
 
         height, width = sinfo.shape
         complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
@@ -122,47 +141,48 @@ for i, Li_fourier in enumerate(f_coeff_list):
         f = fctls.DataFitL2Disp(X, data_odl, forward_op)
 
         for alpha in alphas:
+
+            if 'alpha=' + '{:.1e}'.format(alpha) not in d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])].keys():
             #dTV_regularised_recons['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)] = {}
 
-            print("Experiment_" + str(exp))
-            exp += 1
+                print("Experiment_" + str(exp))
+                exp += 1
 
-            print("start: " + dt.datetime.now().isoformat())
-            reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
-                                                                            gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
-                                                                            prox_options=prox_options)
+                print("start: " + dt.datetime.now().isoformat())
+                reg_im = fctls.directionalTotalVariationNonnegative(image_space, alpha=alpha, sinfo=sinfo,
+                                                                                gamma=gamma, eta=eta, NonNeg=False, strong_convexity=strong_cvx,
+                                                                                prox_options=prox_options)
 
-            g = odl.solvers.SeparableSum(reg_im, reg_affine)
+                g = odl.solvers.SeparableSum(reg_im, reg_affine)
 
-            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                  odl.solvers.CallbackShow(step=5))
+                cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                      odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                      odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                      odl.solvers.CallbackShow(step=5))
 
-            L = [1, 1e+2]
-            ud_vars = [0]
+                L = [1, 1e+2]
+                ud_vars = [0]
 
-            # %%
-            palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
-            palm.run(niter)
+                # %%
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                palm.run(niter)
 
-            print("end: " + dt.datetime.now().isoformat())
+                print("end: " + dt.datetime.now().isoformat())
 
-            recon = palm.x[0].asarray()
-            diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
-            diff = diff[0].asarray() + 1j * diff[1].asarray()
-            diff_shift = np.fft.ifftshift(diff)
-            diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
-                                    sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
+                recon = palm.x[0].asarray()
+                diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
+                diff = diff[0].asarray() + 1j * diff[1].asarray()
+                diff_shift = np.fft.ifftshift(diff)
+                diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
+                                        sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
 
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
-            d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
-                np.real(diff_shift_subsampled).tolist(),
-                np.imag(diff_shift_subsampled).tolist()]
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()
+                d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['fourier_diff'] = [
+                    np.real(diff_shift_subsampled).tolist(),
+                    np.imag(diff_shift_subsampled).tolist()]
 
-outputfile = save_dir + '/dTV_7Li_15032021_' + str(n) + '_pre_registered.json'
 
 print("About to write to datafile: " + outputfile + " at " + dt.datetime.now().isoformat())
 json.dump(d, open(outputfile, 'w'))

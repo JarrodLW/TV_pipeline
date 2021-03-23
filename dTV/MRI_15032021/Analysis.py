@@ -556,7 +556,7 @@ if dTV_discrepancy_plots:
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
         # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
-        # plt.xlabel("log(lambda)")
+        # plt.xlabel("log(alpha)")
         # plt.ylabel("l2-discrepancy")
         # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
         # plt.legend()
@@ -566,7 +566,7 @@ if dTV_discrepancy_plots:
         #              label=avg + 'avgs', color="C" + str(k % 10))
         # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
         #          linestyle=":")
-        # plt.xlabel("log(lambda)")
+        # plt.xlabel("log(alpha)")
         # plt.ylabel("l2-discrepancy")
         # plt.title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
         # plt.legend()
@@ -577,7 +577,7 @@ if dTV_discrepancy_plots:
         plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25),
                  color="C" + str(k % 10),
                  linestyle=":")
-        plt.xlabel("log(lambda)")
+        plt.xlabel("log(alpha)")
         plt.ylabel("l2-discrepancy")
         plt.title(
             "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")

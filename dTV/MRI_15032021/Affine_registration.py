@@ -96,6 +96,53 @@ np.save('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy', 
 
 plt.imshow(pre_registered_H_image, cmap=plt.cm.gray)
 
+# registration of higher-res guide image
+X_high_res = odl.uniform_discr([-1, -1], [1, 1], [128, 128], dtype='float32')
+
+deform_op_high_res = dTV.myDeform.LinDeformFixedTempl(X_high_res.element(image_H_high_res))
+embed_high_res = Embedding_Affine(Y, X_high_res.tangent_bundle)
+transl_operator_high_res = deform_op_high_res * embed_high_res
+
+transl_operator_high_res(v_recon).show()
+pre_registered_H_image_high_res = transl_operator_high_res(v_recon).asarray()
+
+np.save('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy', pre_registered_H_image_high_res)
+
+plt.figure()
+plt.imshow(pre_registered_H_image_high_res, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(np.abs(pre_registered_H_image_high_res - image_H_high_res), cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(image_Li, cmap=plt.cm.gray)
+
+plt.figure()
+plt.imshow(image_H_high_res, cmap=plt.cm.gray)
+
+# checking that when downsampled it agrees with the low-res pre-registered H image
+downsampled = resize(pre_registered_H_image_high_res, (32, 32))
+
+plt.figure()
+plt.imshow(downsampled/np.amax(downsampled), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(pre_registered_H_image/np.amax(pre_registered_H_image), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(pre_registered_H_image/np.amax(pre_registered_H_image) - downsampled/np.amax(downsampled)), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(downsampled/np.amax(downsampled) - image_Li/np.amax(image_Li)), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(pre_registered_H_image/np.amax(pre_registered_H_image) - image_Li/np.amax(image_Li)), cmap=plt.cm.gray)
+plt.colorbar()
+
 ## registration using dTV
 alpha = 10**3
 eta = 0.01
