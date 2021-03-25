@@ -21,7 +21,7 @@ affine_param_plots = False
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-output_dims = [int(32), int(128)]
+output_dims = [int(128)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
