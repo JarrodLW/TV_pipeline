@@ -183,8 +183,6 @@ for i, Li_fourier in enumerate(f_coeff_list):
                     np.real(diff_shift_subsampled).tolist(),
                     np.imag(diff_shift_subsampled).tolist()]
 
-
 print("About to write to datafile: " + outputfile + " at " + dt.datetime.now().isoformat())
 json.dump(d, open(outputfile, 'w'))
 print("Written outputfile at " + dt.datetime.now().isoformat())
-

@@ -21,7 +21,7 @@ affine_param_plots = False
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-output_dims = [int(32)]
+output_dims = [int(32), int(128)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
@@ -388,6 +388,8 @@ if discrepancy_plots:
         plt.ylabel("SSIM")
         plt.title(
             "SSIM between " + output_dim + "-by-" + output_dim + " TV-regularised recons\n and synthetic ground-truth proxy")
+        plt.ylim(0., 1.)
+        plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
 
 # stdev plots
@@ -703,9 +705,11 @@ if dTV_discrepancy_plots:
                      yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
         plt.xlabel("log(alpha)")
-        plt.ylabel("l2-discrepancy")
+        plt.ylabel("SSIM")
         plt.title(
             "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
+        plt.ylim(0., 1.)
+        plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
 
 
