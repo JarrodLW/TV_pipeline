@@ -160,10 +160,10 @@ if plot_TV_results:
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
                             # SSIM vals
-                            GT_SSIM = recon_error(image, GT_image)[2]
-                            GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
-                            GT_SSIM_vals.append(GT_SSIM)
-                            GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                            # GT_SSIM = recon_error(image, GT_image)[2]
+                            # GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                            # GT_SSIM_vals.append(GT_SSIM)
+                            # GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
                             # example data, just to check consistency of fftshifts etc....
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
