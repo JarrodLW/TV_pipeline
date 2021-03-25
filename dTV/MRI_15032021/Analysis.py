@@ -159,11 +159,11 @@ if plot_TV_results:
                             GT_TV_diff_norm = l2_norm(GT_TV_diff)
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
-                            # SSIM vals
-                            # GT_SSIM = recon_error(image, GT_image)[2]
-                            # GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
-                            # GT_SSIM_vals.append(GT_SSIM)
-                            # GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                            SSIM vals
+                            GT_SSIM = recon_error(image, GT_image)[2]
+                            GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                            GT_SSIM_vals.append(GT_SSIM)
+                            GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
                             # example data, just to check consistency of fftshifts etc....
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
@@ -563,10 +563,10 @@ if plot_dTV_results:
                     GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                     # SSIM vals
-                    GT_SSIM = recon_error(recon_image, GT_image)[2]
-                    GT_TV_SSIM = recon_error(recon_image, GT_TV_image)[2]
-                    GT_SSIM_vals.append(GT_SSIM)
-                    GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                    # GT_SSIM = recon_error(recon_image, GT_image)[2]
+                    # GT_TV_SSIM = recon_error(recon_image, GT_TV_image)[2]
+                    # GT_SSIM_vals.append(GT_SSIM)
+                    # GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
                 plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
@@ -582,11 +582,11 @@ if plot_dTV_results:
                 GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_diff_norms
 
-                GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_SSIM_vals
-
-                GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_SSIM_vals
+                # GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                #     'reg_param=' + '{:.1e}'.format(alpha)] = GT_SSIM_vals
+                #
+                # GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                #     'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_SSIM_vals
 
                 stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
