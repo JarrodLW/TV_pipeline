@@ -33,6 +33,8 @@ if plot_TV_results:
     GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
     GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
     GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
+    low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+    low_res_H_image_normalised = low_res_H_image/np.sqrt(np.sum(np.square(low_res_H_image)))
 
     for k, ext in enumerate(extensions):
 
@@ -40,6 +42,7 @@ if plot_TV_results:
         GT_TV_norms_dict = {}
         GT_SSIM_dict = {}
         GT_TV_SSIM_dict = {}
+        H_SSIM_dict = {}
         norms_dict = {}
         stdevs = {}
         morans_I_dict = {}
@@ -50,6 +53,7 @@ if plot_TV_results:
             GT_TV_norms_dict['avgs=' + avg] = {}
             GT_SSIM_dict['avgs=' + avg] = {}
             GT_TV_SSIM_dict['avgs=' + avg] = {}
+            H_SSIM_dict['avgs=' + avg] = {}
             norms_dict['avgs='+ avg] = {}
             stdevs['avgs=' + avg] = {}
             morans_I_dict['avgs=' + avg] = {}
@@ -91,6 +95,7 @@ if plot_TV_results:
                     GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
+                    H_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     norms_dict['avgs='+ avg]['output_dim=' + str(output_dim)] = {}
                     stdevs['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
                     morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
@@ -109,6 +114,7 @@ if plot_TV_results:
                         GT_TV_diff_norms = []
                         GT_SSIM_vals = []
                         GT_TV_SSIM_vals = []
+                        H_SSIM_vals = []
                         diff_norms = []
                         recons = []
                         morans_I_vals = []
@@ -170,8 +176,10 @@ if plot_TV_results:
                             GT_TV_image_normalised = GT_TV_image / np.sqrt(np.sum(np.square(GT_TV_image)))
                             GT_SSIM = recon_error(image_normalised, GT_image_normalised)[2]
                             GT_TV_SSIM = recon_error(image_normalised, GT_TV_image_normalised)[2]
+                            H_SSIM = recon_error(image_normalised, low_res_H_image_normalised)[2]
                             GT_SSIM_vals.append(GT_SSIM)
                             GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                            H_SSIM_vals.append(H_SSIM)
 
                             # example data, just to check consistency of fftshifts etc....
                             if k==0 and j==2 and output_dim==int(32) and reg_param==reg_params[15] and i==5:
@@ -208,6 +216,9 @@ if plot_TV_results:
 
                         GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = GT_TV_SSIM_vals
+
+                        H_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                            'reg_param=' + '{:.1e}'.format(reg_param)] = H_SSIM_vals
 
                         stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                         stdevs['avgs=' + avg]['output_dim=' + str(output_dim)][
@@ -250,6 +261,9 @@ if plot_TV_results:
 
         json.dump(GT_TV_SSIM_dict,
                   open(save_dir + "TV_results/" + 'TV_GT_proxy_SSIM_vals.json', 'w'))
+
+        json.dump(H_SSIM_dict,
+                  open(save_dir + "TV_results/" + 'TV_H_SSIM_vals.json', 'w'))
 
         json.dump(stdevs,
                   open(save_dir + "TV_results/" + 'TV_aggregated_pixel_stds.json', 'w'))

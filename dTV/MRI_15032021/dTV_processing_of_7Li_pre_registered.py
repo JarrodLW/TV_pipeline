@@ -19,7 +19,7 @@ import datetime as dt
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
 #n = int(sys.argv[1]) # 512, 1024, 2048, etc
-n = 1024
+n = 512
 
 image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
 image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
@@ -49,7 +49,7 @@ sinfos['high_res'] = image_H_high_res
 #sinfos['low_res'] = image_H_low_res
 
 #alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([7000.])
+alphas = np.asarray([8000.])
 #eta = 0.01
 eta = 0.02
 gamma = 0.995
