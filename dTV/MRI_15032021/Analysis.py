@@ -919,18 +919,6 @@ if best_recons:
     recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
     GT_image = np.abs(recon_fully_averaged)
 
-    # I shouldn't be copying this code all over the place! Put it somewhere more central
-    if avgs != 512:
-        #f_coeff_arr = np.asarray(f_coeff_list)
-        f_coeff_list_grouped = []
-        num = n // 512
-        for i in range(num):
-            data_arr = np.roll(f_coeff_arr, i, axis=0)
-            for ele in range(len(f_coeff_list) // num):
-                f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
-
-        f_coeff_list = f_coeff_list_grouped
-        f_coeff_arr = np.asarray(f_coeff_list)
 
     for avg in avgs:
 
@@ -945,6 +933,18 @@ if best_recons:
         f.close()
 
         model_params = model_param_dict[str(avg)]
+        # I shouldn't be copying this code all over the place! Put it somewhere more central
+        if avg != 512:
+            # f_coeff_arr = np.asarray(f_coeff_list)
+            f_coeff_list_grouped = []
+            num = avg // 512
+            for i in range(num):
+                data_arr = np.roll(f_coeff_arr, i, axis=0)
+                for ele in range(len(f_coeff_list) // num):
+                    f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
+
+            f_coeff_list = f_coeff_list_grouped
+            f_coeff_arr = np.asarray(f_coeff_list)
 
         fig, axs = plt.subplots(6, 4, figsize=(5, 10))
 
