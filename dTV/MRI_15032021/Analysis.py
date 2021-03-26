@@ -902,47 +902,52 @@ if affine_param_plots:
 
 ## Best (defensible) reconstructions from various experiments
 
-# for 2048 averages
+avgs = [1024, 2048]
+model_param_dict = {'1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [2.8*10**3, 3.0*10**3, 3.7*10**3]}
+
 if best_recons:
 
-    with open(save_dir + 'TV_results/TV_7Li_15032021_2048.json') as f:
-        d_TV = json.load(f)
+    for avg in avgs:
 
-    f.close()
+        with open(save_dir + 'TV_results/TV_7Li_15032021_' + str(avg) + '.json') as f:
+            d_TV = json.load(f)
 
-    with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_2048_pre_registered.json') as f:
-        d_dTV = json.load(f)
+        f.close()
 
-    f.close()
+        with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + str(avg) + '_pre_registered.json') as f:
+            d_dTV = json.load(f)
 
-    fig, axs = plt.subplots(6, 3, figsize=(5, 10))
-    for i in range(6):
+        f.close()
 
-        recon_TV = np.asarray(d_TV['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(3.6*10**3)]
-                           ['output_size=' + str(32)]).astype('float64')
-        image_TV = np.abs(recon_TV[0] + 1j * recon_TV[1])
+        model_params = model_param_dict[str(avg)]
 
-        recon_dTV_32 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(32)][
-                               'alpha=' + '{:.1e}'.format(3.7*10**3)]['recon']).astype('float64')
-        image_dTV_32 = np.abs(recon_dTV_32[0] + 1j * recon_dTV_32[1])
+        fig, axs = plt.subplots(6, 3, figsize=(5, 10))
+        for i in range(6):
 
-        recon_dTV_128 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(128)][
-                                      'alpha=' + '{:.1e}'.format(3.7 * 10 ** 3)]['recon']).astype('float64')
+            recon_TV = np.asarray(d_TV['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(model_params[0])]
+                               ['output_size=' + str(32)]).astype('float64')
+            image_TV = np.abs(recon_TV[0] + 1j * recon_TV[1])
 
-        fourier_complex = np.fft.fft2(recon_dTV_128[0] + 1j * recon_dTV_128[1])
-        fourier_shift = np.fft.ifftshift(fourier_complex)
-        fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
-        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
-        dTV_recon_from_128 = np.abs(rec_fourier)
+            recon_dTV_32 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(32)][
+                                   'alpha=' + '{:.1e}'.format(model_params[1])]['recon']).astype('float64')
+            image_dTV_32 = np.abs(recon_dTV_32[0] + 1j * recon_dTV_32[1])
 
-        axs[i, 0].imshow(image_TV, cmap=plt.cm.gray)
-        axs[i, 0].axis("off")
-        axs[i, 1].imshow(image_dTV_32, cmap=plt.cm.gray)
-        axs[i, 1].axis("off")
-        axs[i, 2].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
-        axs[i, 2].axis("off")
+            recon_dTV_128 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(128)][
+                                          'alpha=' + '{:.1e}'.format(model_params[2])]['recon']).astype('float64')
 
-        fig.tight_layout(w_pad=0.4, h_pad=0.6)
-        plt.savefig(save_dir + "best_recons_2048.pdf")
+            fourier_complex = np.fft.fft2(recon_dTV_128[0] + 1j * recon_dTV_128[1])
+            fourier_shift = np.fft.ifftshift(fourier_complex)
+            fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
+            rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+            dTV_recon_from_128 = np.abs(rec_fourier)
 
+            axs[i, 0].imshow(image_TV, cmap=plt.cm.gray)
+            axs[i, 0].axis("off")
+            axs[i, 1].imshow(image_dTV_32, cmap=plt.cm.gray)
+            axs[i, 1].axis("off")
+            axs[i, 2].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
+            axs[i, 2].axis("off")
+
+            fig.tight_layout(w_pad=0.4, h_pad=0.8)
+            plt.savefig(save_dir + "best_recons_"+str(avg)+".pdf")
 
