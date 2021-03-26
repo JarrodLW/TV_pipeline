@@ -18,8 +18,8 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-n = int(sys.argv[1]) # 512, 1024, 2048, etc
-#n = 2048
+#n = int(sys.argv[1]) # 512, 1024, 2048, etc
+n = 1024
 
 image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
 image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
@@ -42,27 +42,27 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-#f_coeff_list = f_coeff_list[0:5]  # DELETE THIS!!!!
+f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
 
 sinfos = {}
-#sinfos['high_res'] = sinfo_high_res
-#sinfos['med_res'] = sinfo_med_res
-#sinfos['low_res'] = sinfo_low_res
 sinfos['high_res'] = image_H_high_res
-sinfos['low_res'] = image_H_low_res
+#sinfos['low_res'] = image_H_low_res
 
-alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-#alphas = np.asarray([6000.])
-eta = 0.01
+#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
+alphas = np.asarray([7000.])
+#eta = 0.01
+eta = 0.02
 gamma = 0.995
+#gamma = 0.99999
 strong_cvx = 1e-5
 niter_prox = 20
-niter = 300
+#niter = 300
+niter = 50
 
 Yaff = odl.tensor_space(6)
 exp = 0
 
-save_dir = save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
            'Experiments/MRI_birmingham/Results_15032021/dTV_results_pre_registered'
 run_exp = True
 
@@ -165,7 +165,8 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 ud_vars = [0]
 
                 # %%
-                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                #palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
                 palm.run(niter)
 
                 print("end: " + dt.datetime.now().isoformat())

@@ -542,6 +542,13 @@ if plot_dTV_results:
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
+                    if output_dim == int(128):
+                        fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+                        fourier_shift = np.fft.ifftshift(fourier_complex)
+                        fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
+                        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+                        rec_low_res = np.abs(rec_fourier)
+
                     # example data, just to check consistency of fftshifts etc....
                     if j == 4 and output_dim == int(32) and alpha == alphas[15] and i == 5:
                         data_array = np.asarray(
@@ -563,10 +570,15 @@ if plot_dTV_results:
                     GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                     # SSIM vals
-                    # GT_SSIM = recon_error(recon_image, GT_image)[2]
-                    # GT_TV_SSIM = recon_error(recon_image, GT_TV_image)[2]
-                    # GT_SSIM_vals.append(GT_SSIM)
-                    # GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                    if output_dim == int(32):
+                        image = recon_image
+                    elif output_dim == int(128):
+                        image = rec_low_res
+
+                    GT_SSIM = recon_error(image, GT_image)[2]
+                    GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                    GT_SSIM_vals.append(GT_SSIM)
+                    GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
                 plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
@@ -582,11 +594,11 @@ if plot_dTV_results:
                 GT_TV_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                     'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_diff_norms
 
-                # GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                #     'reg_param=' + '{:.1e}'.format(alpha)] = GT_SSIM_vals
-                #
-                # GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
-                #     'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_SSIM_vals
+                GT_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_SSIM_vals
+
+                GT_TV_SSIM_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
+                    'reg_param=' + '{:.1e}'.format(alpha)] = GT_TV_SSIM_vals
 
                 stdev = np.sqrt(np.sum(np.square(np.std(recons, axis=0))))
                 stdevs['avgs=' + avg]['output_dim=' + str(output_dim)]['reg_param=' + '{:.1e}'.format(alpha)] = stdev
@@ -647,7 +659,7 @@ if dTV_discrepancy_plots:
         GT_TV_discrep_arr = np.zeros((len(alphas), 32))
         GT_SSIM_arr = np.zeros((len(alphas), 32))
         GT_proxy_SSIM_arr = np.zeros((len(alphas), 32))
-        output_dim = str(32)
+        output_dim = str(128)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
         DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
