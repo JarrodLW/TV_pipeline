@@ -906,6 +906,31 @@ avgs = [1024, 2048]
 model_param_dict = {'1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 2.8*10**3, 4.8*10**3]}
 
 if best_recons:
+    # grabbing the fully-averaged recon
+    f_coeff_list = []
+    for i in range(3, 35):
+        f_coeffs = np.reshape(np.fromfile(dir + 'Data_15032021/Li_data/' + str(i) + '/fid', dtype=np.int32), (64, 128))
+        f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+        f_coeff_list.append(f_coeffs_unpacked)
+
+    f_coeff_arr = np.asarray(f_coeff_list)
+    fully_averaged_coeffs = np.average(f_coeff_arr, axis=0)
+    fully_averaged_shifted = np.fft.fftshift(fully_averaged_coeffs)
+    recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
+    GT_image = np.abs(recon_fully_averaged)
+
+    # I shouldn't be copying this code all over the place! Put it somewhere more central
+    if avgs != 512:
+        #f_coeff_arr = np.asarray(f_coeff_list)
+        f_coeff_list_grouped = []
+        num = n // 512
+        for i in range(num):
+            data_arr = np.roll(f_coeff_arr, i, axis=0)
+            for ele in range(len(f_coeff_list) // num):
+                f_coeff_list_grouped.append(np.sum(data_arr[num * ele:num * (ele + 1)], axis=0) / num)
+
+        f_coeff_list = f_coeff_list_grouped
+        f_coeff_arr = np.asarray(f_coeff_list)
 
     for avg in avgs:
 
@@ -921,8 +946,13 @@ if best_recons:
 
         model_params = model_param_dict[str(avg)]
 
-        fig, axs = plt.subplots(6, 3, figsize=(5, 10))
-        for i in range(6):
+        fig, axs = plt.subplots(6, 4, figsize=(5, 10))
+
+        for j in range(4):
+            axs[0, j].imshow(GT_image, cmap=plt.cm.gray)
+            axs[0, j].axis("off")
+
+        for i in range(5):
 
             recon_TV = np.asarray(d_TV['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(model_params[0])]
                                ['output_size=' + str(32)]).astype('float64')
@@ -941,12 +971,18 @@ if best_recons:
             rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
             dTV_recon_from_128 = np.abs(rec_fourier)
 
-            axs[i, 0].imshow(image_TV, cmap=plt.cm.gray)
-            axs[i, 0].axis("off")
-            axs[i, 1].imshow(image_dTV_32, cmap=plt.cm.gray)
-            axs[i, 1].axis("off")
-            axs[i, 2].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
-            axs[i, 2].axis("off")
+            f_data = f_coeff_arr[i, :, :]
+            f_data_shifted = np.fft.fftshift(f_data)
+            recon_fourier = np.fft.fftshift(np.fft.ifft2(f_data_shifted))
+
+            axs[i+1, 0].imshow(np.abs(recon_fourier), cmap=plt.cm.gray)
+            axs[i+1, 0].axis("off")
+            axs[i+1, 1].imshow(image_TV, cmap=plt.cm.gray)
+            axs[i+1, 1].axis("off")
+            axs[i+1, 2].imshow(image_dTV_32, cmap=plt.cm.gray)
+            axs[i+1, 2].axis("off")
+            axs[i+1, 3].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
+            axs[i+1, 3].axis("off")
 
             fig.tight_layout(w_pad=0.4, h_pad=0.8)
             plt.savefig(save_dir + "best_recons_"+str(avg)+".pdf")
