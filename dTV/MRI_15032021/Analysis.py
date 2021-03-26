@@ -910,7 +910,7 @@ if best_recons:
 
     f.close()
 
-    with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg + '_pre_registered.json') as f:
+    with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_2048_pre_registered.json') as f:
         d_dTV = json.load(f)
 
     f.close()
@@ -918,15 +918,15 @@ if best_recons:
     fig, axs = plt.subplots(6, 3, figsize=(5, 10))
     for i in range(4):
 
-        recon_TV = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(3.6*10**3)]
+        recon_TV = np.asarray(d_TV['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(3.6*10**3)]
                            ['output_size=' + str(32)]).astype('float64')
         image_TV = np.abs(recon_TV[0] + 1j * recon_TV[1])
 
-        recon_dTV_32 = np.asarray(d['measurement=' + str(i)]['output_size=' + str(32)][
+        recon_dTV_32 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(32)][
                                'alpha=' + '{:.1e}'.format(3.6*10**3)]['recon']).astype('float64')
         image_dTV_32 = np.abs(recon[0] + 1j * recon[1])
 
-        recon_dTV_128 = np.asarray(d['measurement=' + str(i)]['output_size=' + str(32)][
+        recon_dTV_128 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(128)][
                                       'alpha=' + '{:.1e}'.format(3.7 * 10 ** 3)]['recon']).astype('float64')
 
         fourier_complex = np.fft.fft2(recon_dTV_128[0] + 1j * recon_dTV_128[1])
