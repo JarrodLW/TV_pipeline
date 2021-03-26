@@ -942,7 +942,7 @@ if best_recons:
         axs[i, 2].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
         axs[i, 2].axis("off")
 
-        fig.tight_layout(w_pad=0.4, h_pad=0.4)
+        fig.tight_layout(w_pad=0.4, h_pad=0.6)
         plt.savefig(save_dir + "best_recons_2048.pdf")
 
 
