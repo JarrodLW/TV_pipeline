@@ -8,9 +8,9 @@ import libpysal
 import esda
 from Utils import *
 
-plot_TV_results = False
+plot_TV_results = True
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -21,7 +21,8 @@ affine_param_plots = False
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-output_dims = [int(128)]
+#output_dims = [int(128)]
+output_dims = [int(32)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
@@ -160,8 +161,15 @@ if plot_TV_results:
                             GT_TV_diff_norms.append(GT_TV_diff_norm)
 
                             # SSIM vals
-                            GT_SSIM = recon_error(image, GT_image)[2]
-                            GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                            # GT_SSIM = recon_error(image, GT_image)[2]
+                            # GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                            # GT_SSIM_vals.append(GT_SSIM)
+                            # GT_TV_SSIM_vals.append(GT_TV_SSIM)
+                            image_normalised = image / np.sqrt(np.sum(np.square(image)))
+                            GT_image_normalised = GT_image / np.sqrt(np.sum(np.square(GT_image)))
+                            GT_TV_image_normalised = GT_TV_image / np.sqrt(np.sum(np.square(GT_TV_image)))
+                            GT_SSIM = recon_error(image_normalised, GT_image_normalised)[2]
+                            GT_TV_SSIM = recon_error(image_normalised, GT_TV_image_normalised)[2]
                             GT_SSIM_vals.append(GT_SSIM)
                             GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
