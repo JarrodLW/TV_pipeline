@@ -924,7 +924,7 @@ if best_recons:
 
         recon_dTV_32 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(32)][
                                'alpha=' + '{:.1e}'.format(3.7*10**3)]['recon']).astype('float64')
-        image_dTV_32 = np.abs(recon[0] + 1j * recon[1])
+        image_dTV_32 = np.abs(recon_dTV_32[0] + 1j * recon_dTV_32[1])
 
         recon_dTV_128 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(128)][
                                       'alpha=' + '{:.1e}'.format(3.7 * 10 ** 3)]['recon']).astype('float64')
