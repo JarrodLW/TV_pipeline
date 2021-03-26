@@ -21,8 +21,8 @@ affine_param_plots = False
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-#output_dims = [int(128)]
-output_dims = [int(32)]
+output_dims = [int(128)]
+#output_dims = [int(32)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
@@ -700,17 +700,33 @@ if dTV_discrepancy_plots:
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_fidelities.json') as f:
         d = json.load(f)
 
+    f.close()
+
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_fidelities.json') as f:
         D = json.load(f)
+
+    f.close()
 
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json') as f:
         DD = json.load(f)
 
+    f.close()
+
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_SSIM_vals.json') as f:
         D_SSIM = json.load(f)
 
+    f.close()
+
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_GT_proxy_SSIM_vals.json') as f:
         DD_SSIM = json.load(f)
+
+    f.close()
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_H_SSIM_vals.json') as f:
+        DDD_SSIM = json.load(f)
+
+    f.close()
 
     Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
 
@@ -721,12 +737,14 @@ if dTV_discrepancy_plots:
         GT_TV_discrep_arr = np.zeros((len(alphas), 32))
         GT_SSIM_arr = np.zeros((len(alphas), 32))
         GT_proxy_SSIM_arr = np.zeros((len(alphas), 32))
+        H_SSIM_arr = np.zeros((len(alphas), 32))
         output_dim = str(128)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
         DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
         D_SSIM3 = D_SSIM['avgs=' + avg]['output_dim=' + output_dim]
         DD_SSIM3 = DD_SSIM['avgs=' + avg]['output_dim=' + output_dim]
+        DDD_SSIM3 = DDD_SSIM['avgs=' + avg]['output_dim=' + output_dim]
 
         for i, alpha in enumerate(alphas):
 
@@ -744,6 +762,9 @@ if dTV_discrepancy_plots:
 
             GT_proxy_SSIM_vals = np.asarray(DD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             GT_proxy_SSIM_arr[i, :] = GT_proxy_SSIM_vals
+
+            H_SSIM_vals = np.asarray(DDD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            H_SSIM_arr[i, :] = H_SSIM_vals
 
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
         #              label=avg+'avgs', color="C"+str(k%10))
@@ -775,13 +796,24 @@ if dTV_discrepancy_plots:
         #     "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
         # plt.legend()
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
-                     yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
+        #              yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.xlabel("log(alpha)")
+        # plt.ylabel("SSIM")
+        # plt.title(
+        #     "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
+        # plt.ylim(0., 1.)
+        # plt.yticks(np.linspace(0, 1, 11))
+        # plt.legend()
+
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(H_SSIM_arr, axis=1)[1:],
+                     yerr=np.std(H_SSIM_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
         plt.xlabel("log(alpha)")
         plt.ylabel("SSIM")
         plt.title(
-            "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
+            "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and low-res H image")
         plt.ylim(0., 1.)
         plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
