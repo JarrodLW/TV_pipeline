@@ -984,6 +984,6 @@ if best_recons:
             axs[i+1, 3].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
             axs[i+1, 3].axis("off")
 
-            fig.tight_layout(w_pad=0.4, h_pad=0.4)
+            #fig.tight_layout(w_pad=0.4, h_pad=0.4)
             plt.savefig(save_dir + "best_recons_"+str(avg)+".pdf")
 
