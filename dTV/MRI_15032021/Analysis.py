@@ -10,13 +10,14 @@ from Utils import *
 
 plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
+best_recons = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
@@ -818,7 +819,6 @@ if dTV_discrepancy_plots:
         plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
 
-
     with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json') as f:
         d = json.load(f)
 
@@ -899,3 +899,50 @@ if affine_param_plots:
             #axs[i, m].imshow(np.abs(deformed_template - template), cmap=plt.cm.gray)
             axs[i+1, m].imshow(deformed_template)
             axs[i+1, m].axis("off")
+
+## Best (defensible) reconstructions from various experiments
+
+# for 2048 averages
+if best_recons:
+
+    with open(save_dir + 'TV_results/TV_7Li_15032021_2048.json') as f:
+        d_TV = json.load(f)
+
+    f.close()
+
+    with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg + '_pre_registered.json') as f:
+        d_dTV = json.load(f)
+
+    f.close()
+
+    fig, axs = plt.subplots(6, 3, figsize=(5, 10))
+    for i in range(4):
+
+        recon_TV = np.asarray(d['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(3.6*10**3)]
+                           ['output_size=' + str(32)]).astype('float64')
+        image_TV = np.abs(recon_TV[0] + 1j * recon_TV[1])
+
+        recon_dTV_32 = np.asarray(d['measurement=' + str(i)]['output_size=' + str(32)][
+                               'alpha=' + '{:.1e}'.format(3.6*10**3)]['recon']).astype('float64')
+        image_dTV_32 = np.abs(recon[0] + 1j * recon[1])
+
+        recon_dTV_128 = np.asarray(d['measurement=' + str(i)]['output_size=' + str(32)][
+                                      'alpha=' + '{:.1e}'.format(3.7 * 10 ** 3)]['recon']).astype('float64')
+
+        fourier_complex = np.fft.fft2(recon_dTV_128[0] + 1j * recon_dTV_128[1])
+        fourier_shift = np.fft.ifftshift(fourier_complex)
+        fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
+        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+        dTV_recon_from_128 = np.abs(rec_fourier)
+
+        axs[i, 0].imshow(image_TV, cmap=plt.cm.gray)
+        axs[i, 0].axis("off")
+        axs[i, 1].imshow(image_dTV_32, cmap=plt.cm.gray)
+        axs[i, 1].axis("off")
+        axs[i, 2].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
+        axs[i, 2].axis("off")
+
+        fig.tight_layout(w_pad=0.4, h_pad=0.4)
+        plt.savefig(save_dir + "best_recons_2048.pdf")
+
+
