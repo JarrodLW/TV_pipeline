@@ -903,7 +903,7 @@ if affine_param_plots:
 ## Best (defensible) reconstructions from various experiments
 
 avgs = [1024, 2048]
-model_param_dict = {'1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 3.0*10**3, 3.7*10**3]}
+model_param_dict = {'1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 2.8*10**3, 4.8*10**3]}
 
 if best_recons:
 
