@@ -542,6 +542,7 @@ if plot_dTV_results:
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
+                    # grabbing the 32x32 reconstruction from the synthetic K-space data
                     if output_dim == int(128):
                         fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
                         fourier_shift = np.fft.ifftshift(fourier_complex)
@@ -575,8 +576,11 @@ if plot_dTV_results:
                     elif output_dim == int(128):
                         image = rec_low_res
 
-                    GT_SSIM = recon_error(image, GT_image)[2]
-                    GT_TV_SSIM = recon_error(image, GT_TV_image)[2]
+                    image_normalised = image/np.sqrt(np.sum(np.square(image)))
+                    GT_image_normalised = GT_image/np.sqrt(np.sum(np.square(GT_image)))
+                    GT_TV_image_normalised = GT_TV_image / np.sqrt(np.sum(np.square(GT_TV_image)))
+                    GT_SSIM = recon_error(image_normalised, GT_image_normalised)[2]
+                    GT_TV_SSIM = recon_error(image_normalised, GT_TV_image_normalised)[2]
                     GT_SSIM_vals.append(GT_SSIM)
                     GT_TV_SSIM_vals.append(GT_TV_SSIM)
 
