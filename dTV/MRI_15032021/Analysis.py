@@ -916,7 +916,7 @@ if best_recons:
     f.close()
 
     fig, axs = plt.subplots(6, 3, figsize=(5, 10))
-    for i in range(4):
+    for i in range(6):
 
         recon_TV = np.asarray(d_TV['measurement=' + str(i)]['reg_param=' + '{:.1e}'.format(3.6*10**3)]
                            ['output_size=' + str(32)]).astype('float64')
