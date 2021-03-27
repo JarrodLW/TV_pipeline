@@ -438,13 +438,13 @@ if discrepancy_plots:
 
 # stdev plots
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_results/Robustness_31112020_TV_aggregated_pixel_stds_new.json') as f:
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/TV/TV_aggregated_pixel_stds.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         stdev_arr = np.zeros(len(reg_params))
-        d3 = d['avgs='+avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=32']
 
         for i, reg_param in enumerate(reg_params):
 
@@ -454,7 +454,7 @@ if discrepancy_plots:
         plt.plot(np.log10(reg_params)[1:], stdev_arr[1:]/32, label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(lambda)")
         plt.ylabel("mean-squared stdev")
-        plt.title("Mean-squared standard deviation of TV-regularised \n reconstructions, 64-by-64")
+        plt.title("Mean-squared standard deviation of TV-regularised \n reconstructions, 32-by-32")
         plt.legend()
 
 # Moran plots (for Li2SO4)
@@ -819,13 +819,13 @@ if dTV_discrepancy_plots:
         plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
 
-    with open('/Users/jlw31/Desktop/Robustness_results_new/Li2SO4_results/Li2SO4_TV_initialised_dTV_results/Robustness_31112020_TV_init_dTV_aggregated_pixel_stds_new.json') as f:
+    with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_aggregated_pixel_stds.json') as f:
         d = json.load(f)
 
     for k, avg in enumerate(avgs):
 
         stdev_arr = np.zeros(len(alphas))
-        d3 = d['avgs='+avg]['output_dim=64']
+        d3 = d['avgs='+avg]['output_dim=128']
 
         for i, alpha in enumerate(alphas):
 
@@ -835,7 +835,7 @@ if dTV_discrepancy_plots:
         plt.plot(np.log10(alphas)[1:], stdev_arr[1:]/32, label=avg+'avgs', color="C"+str(k%10))
         plt.xlabel("log10(lambda)")
         plt.ylabel("mean-squared stdev")
-        plt.title("Mean-squared standard deviation of dTV-regularised \n reconstructions, 64-by-64")
+        plt.title("Mean-squared standard deviation of dTV-regularised \n reconstructions, 128-by-128")
         plt.legend()
 
 if affine_param_plots:
@@ -903,7 +903,7 @@ if affine_param_plots:
 ## Best (defensible) reconstructions from various experiments
 
 avgs = [1024, 2048]
-model_param_dict = {'1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 2.8*10**3, 4.8*10**3]}
+model_param_dict = {'512': [8.9*10**3, 1.1*10**4, 1.9*10**4], '1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 2.8*10**3, 4.8*10**3]}
 
 if best_recons:
     # grabbing the fully-averaged recon
