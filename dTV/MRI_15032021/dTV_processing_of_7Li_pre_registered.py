@@ -16,13 +16,16 @@ from skimage.measure import block_reduce
 import dTV.myAlgorithms as algs
 import dTV.myFunctionals as fctls
 import datetime as dt
+from skimage.transform import resize
 
 dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-#n = int(sys.argv[1]) # 512, 1024, 2048, etc
-n = 512
+n = int(sys.argv[1]) # 512, 1024, 2048, etc
+#n = 512
 
 image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
 image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
+
+image_H_med_res = resize(image_H_high_res, (64, 64))
 
 f_coeff_list = []
 
@@ -42,22 +45,20 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
+#f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
 
 sinfos = {}
-sinfos['high_res'] = image_H_high_res
+#sinfos['high_res'] = image_H_high_res
+sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
-#alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([8000.])
-#eta = 0.01
-eta = 0.02
+alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
+#alphas = np.asarray([8000.])
+eta = 0.01
 gamma = 0.995
-#gamma = 0.99999
 strong_cvx = 1e-5
 niter_prox = 20
-#niter = 300
-niter = 50
+niter = 100
 
 Yaff = odl.tensor_space(6)
 exp = 0
