@@ -956,7 +956,7 @@ if best_recons:
             f_coeff_list = f_coeff_list_grouped
             f_coeff_arr = np.asarray(f_coeff_list)
 
-        fig, axs = plt.subplots(6, 5, figsize=(10, 12))
+        fig, axs = plt.subplots(6, 5, figsize=(10, 14))
 
         for j in range(5):
             axs[0, j].imshow(GT_image, cmap=plt.cm.gray)
