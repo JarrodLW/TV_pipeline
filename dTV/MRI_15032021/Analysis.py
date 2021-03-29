@@ -1000,9 +1000,9 @@ if best_recons:
             axs[i+1, 1].axis("off")
             axs[i+1, 2].imshow(image_dTV_32, cmap=plt.cm.gray)
             axs[i+1, 2].axis("off")
-            axs[i + 1, 4].imshow(dTV_recon_from_64, cmap=plt.cm.gray)
-            axs[i + 1, 4].axis("off")
-            axs[i+1, 4].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
+            axs[i + 1, 3].imshow(dTV_recon_from_64, cmap=plt.cm.gray)
+            axs[i + 1, 3].axis("off")
+            axs[i+1, ].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
             axs[i+1, 4].axis("off")
 
             fig.tight_layout(w_pad=0.1, h_pad=0.1)
