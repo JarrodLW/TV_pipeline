@@ -18,7 +18,8 @@ discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 best_recons = False
-hyperparam_sweep_resuls = True
+hyperparam_sweep_results = False
+plot_hyperparam_sweep_results = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
@@ -1028,7 +1029,7 @@ def retrieving_lower_res_image(recon):
 
     return rec_low_res_normalised
 
-if hyperparam_sweep_resuls:
+if hyperparam_sweep_results:
 
     GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
     GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
@@ -1062,8 +1063,15 @@ if hyperparam_sweep_resuls:
     #SSIMs = np.array((5, len(etas), 32))
     D = {}
 
-    for k, eta in enumerate(etas):
-        for i in range(32):
+    for i in range(32):
+        D['measurement=' + str(i)] = {}
+        D['measurement=' + str(i)]['gamma=' + str(9.0e-01)] = {}
+        D['measurement=' + str(i)]['gamma=' + str(9.3e-01)] = {}
+        D['measurement=' + str(i)]['gamma=' + str(9.5e-01)] = {}
+        D['measurement=' + str(i)]['gamma=' + str(9.7e-01)] = {}
+        D['measurement=' + str(i)]['gamma=' + str(9.9e-01)] = {}
+
+        for k, eta in enumerate(etas):
 
             rec_1 = np.asarray(d1['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
             rec_2 = np.asarray(
@@ -1093,13 +1101,6 @@ if hyperparam_sweep_resuls:
             # SSIMs[3, k, i] = SSIM_4
             # SSIMs[4, k, i] = SSIM_5
 
-            D['measurement=' + str(i)] = {}
-            D['measurement=' + str(i)]['gamma=' + str(9.0e-01)] = {}
-            D['measurement=' + str(i)]['gamma=' + str(9.3e-01)] = {}
-            D['measurement=' + str(i)]['gamma=' + str(9.5e-01)] = {}
-            D['measurement=' + str(i)]['gamma=' + str(9.7e-01)] = {}
-            D['measurement=' + str(i)]['gamma=' + str(9.9e-01)] = {}
-
             D['measurement=' + str(i)]['gamma=' + str(9.0e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_1
             D['measurement=' + str(i)]['gamma=' + str(9.3e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_2
             D['measurement=' + str(i)]['gamma=' + str(9.5e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_3
@@ -1109,3 +1110,9 @@ if hyperparam_sweep_resuls:
     json.dump(D,
               open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_proxy_SSIMs.json',
                    'w'))
+
+if plot_hyperparam_sweep_results:
+
+    d = json.load(open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/'
+                       'dTV_7Li_15032021_pre_registered_hyper_search_proxy_SSIMs.json', 'r'))
+
