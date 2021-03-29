@@ -209,3 +209,25 @@ plt.colorbar()
 l2_np = np.sqrt(np.sum(np.square(np.abs(rec_all_averaged))))
 l2_odl = np.sqrt(np.sum(np.square(np.abs(rec_odl.asarray()[0]+1j*rec_odl.asarray()[1]))))
 
+# SSIM computation
+
+GT_TV_data = np.load('dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021_synth_data.npy')
+GT_TV_image = np.load('dTV/MRI_15032021/Results_15032021/example_TV_recon_15032021.npy')
+GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
+GT_TV_image_normalised = GT_TV_image/np.sqrt(np.sum(np.square(GT_TV_image)))
+
+fully_averaged_image = np.abs(recon_fully_averaged)
+fully_averaged_image_normalised = fully_averaged_image/np.sqrt(np.sum(np.square(fully_averaged_image)))
+
+SSIM_fully_averaged_GT_arr = np.zeros((5, 32))
+SSIM_proxy_GT_arr = np.zeros((5, 32))
+
+for k, avg in enumerate(avgs):
+
+    for j in range(32):
+        recon = np.abs(recon_arr[k, j, :, :])
+        recon_normalised = recon/np.sqrt(np.sum(np.square(recon)))
+        SSIM_1 = recon_error(recon_normalised, fully_averaged_image_normalised)[2]
+        SSIM_2 = recon_error(recon_normalised, GT_TV_image_normalised)[2]
+        SSIM_fully_averaged_GT_arr[k, j] = SSIM_1
+        SSIM_proxy_GT_arr[k, j] = SSIM_2

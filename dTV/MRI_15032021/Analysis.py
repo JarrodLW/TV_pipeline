@@ -739,6 +739,7 @@ if dTV_discrepancy_plots:
     f.close()
 
     Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
+    Fourier_SSIMs_GT_proxy = [0.1, 0.16, 0.26, 0.37, 0.5]
 
     for k, avg in enumerate(avgs):
 
@@ -776,13 +777,13 @@ if dTV_discrepancy_plots:
             H_SSIM_vals = np.asarray(DDD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             H_SSIM_arr[i, :] = H_SSIM_vals
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
-                     label=avg+'avgs', color="C"+str(k%10))
-        plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
-        plt.xlabel("log(alpha)")
-        plt.ylabel("l2-discrepancy")
-        plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
-        plt.legend()
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
+        #              label=avg+'avgs', color="C"+str(k%10))
+        # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
+        # plt.xlabel("log(alpha)")
+        # plt.ylabel("l2-discrepancy")
+        # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
+        # plt.legend()
 
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
         #              yerr=np.std(GT_discrep_arr[1:], axis=1),
@@ -809,6 +810,9 @@ if dTV_discrepancy_plots:
         plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
                      yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
                      label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.plot(np.log10(np.asarray(alphas))[1:], Fourier_SSIMs_GT_proxy[k] * np.ones(25),
+        #                   color="C" + str(k % 10),
+        #                   linestyle=":")
         plt.xlabel("log(alpha)")
         plt.ylabel("SSIM")
         plt.title(
@@ -817,16 +821,16 @@ if dTV_discrepancy_plots:
         plt.yticks(np.linspace(0, 1, 11))
         plt.legend()
 
-        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(H_SSIM_arr, axis=1)[1:],
-                     yerr=np.std(H_SSIM_arr[1:], axis=1),
-                     label=avg + 'avgs', color="C" + str(k % 10))
-        plt.xlabel("log(alpha)")
-        plt.ylabel("SSIM")
-        plt.title(
-            "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and low-res H image")
-        plt.ylim(0., 1.)
-        plt.yticks(np.linspace(0, 1, 11))
-        plt.legend()
+        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(H_SSIM_arr, axis=1)[1:],
+        #              yerr=np.std(H_SSIM_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # plt.xlabel("log(alpha)")
+        # plt.ylabel("SSIM")
+        # plt.title(
+        #     "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and low-res H image")
+        # plt.ylim(0., 1.)
+        # plt.yticks(np.linspace(0, 1, 11))
+        # plt.legend()
 
     with open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_aggregated_pixel_stds.json') as f:
         d = json.load(f)
