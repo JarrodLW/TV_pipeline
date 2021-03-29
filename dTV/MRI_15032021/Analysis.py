@@ -1024,27 +1024,27 @@ if hyperparam_sweep_resuls:
     GT_TV_image_normalised = GT_TV_image / np.sqrt(np.sum(np.square(GT_TV_image)))
 
     with open(
-            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.0e-01.json') as f:
+            save_dir + 'Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.0e-01.json') as f:
         d1 = json.load(f)
     f.close()
 
     with open(
-            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.3e-01.json') as f:
+            save_dir + 'Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.3e-01.json') as f:
         d2 = json.load(f)
     f.close()
 
     with open(
-            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.5e-01.json') as f:
+            save_dir + 'Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.5e-01.json') as f:
         d3 = json.load(f)
     f.close()
 
     with open(
-            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.7e-01.json') as f:
+            save_dir + 'Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.7e-01.json') as f:
         d4 = json.load(f)
     f.close()
 
     with open(
-            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.9e-01.json') as f:
+            save_dir + 'Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_1024_pre_registered_hyper_search_gamma_9.9e-01.json') as f:
         d5 = json.load(f)
     f.close()
 
