@@ -958,7 +958,7 @@ if best_recons:
 
         fig, axs = plt.subplots(6, 5, figsize=(10, 12))
 
-        for j in range(4):
+        for j in range(5):
             axs[0, j].imshow(GT_image, cmap=plt.cm.gray)
             axs[0, j].axis("off")
 
