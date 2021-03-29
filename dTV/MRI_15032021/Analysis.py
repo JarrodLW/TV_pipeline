@@ -10,7 +10,7 @@ from Utils import *
 
 plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = True
+plot_dTV_results = False
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -748,7 +748,7 @@ if dTV_discrepancy_plots:
         GT_SSIM_arr = np.zeros((len(alphas), 32))
         GT_proxy_SSIM_arr = np.zeros((len(alphas), 32))
         H_SSIM_arr = np.zeros((len(alphas), 32))
-        output_dim = str(128)
+        output_dim = str(64)
         d3 = d['avgs='+avg]['output_dim='+output_dim]
         D3 = D['avgs=' + avg]['output_dim=' + output_dim]
         DD3 = DD['avgs=' + avg]['output_dim=' + output_dim]
@@ -776,13 +776,13 @@ if dTV_discrepancy_plots:
             H_SSIM_vals = np.asarray(DDD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             H_SSIM_arr[i, :] = H_SSIM_vals
 
-        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
-        #              label=avg+'avgs', color="C"+str(k%10))
-        # plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
-        # plt.xlabel("log(alpha)")
-        # plt.ylabel("l2-discrepancy")
-        # plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
-        # plt.legend()
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:], yerr=np.std(discrep_arr[1:], axis=1),
+                     label=avg+'avgs', color="C"+str(k%10))
+        plt.plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C"+str(k%10), linestyle=":")
+        plt.xlabel("log(alpha)")
+        plt.ylabel("l2-discrepancy")
+        plt.title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
+        plt.legend()
 
         # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
         #              yerr=np.std(GT_discrep_arr[1:], axis=1),
@@ -806,16 +806,16 @@ if dTV_discrepancy_plots:
         #     "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
         # plt.legend()
 
-        # plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
-        #              yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
-        #              label=avg + 'avgs', color="C" + str(k % 10))
-        # plt.xlabel("log(alpha)")
-        # plt.ylabel("SSIM")
-        # plt.title(
-        #     "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
-        # plt.ylim(0., 1.)
-        # plt.yticks(np.linspace(0, 1, 11))
-        # plt.legend()
+        plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
+                     yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),
+                     label=avg + 'avgs', color="C" + str(k % 10))
+        plt.xlabel("log(alpha)")
+        plt.ylabel("SSIM")
+        plt.title(
+            "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
+        plt.ylim(0., 1.)
+        plt.yticks(np.linspace(0, 1, 11))
+        plt.legend()
 
         plt.errorbar(np.log10(np.asarray(alphas))[1:], np.average(H_SSIM_arr, axis=1)[1:],
                      yerr=np.std(H_SSIM_arr[1:], axis=1),
@@ -912,7 +912,8 @@ if affine_param_plots:
 ## Best (defensible) reconstructions from various experiments
 
 avgs = [512, 1024, 2048]
-model_param_dict = {'512': [8.9*10**3, 1.1*10**4, 1.9*10**4], '1024': [5.1*10**3, 6.3*10**3, 8.3*10**3], '2048': [3.0*10**3, 2.8*10**3, 4.8*10**3]}
+model_param_dict = {'512': [8.9*10**3, 1.1*10**4, 1.9*10**4, 1.9*10**4], '1024': [5.1*10**3, 6.3*10**3, 8.3*10**3, 8.3*10**3],
+                    '2048': [3.0*10**3, 2.8*10**3, 3.7*10**3, 4.8*10**3]}
 
 if best_recons:
     # grabbing the fully-averaged recon
@@ -971,8 +972,17 @@ if best_recons:
                                    'alpha=' + '{:.1e}'.format(model_params[1])]['recon']).astype('float64')
             image_dTV_32 = np.abs(recon_dTV_32[0] + 1j * recon_dTV_32[1])
 
+            recon_dTV_64 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(64)][
+                                           'alpha=' + '{:.1e}'.format(model_params[2])]['recon']).astype('float64')
+
             recon_dTV_128 = np.asarray(d_dTV['measurement=' + str(i)]['output_size=' + str(128)][
-                                          'alpha=' + '{:.1e}'.format(model_params[2])]['recon']).astype('float64')
+                                          'alpha=' + '{:.1e}'.format(model_params[3])]['recon']).astype('float64')
+
+            fourier_complex = np.fft.fft2(recon_dTV_64[0] + 1j * recon_dTV_64[1])
+            fourier_shift = np.fft.ifftshift(fourier_complex)
+            fourier_shift_subsampled = fourier_shift[32 - 16:32 + 16, 32 - 16:32 + 16]
+            rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+            dTV_recon_from_64 = np.abs(rec_fourier)
 
             fourier_complex = np.fft.fft2(recon_dTV_128[0] + 1j * recon_dTV_128[1])
             fourier_shift = np.fft.ifftshift(fourier_complex)
@@ -990,8 +1000,10 @@ if best_recons:
             axs[i+1, 1].axis("off")
             axs[i+1, 2].imshow(image_dTV_32, cmap=plt.cm.gray)
             axs[i+1, 2].axis("off")
-            axs[i+1, 3].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
-            axs[i+1, 3].axis("off")
+            axs[i + 1, 4].imshow(dTV_recon_from_64, cmap=plt.cm.gray)
+            axs[i + 1, 4].axis("off")
+            axs[i+1, 4].imshow(dTV_recon_from_128, cmap=plt.cm.gray)
+            axs[i+1, 4].axis("off")
 
             fig.tight_layout(w_pad=0.1, h_pad=0.1)
             plt.savefig(save_dir + "best_recons_"+str(avg)+".pdf")
