@@ -43,7 +43,7 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
+#f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
 
 sinfos = {}
 #sinfos['high_res'] = image_H_high_res
