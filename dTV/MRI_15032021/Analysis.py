@@ -1093,6 +1093,13 @@ if hyperparam_sweep_resuls:
             # SSIMs[3, k, i] = SSIM_4
             # SSIMs[4, k, i] = SSIM_5
 
+            D['measurement=' + str(i)] = {}
+            D['measurement=' + str(i)]['gamma=' + str(9.0e-01)] = {}
+            D['measurement=' + str(i)]['gamma=' + str(9.3e-01)] = {}
+            D['measurement=' + str(i)]['gamma=' + str(9.5e-01)] = {}
+            D['measurement=' + str(i)]['gamma=' + str(9.7e-01)] = {}
+            D['measurement=' + str(i)]['gamma=' + str(9.9e-01)] = {}
+
             D['measurement=' + str(i)]['gamma=' + str(9.0e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_1
             D['measurement=' + str(i)]['gamma=' + str(9.3e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_2
             D['measurement=' + str(i)]['gamma=' + str(9.5e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_3
