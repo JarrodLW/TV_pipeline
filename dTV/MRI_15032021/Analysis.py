@@ -18,8 +18,8 @@ discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 best_recons = False
-hyperparam_sweep_results = False
-plot_hyperparam_sweep_results = True
+hyperparam_sweep_results = True
+plot_hyperparam_sweep_results = False
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
