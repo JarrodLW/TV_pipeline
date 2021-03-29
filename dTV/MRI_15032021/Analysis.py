@@ -17,7 +17,8 @@ plot_subset_TV_results = False
 discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
-best_recons = True
+best_recons = False
+hyperparam_sweep_resuls = True
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
@@ -1012,3 +1013,79 @@ if best_recons:
             fig.tight_layout(w_pad=0.3, h_pad=0.2)
             plt.savefig(save_dir + "best_recons_"+str(avg)+".pdf")
 
+# processing data from hyperparameter sweep
+
+etas = np.logspace(-3, -1, num=10)
+
+if hyperparam_sweep_resuls:
+
+    GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
+    GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
+    GT_TV_image_normalised = GT_TV_image / np.sqrt(np.sum(np.square(GT_TV_image)))
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_gamma_9.0e-01.json') as f:
+        d1 = json.load(f)
+    f.close()
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_gamma_9.3e-01.json') as f:
+        d2 = json.load(f)
+    f.close()
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_gamma_9.5e-01.json') as f:
+        d3 = json.load(f)
+    f.close()
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_gamma_9.7e-01.json') as f:
+        d4 = json.load(f)
+    f.close()
+
+    with open(
+            '/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_gamma_9.9e-01.json') as f:
+        d5 = json.load(f)
+    f.close()
+
+    #SSIMs = np.array((5, len(etas), 32))
+    D = {}
+
+    for k, eta in enumerate(etas):
+        for i in range(32):
+
+            rec_1 = np.asarray(d1['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
+            rec_1_normalised = rec_1/np.sqrt(np.sum(np.square(rec_1)))
+            rec_2 = np.asarray(
+                d2['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
+            rec_2_normalised = rec_2 / np.sqrt(np.sum(np.square(rec_2)))
+            rec_3 = np.asarray(
+                d3['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
+            rec_3_normalised = rec_3 / np.sqrt(np.sum(np.square(rec_3)))
+            rec_4 = np.asarray(
+                d4['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
+            rec_4_normalised = rec_4 / np.sqrt(np.sum(np.square(rec_4)))
+            rec_5 = np.asarray(
+                d5['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
+            rec_5_normalised = rec_5 / np.sqrt(np.sum(np.square(rec_5)))
+            SSIM_1 = recon_error(rec_1_normalised, GT_TV_image_normalised)[2]
+            SSIM_2 = recon_error(rec_2_normalised, GT_TV_image_normalised)[2]
+            SSIM_3 = recon_error(rec_3_normalised, GT_TV_image_normalised)[2]
+            SSIM_4 = recon_error(rec_4_normalised, GT_TV_image_normalised)[2]
+            SSIM_5 = recon_error(rec_5_normalised, GT_TV_image_normalised)[2]
+
+            # SSIMs[0, k, i] = SSIM_1
+            # SSIMs[1, k, i] = SSIM_2
+            # SSIMs[2, k, i] = SSIM_3
+            # SSIMs[3, k, i] = SSIM_4
+            # SSIMs[4, k, i] = SSIM_5
+
+            D['measurement=' + str(i)]['gamma=' + str(9.0e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_1
+            D['measurement=' + str(i)]['gamma=' + str(9.3e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_2
+            D['measurement=' + str(i)]['gamma=' + str(9.5e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_3
+            D['measurement=' + str(i)]['gamma=' + str(9.7e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_4
+            D['measurement=' + str(i)]['gamma=' + str(9.9e-01)]['eta=' + '{:.1e}'.format(eta)] = SSIM_5
+
+    json.dump(D,
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_proxy_SSIMs.json',
+                   'w'))

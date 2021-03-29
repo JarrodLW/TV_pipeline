@@ -92,6 +92,8 @@ for i, Li_fourier in enumerate(f_coeff_list):
     if 'measurement=' + str(i) not in d.keys():
         d['measurement=' + str(i)] = {}
 
+    print('measurment '+str(i))
+
     #d['measurement=' + str(i)] = {}
 
     for dict_key in sinfos.keys():
