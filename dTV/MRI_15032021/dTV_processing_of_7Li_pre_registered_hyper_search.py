@@ -51,7 +51,8 @@ sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
 #alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([8000.])
+#alphas = np.asarray([8000.])
+alpha = 8000.
 #eta = 0.01
 etas = np.logspace(-3, -1, num=10)
 #gamma = 0.995
@@ -143,7 +144,7 @@ for i, Li_fourier in enumerate(f_coeff_list):
 
         for eta in etas:
 
-            if 'alpha=' + '{:.1e}'.format(alpha) not in d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])].keys():
+            if 'eta=' + '{:.1e}'.format(eta) not in d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])].keys():
                 d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['eta=' + '{:.1e}'.format(eta)] = {}
 
                 print("Experiment_" + str(exp))
