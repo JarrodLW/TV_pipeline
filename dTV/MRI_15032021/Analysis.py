@@ -10,7 +10,7 @@ from Utils import *
 
 plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -22,7 +22,7 @@ best_recons = True
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-output_dims = [int(128)]
+output_dims = [int(64)]
 #output_dims = [int(32)]
 
 dir = 'dTV/MRI_15032021/'
@@ -593,6 +593,13 @@ if plot_dTV_results:
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
                     # grabbing the 32x32 reconstruction from the synthetic K-space data
+                    if output_dim == int(64):
+                        fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+                        fourier_shift = np.fft.ifftshift(fourier_complex)
+                        fourier_shift_subsampled = fourier_shift[32 - 16:32 + 16, 32 - 16:32 + 16]
+                        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+                        rec_low_res = np.abs(rec_fourier)
+
                     if output_dim == int(128):
                         fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
                         fourier_shift = np.fft.ifftshift(fourier_complex)
@@ -623,6 +630,8 @@ if plot_dTV_results:
                     # SSIM vals
                     if output_dim == int(32):
                         image = recon_image
+                    elif output_dim == int(64):
+                        image = rec_low_res
                     elif output_dim == int(128):
                         image = rec_low_res
 
