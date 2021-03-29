@@ -1017,6 +1017,17 @@ if best_recons:
 
 etas = np.logspace(-3, -1, num=10)
 
+def retrieving_lower_res_image(recon):
+
+    fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+    fourier_shift = np.fft.ifftshift(fourier_complex)
+    fourier_shift_subsampled = fourier_shift[32 - 16:32 + 16, 32 - 16:32 + 16]
+    rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+    rec_low_res = np.abs(rec_fourier)
+    rec_low_res_normalised = rec_low_res/np.sqrt(np.sum(np.square(rec_low_res)))
+
+    return rec_low_res_normalised
+
 if hyperparam_sweep_resuls:
 
     GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
@@ -1055,24 +1066,26 @@ if hyperparam_sweep_resuls:
         for i in range(32):
 
             rec_1 = np.asarray(d1['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
-            rec_1_normalised = rec_1/np.sqrt(np.sum(np.square(rec_1)))
             rec_2 = np.asarray(
                 d2['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
-            rec_2_normalised = rec_2 / np.sqrt(np.sum(np.square(rec_2)))
             rec_3 = np.asarray(
                 d3['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
-            rec_3_normalised = rec_3 / np.sqrt(np.sum(np.square(rec_3)))
             rec_4 = np.asarray(
                 d4['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
-            rec_4_normalised = rec_4 / np.sqrt(np.sum(np.square(rec_4)))
             rec_5 = np.asarray(
                 d5['measurement=' + str(i)]['output_size=' + str(64)]['eta=' + '{:.1e}'.format(eta)]['recon'])
-            rec_5_normalised = rec_5 / np.sqrt(np.sum(np.square(rec_5)))
-            SSIM_1 = recon_error(rec_1_normalised, GT_TV_image_normalised)[2]
-            SSIM_2 = recon_error(rec_2_normalised, GT_TV_image_normalised)[2]
-            SSIM_3 = recon_error(rec_3_normalised, GT_TV_image_normalised)[2]
-            SSIM_4 = recon_error(rec_4_normalised, GT_TV_image_normalised)[2]
-            SSIM_5 = recon_error(rec_5_normalised, GT_TV_image_normalised)[2]
+
+            rec_1_32 = retrieving_lower_res_image(rec_1)
+            rec_2_32 = retrieving_lower_res_image(rec_2)
+            rec_3_32 = retrieving_lower_res_image(rec_3)
+            rec_4_32 = retrieving_lower_res_image(rec_4)
+            rec_5_32 = retrieving_lower_res_image(rec_5)
+
+            SSIM_1 = recon_error(rec_1_32, GT_TV_image_normalised)[2]
+            SSIM_2 = recon_error(rec_2_32, GT_TV_image_normalised)[2]
+            SSIM_3 = recon_error(rec_3_32, GT_TV_image_normalised)[2]
+            SSIM_4 = recon_error(rec_4_32, GT_TV_image_normalised)[2]
+            SSIM_5 = recon_error(rec_5_32, GT_TV_image_normalised)[2]
 
             # SSIMs[0, k, i] = SSIM_1
             # SSIMs[1, k, i] = SSIM_2
