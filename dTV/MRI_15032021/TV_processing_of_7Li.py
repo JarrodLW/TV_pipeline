@@ -14,7 +14,27 @@ from Utils import *
 import sys
 import datetime as dt
 
-dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
+date = '24052021'
+#date = '15032021'
+
+dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
+dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
+
+if date=='15032021':
+    H_index_low_res = 5
+    H_index_high_res = 6
+    low_res_shape = (64, 128)
+    Li_range = range(3, 35)
+    low_res_data_width = 32
+
+elif date=='24052021':
+    H_index_low_res = 29
+    H_index_high_res = 32
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
+
+#dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
 
 f_coeff_list = []

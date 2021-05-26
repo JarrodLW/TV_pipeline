@@ -6,6 +6,8 @@ Rough_tests.py
 *.hdf
 *.nxs
 *.hdf5
+*.hdf
+*.nxs
 .DS_Store
 *.pdf
 *.tif
