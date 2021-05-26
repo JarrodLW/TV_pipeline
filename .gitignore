@@ -3,6 +3,8 @@ __pycache__/
 venv/
 Rough_tests.py
 *.json
+*.hdf
+*.nxs
 *.hdf5
 .DS_Store
 *.pdf
@@ -18,3 +20,4 @@ dTV/MRI_15032021/Rough.py
 !pre_registered_H_image_low_res.npy
 !pre_registereed_H_image_high_res.npy
 !example_TV_recon_15032021.npy
+

@@ -247,9 +247,9 @@ def recon_error(im_recon, im_ref):
 
     return l2_error, psnr_val, ssim_val
 
-def unpacking_fourier_coeffs_15032021(arr):
+def unpacking_fourier_coeffs_15032021(arr, data_width):
 
-    fourier_real_im = arr[:, :64]
+    fourier_real_im = arr[:, :2*data_width]
     fourier_real_im = fourier_real_im[::2, :]
 
     fourier_real = fourier_real_im[:, 1::2]

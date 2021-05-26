@@ -1111,8 +1111,34 @@ if hyperparam_sweep_results:
               open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_hyper_search_proxy_SSIMs.json',
                    'w'))
 
+gammas = [9.0e-01, 9.3e-01, 9.5e-01, 9.7e-01, 9.9e-01]
+
 if plot_hyperparam_sweep_results:
 
     d = json.load(open('/Users/jlw31/Desktop/Results_on_15032021_dataset/dTV_pre_registered/'
                        'dTV_7Li_15032021_pre_registered_hyper_search_proxy_SSIMs.json', 'r'))
+
+    output_dim = str(64)
+
+    for k, gamma in enumerate(gammas):
+        SSIM_arr = np.zeros((len(etas), 32))
+        for i in range(32):
+            for j, eta in enumerate(etas):
+
+                d2 = d['measurement=' + str(i)]
+                d3 = d2['gamma='+str(gamma)]
+                SSIM = d3['eta=' + '{:.1e}'.format(eta)]
+                SSIM_arr[j, i] = SSIM
+
+        plt.errorbar(np.log10(np.asarray(etas)), np.average(SSIM_arr, axis=1),
+                     yerr=np.std(SSIM_arr, axis=1),
+                     label='gamma=' + str(gamma), color="C" + str(k%10))
+        plt.xlabel("log(eta)")
+        plt.ylabel("SSIM")
+        plt.title(
+            "SSIM between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy, varying hyperparams")
+        plt.ylim(0., 1.)
+        plt.yticks(np.linspace(0, 1, 11))
+        plt.legend()
+
 

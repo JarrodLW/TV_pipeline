@@ -8,14 +8,32 @@ from Utils import *
 avgs = ['512', '1024', '2048', '4096', '8192']
 output_dims = [int(32), int(64)]
 
-dir_Li = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-dir_H = 'dTV/MRI_15032021/Data_15032021/H_data/'
+date = '24052021'
+#date = '15032021'
+
+dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
+dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
+
+if date=='15032021':
+    H_index_low_res = 5
+    H_index_high_res = 6
+    low_res_shape = (64, 128)
+    Li_range = range(3, 35)
+    low_res_data_width = 32
+
+elif date=='24052021':
+    H_index_low_res = 29
+    H_index_high_res = 32
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
 
 ## 1H reconstructions
 
 # low-res
-f_coeffs = np.reshape(np.fromfile(dir_H +str(5)+'/fid', dtype=np.int32), (64, 128))
-f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+#f_coeffs = np.reshape(np.fromfile(dir_H +str(H_index_low_res)+'/fid', dtype=np.int32), (64, 128))
+f_coeffs = np.reshape(np.fromfile(dir_H +str(H_index_low_res)+'/fid', dtype=np.int32), low_res_shape)
+f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
 recon_low_res = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs_unpacked)))
 
 plt.figure()
@@ -23,7 +41,7 @@ plt.imshow(np.abs(recon_low_res), cmap=plt.cm.gray)
 plt.colorbar()
 
 # high-res
-f_coeffs = np.reshape(np.fromfile(dir_H +str(6)+'/fid', dtype=np.int32), (128, 256))
+f_coeffs = np.reshape(np.fromfile(dir_H +str(H_index_high_res)+'/fid', dtype=np.int32), (128, 256))
 f_coeffs = f_coeffs[:, 1::2] + 1j*f_coeffs[:, ::2]
 recon_high_res = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs)))
 
@@ -31,18 +49,31 @@ plt.figure()
 plt.imshow(np.abs(recon_high_res), cmap=plt.cm.gray)
 plt.colorbar()
 
+## 7Li reconstruction from long run
+
+if date=='24052021':
+
+    f_coeffs = np.reshape(np.fromfile(dir_Li +'4/fid', dtype=np.int32), (80, 128))
+    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
+    fourier_long_run = np.fft.fftshift(f_coeffs_unpacked)/32
+    recon_long_run = np.fft.fftshift(np.fft.ifft2(fourier_long_run))
+
+    plt.figure()
+    plt.imshow(np.abs(recon_long_run), cmap=plt.cm.gray)
+    plt.colorbar()
+
 ## 7Li reconstructions
 f_coeff_list = []
 
-for i in range(3, 35):
-    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), (64, 128))
-    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+for i in Li_range:
+    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), (80, 128))
+    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
     f_coeff_list.append(f_coeffs_unpacked)
 
 # putting all the data into a single array, first index corresponding to number of averages, second the sample number,
 # third and fourth indexing the data itself
 f_coeff_arr = np.asarray(f_coeff_list)
-f_coeff_arr_combined = np.zeros((len(avgs), 32, 32, 32), dtype='complex')
+f_coeff_arr_combined = np.zeros((len(avgs), 32, low_res_data_width, low_res_data_width), dtype='complex')
 
 for avg_ind in range(len(avgs)):
 
@@ -57,14 +88,20 @@ for avg_ind in range(len(avgs)):
 
 fully_averaged = np.average(f_coeff_arr, axis=0)
 fully_averaged_shifted = np.fft.fftshift(fully_averaged)
+
+if date=='24052021': # averaging with the data from the full run
+
+    fully_averaged_shifted = (fully_averaged_shifted + fourier_long_run)/2
+
 recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
 
 plt.figure()
 plt.imshow(np.abs(recon_fully_averaged), cmap=plt.cm.gray)
 plt.colorbar()
 
-recon_arr = np.zeros((len(avgs), 32, 32, 32), dtype='complex')
-recon_arr_upsampled = np.zeros((len(avgs), 32, 64, 64), dtype='complex')
+recon_arr = np.zeros((len(avgs), 32, low_res_data_width, low_res_data_width), dtype='complex')
+upsampled_size = 2*low_res_data_width
+recon_arr_upsampled = np.zeros((len(avgs), 32, upsampled_size, upsampled_size), dtype='complex')
 
 for avg_ind in range(len(avgs)):
     for i in range(32):
@@ -75,8 +112,9 @@ for avg_ind in range(len(avgs)):
 
         recon_arr[avg_ind, i, :, :] = recon
 
-        f_data_padded = np.zeros((64, 64), dtype='complex')
-        f_data_padded[64 // 2 - 16:64 // 2 + 16, 64// 2 - 16:64 // 2 + 16] = f_data
+        f_data_padded = np.zeros((upsampled_size, upsampled_size), dtype='complex')
+        f_data_padded[upsampled_size // 2 - low_res_data_width//2:upsampled_size // 2 + low_res_data_width//2,
+        upsampled_size // 2 - low_res_data_width//2:upsampled_size // 2 + low_res_data_width//2] = f_data
         f_data_padded_shifted = np.fft.fftshift(f_data_padded)
 
         recon_upsampled = np.fft.fftshift(np.fft.ifft2(f_data_padded_shifted))
@@ -231,3 +269,15 @@ for k, avg in enumerate(avgs):
         SSIM_2 = recon_error(recon_normalised, GT_TV_image_normalised)[2]
         SSIM_fully_averaged_GT_arr[k, j] = SSIM_1
         SSIM_proxy_GT_arr[k, j] = SSIM_2
+
+# averaging
+upsampled_size=32
+
+f_data_padded = np.zeros((upsampled_size, upsampled_size), dtype='complex')
+f_data_padded[upsampled_size // 2 - low_res_data_width//2:upsampled_size // 2 + low_res_data_width//2,
+upsampled_size // 2 - low_res_data_width//2:upsampled_size // 2 + low_res_data_width//2] = fully_averaged
+f_data_padded_shifted = np.fft.fftshift(f_data_padded)
+
+recon_upsampled = np.fft.fftshift(np.fft.ifft2(f_data_padded_shifted))
+
+plt.imshow(np.abs(recon_upsampled), cmap=plt.cm.gray)

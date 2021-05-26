@@ -10,16 +10,31 @@ import odl
 import myOperators as ops
 from Utils import *
 
-dir_Li = 'dTV/MRI_15032021/Data_15032021/Li_data/'
+date = '24052021'
+#date = '15032021'
+
+dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
+
+if date=='15032021':
+    low_res_shape = (64, 128)
+    Li_range = range(3, 35)
+    low_res_data_width = 32
+
+elif date=='24052021':
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
+
+# dir_Li = 'dTV/MRI_15032021/Data_15032021/Li_data/'
 f_coeff_list = []
 
-for i in range(3, 35):
-    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), (64, 128))
-    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+for i in Li_range:
+    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), low_res_shape)
+    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
     f_coeff_list.append(f_coeffs_unpacked)
 
 reg_params = np.logspace(2., np.log10(5*10**3), num=15)
-output_dims = [int(32)]
+output_dims = [int(40)]
 Li_fourier = np.average(np.asarray(f_coeff_list), axis=0)
 
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -30,8 +45,8 @@ plt.imshow(np.abs(naive_recon), cmap=plt.cm.gray)
 run_exp = True
 #plot_results = True
 
-recon_arr = np.zeros((15, 2, 32, 32))
-#reg_params = [1000.]
+recon_arr = np.zeros((15, 2, low_res_data_width, low_res_data_width))
+reg_params = [1000.]
 
 if run_exp:
 
@@ -46,7 +61,8 @@ if run_exp:
             exp+=1
 
             data = np.zeros((output_dim, output_dim), dtype='complex')
-            data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
+            data[output_dim// 2 - low_res_data_width // 2:output_dim // 2 + low_res_data_width // 2,
+            output_dim // 2 - low_res_data_width // 2:output_dim // 2 + low_res_data_width // 2]  = Li_fourier
             data = np.fft.fftshift(data)
             subsampling_matrix = np.zeros((output_dim, output_dim))
             subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
@@ -56,7 +72,7 @@ if run_exp:
             recon_arr[k, 0, :, :] = np.real(recons[0])
             recon_arr[k, 1, :, :] = np.imag(recons[0])
 
-np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/TV_reg_recons_16384.npy', recon_arr)
+np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_'+date+'/TV_reg_recons_16384.npy', recon_arr)
 
 recon_arr_16384 = np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_15032021/TV_reg_recons_16384.npy')
 
