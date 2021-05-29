@@ -18,18 +18,14 @@ date = '24052021'
 #date = '15032021'
 
 dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
-dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
+#dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
 
 if date=='15032021':
-    H_index_low_res = 5
-    H_index_high_res = 6
     low_res_shape = (64, 128)
     Li_range = range(3, 35)
     low_res_data_width = 32
 
 elif date=='24052021':
-    H_index_low_res = 29
-    H_index_high_res = 32
     low_res_shape = (80, 128)
     Li_range = range(8, 40)
     low_res_data_width = 40
@@ -39,8 +35,8 @@ n = int(sys.argv[1]) # 512, 1024, 2048, etc
 
 f_coeff_list = []
 
-for i in range(3, 35):
-    f_coeffs = np.reshape(np.fromfile(dir +str(i)+'/fid', dtype=np.int32), (64, 128))
+for i in Li_range:
+    f_coeffs = np.reshape(np.fromfile(dir +str(i)+'/fid', dtype=np.int32), low_res_shape)
     f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
     f_coeff_list.append(f_coeffs_unpacked)
 
@@ -56,15 +52,20 @@ if n !=512:
     f_coeff_list = f_coeff_list_grouped
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-output_dims = [int(32), int(64)]
-# output_dims = [int(32)]
+
+if date=='15032021':
+    output_dims = [int(32), int(64)]
+
+elif date=='24052021':
+    output_dims = [int(40), int(80), int(128)]
+
 Li_fourier_coeffs = f_coeff_list
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-           'Experiments/MRI_birmingham/Results_15032021/TV_results'
+           'Experiments/MRI_birmingham/Results_'+date+'/TV_results'
 
 # save_dir = 'dTV/MRI_15032021/Results_15032021'
-filename = save_dir + '/TV_7Li_15032021_' + str(n) + '.json'
+filename = save_dir + '/TV_7Li_' + date + '_' + str(n) + '.json'
 print("Looking for file: "+filename)
 
 if os.path.isfile(filename):
@@ -105,10 +106,12 @@ if run_exp:
                     exp+=1
 
                     data = np.zeros((output_dim, output_dim), dtype='complex')
-                    data[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = Li_fourier
+                    data[output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2,
+                    output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2] = Li_fourier
                     data = np.fft.fftshift(data)
                     subsampling_matrix = np.zeros((output_dim, output_dim))
-                    subsampling_matrix[output_dim//2 - 16 :output_dim//2 + 16, output_dim//2 - 16 :output_dim//2 + 16] = 1
+                    subsampling_matrix[output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2,
+                    output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2] = 1
                     subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
                     recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
