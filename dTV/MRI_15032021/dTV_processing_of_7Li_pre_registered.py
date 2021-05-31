@@ -18,20 +18,37 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 from skimage.transform import resize
 
-dir = 'dTV/MRI_15032021/Data_15032021/Li_data/'
+date = '24052021'
+#date = '15032021'
+
+dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
+#dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
+
+if date=='15032021':
+    low_res_shape = (64, 128)
+    Li_range = range(3, 35)
+    low_res_data_width = 32
+
+    image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+    image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
+    image_H_med_res = resize(image_H_high_res, (64, 64))
+
+elif date=='24052021':
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
+    image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
+    image_H_med_res = resize(image_H_high_res, (80, 80))
+    image_H_low_res = resize(image_H_high_res, (40, 40))
+
 n = int(sys.argv[1]) # 512, 1024, 2048, etc
 #n = 512
 
-image_H_low_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
-image_H_high_res = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res.npy')
-
-image_H_med_res = resize(image_H_high_res, (64, 64))
-
 f_coeff_list = []
 
-for i in range(3, 35):
-    f_coeffs = np.reshape(np.fromfile(dir + str(i) + '/fid', dtype=np.int32), (64, 128))
-    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+for i in Li_range:
+    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), low_res_shape)
+    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
     f_coeff_list.append(f_coeffs_unpacked)
 
 if n !=512:
@@ -45,7 +62,7 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-#f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
+f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
 
 sinfos = {}
 #sinfos['high_res'] = image_H_high_res
@@ -53,7 +70,7 @@ sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
 alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-#alphas = np.asarray([8000.])
+alphas = np.asarray([8000.])
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
@@ -64,7 +81,7 @@ Yaff = odl.tensor_space(6)
 exp = 0
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-           'Experiments/MRI_birmingham/Results_15032021/dTV_results_pre_registered'
+           'Experiments/MRI_birmingham/Results_'+date+'/dTV_results_pre_registered'
 run_exp = True
 
 outputfile = save_dir + '/dTV_7Li_15032021_' + str(n) + '_pre_registered.json'
