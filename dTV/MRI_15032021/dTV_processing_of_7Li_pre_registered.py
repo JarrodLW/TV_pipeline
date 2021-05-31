@@ -183,8 +183,8 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 ud_vars = [0]
 
                 # %%
-                #palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
-                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                #palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
                 palm.run(niter)
 
                 print("end: " + dt.datetime.now().isoformat())
