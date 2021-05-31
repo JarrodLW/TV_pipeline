@@ -70,7 +70,7 @@ sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
 alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([8000.])
+alphas = np.asarray([8000.]) # DELETE THIS!
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
