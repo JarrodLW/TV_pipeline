@@ -37,7 +37,7 @@ f_coeff_list = []
 
 for i in Li_range:
     f_coeffs = np.reshape(np.fromfile(dir +str(i)+'/fid', dtype=np.int32), low_res_shape)
-    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
     f_coeff_list.append(f_coeffs_unpacked)
 
 if n !=512:
