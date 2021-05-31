@@ -52,6 +52,7 @@ if n !=512:
     f_coeff_list = f_coeff_list_grouped
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
+reg_params = [reg_params[0]]
 
 if date=='15032021':
     output_dims = [int(32), int(64)]
