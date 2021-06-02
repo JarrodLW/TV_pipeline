@@ -62,15 +62,15 @@ if n !=512:
 
     f_coeff_list = f_coeff_list_grouped
 
-f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
+#f_coeff_list = [f_coeff_list[0]]  # DELETE THIS!!!!
 
 sinfos = {}
-#sinfos['high_res'] = image_H_high_res
+sinfos['high_res'] = image_H_high_res
 sinfos['med_res'] = image_H_med_res
-#sinfos['low_res'] = image_H_low_res
+sinfos['low_res'] = image_H_low_res
 
 alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(2.5, 4.75, num=20)))
-alphas = np.asarray([8000.]) # DELETE THIS!
+#alphas = np.asarray([8000.]) # DELETE THIS!
 eta = 0.01
 gamma = 0.995
 strong_cvx = 1e-5
