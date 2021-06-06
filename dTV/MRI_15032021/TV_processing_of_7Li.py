@@ -16,6 +16,7 @@ import datetime as dt
 
 date = '24052021'
 #date = '15032021'
+TV_reg_type = 'complex_TV'
 
 dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
 #dir_H = 'dTV/MRI_15032021/Data_' + date + '/H_data/'
@@ -52,7 +53,7 @@ if n !=512:
     f_coeff_list = f_coeff_list_grouped
 
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
-#reg_params = reg_params[-2:]
+reg_params = reg_params[-2:] # REMOVE THIS
 
 if date=='15032021':
     output_dims = [int(32), int(64)]
@@ -61,10 +62,17 @@ elif date=='24052021':
     output_dims = [int(40), int(80), int(128)]
 
 Li_fourier_coeffs = f_coeff_list
-#Li_fourier_coeffs = Li_fourier_coeffs[:1]
+Li_fourier_coeffs = Li_fourier_coeffs[:1] # REMOVE THIS
 
-save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-           'Experiments/MRI_birmingham/Results_'+date+'/TV_results'
+if TV_reg_type=='real_imag_TV':
+
+    save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
+               'Experiments/MRI_birmingham/Results_'+date+'/TV_results'
+
+elif TV_reg_type=='complex_TV':
+
+    save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
+               'Experiments/MRI_birmingham/Results_' + date + '/TV_complex_results'
 
 # save_dir = 'dTV/MRI_15032021/Results_15032021'
 filename = save_dir + '/TV_7Li_' + date + '_' + str(n) + '.json'
@@ -90,7 +98,7 @@ if run_exp:
     regularised_recons = {}
     exp = 0
     for i, Li_fourier in enumerate(Li_fourier_coeffs):
-        model = VariationalRegClass('MRI', 'TV')
+        model = VariationalRegClass('MRI', 'TV', TV_reg_type=TV_reg_type)
 
         if 'measurement=' + str(i) not in d.keys():
             d['measurement=' + str(i)] = {}

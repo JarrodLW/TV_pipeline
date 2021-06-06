@@ -19,8 +19,9 @@ class VariationalRegClass:
 
     # Decide on grid size. Should width be equal to number to pixels? Seems to be the case in MRI.
 
-    def __init__(self, measurement_type, reg_type):
+    def __init__(self, measurement_type, reg_type, TV_reg_type='real_imag_TV'):
 
+        self.TV_reg_type = TV_reg_type
         self.measurement_type = measurement_type
         self.reg_type = reg_type
         self.image_space = None
@@ -235,9 +236,27 @@ class VariationalRegClass:
         if self.measurement_type == 'MRI':
             G_0 = odl.Gradient(self.image_space[0]) * odl.ComponentProjection(self.image_space, 0)
             G_1 = odl.Gradient(self.image_space[1]) * odl.ComponentProjection(self.image_space, 1)
-            op = odl.BroadcastOperator(self.subsampled_forward_op, G_0, G_1)
-            reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(G_0.range),
-                        self.reg_param * odl.solvers.GroupL1Norm(G_1.range)]
+
+            if self.TV_reg_type == 'real_imag_TV':
+                op = odl.BroadcastOperator(self.subsampled_forward_op, G_0, G_1)
+                reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(G_0.range),
+                            self.reg_param * odl.solvers.GroupL1Norm(G_1.range)]
+
+            elif self.TV_reg_type == 'complex_TV':
+                # stacking the gradients into rank 4 product space TODO must be a better way!
+                #stacked_space = odl.space.pspace.ProductSpace(G_0.range, 4)
+                stacked_space = G_0.range[0]**4
+                emb_0 = odl.operator.pspace_ops.ComponentProjection(stacked_space, 0).adjoint
+                emb_1 = odl.operator.pspace_ops.ComponentProjection(stacked_space, 1).adjoint
+                emb_2 = odl.operator.pspace_ops.ComponentProjection(stacked_space, 2).adjoint
+                emb_3 = odl.operator.pspace_ops.ComponentProjection(stacked_space, 3).adjoint
+                proj_0 = odl.operator.pspace_ops.ComponentProjection(G_0.range, 0)
+                proj_1 = odl.operator.pspace_ops.ComponentProjection(G_0.range, 1)
+                stacked_gradients = emb_0*proj_0*G_0 + emb_1*proj_1*G_0 + emb_2*proj_0*G_1 + emb_3*proj_1*G_1
+                print('domain: ' + str(stacked_gradients.domain))
+                print('range: ' + str(stacked_gradients.range))
+                op = odl.BroadcastOperator(self.subsampled_forward_op, stacked_gradients)
+                reg_norms = [self.reg_param * odl.solvers.GroupL1Norm(stacked_gradients.range)]
 
         else:
             G = odl.Gradient(self.image_space)

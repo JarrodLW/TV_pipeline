@@ -53,7 +53,7 @@ if run_exp:
     regularised_recons = {}
     exp = 0
 
-    model = VariationalRegClass('MRI', 'TV')
+    model = VariationalRegClass('MRI', 'TV', TV_reg_type='complex_TV')
     for k, reg_param in enumerate(reg_params):
         for output_dim in output_dims:
 
