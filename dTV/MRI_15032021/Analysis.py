@@ -639,7 +639,7 @@ if plot_dTV_results:
                     forward_op = RealFourierTransform(image_space)
 
                     diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) \
-                           - forward_op.range.element([np.real(coeffs), np.imag(coeffs)])
+                           - forward_op.range.element([np.real(coeffs[i]), np.imag(coeffs[i])])
                     diff = diff[0].asarray() + 1j * diff[1].asarray()
                     diff_shift = np.fft.ifftshift(diff)
                     fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
