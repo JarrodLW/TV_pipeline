@@ -42,6 +42,7 @@ reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2
 #output_dims = [int(32), int(64)]
 #output_dims = [int(64)]
 #output_dims = [int(32)]
+output_dims = [int(40)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
