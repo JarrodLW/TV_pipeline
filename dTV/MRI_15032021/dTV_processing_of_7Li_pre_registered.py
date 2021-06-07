@@ -193,8 +193,8 @@ for i, Li_fourier in enumerate(f_coeff_list):
                 diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
                 diff = diff[0].asarray() + 1j * diff[1].asarray()
                 diff_shift = np.fft.ifftshift(diff)
-                diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - 16:sinfo.shape[0] // 2 + 16,
-                                        sinfo.shape[1] // 2 - 16:sinfo.shape[1] // 2 + 16]
+                diff_shift_subsampled = diff_shift[sinfo.shape[0] // 2 - low_res_data_width//2:sinfo.shape[0] // 2 + low_res_data_width//2,
+                                        sinfo.shape[1] // 2 - low_res_data_width//2:sinfo.shape[1] // 2 + low_res_data_width//2]
 
                 d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['recon'] = recon.tolist()
                 d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['alpha=' + '{:.1e}'.format(alpha)]['affine_params'] = palm.x[1].asarray().tolist()

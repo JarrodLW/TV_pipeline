@@ -627,8 +627,23 @@ if plot_dTV_results:
                     recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
 
-                    fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
-                        'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
+                    # fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                    #     'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
+
+                    # NOTE: for the 24052021 dataset, there's an error in the fourier diffs that were saved alongside
+                    # the reconstructions, so we have to recompute them here
+
+                    complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                                      shape=[output_dim, output_dim], dtype='complex')
+                    image_space = complex_space.real_space ** 2
+                    forward_op = RealFourierTransform(image_space)
+
+                    diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) \
+                           - forward_op.range.element([np.real(coeffs), np.imag(coeffs)])
+                    diff = diff[0].asarray() + 1j * diff[1].asarray()
+                    diff_shift = np.fft.ifftshift(diff)
+                    fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                                        output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
 
                     print(np.shape(fourier_diff))
                     print(np.shape(coeffs_minus_GT[i, :, :]))
