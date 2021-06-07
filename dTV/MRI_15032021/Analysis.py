@@ -251,7 +251,7 @@ if plot_TV_results:
                             recons.append(image)
 
                         fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                         plt.close()
 
@@ -280,19 +280,19 @@ if plot_TV_results:
                         morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = morans_I_vals
 
-                        np.save(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
+                        np.save(save_dir + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_arr.npy", np.std(recons, axis=0))
 
                         plt.figure()
                         plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                         plt.colorbar()
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_"+ avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_"+ avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_plot.pdf")
                         plt.close()
 
                         plt.figure()
                         plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + ext + "/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + "stdev_hist.pdf")
                         plt.close()
 
@@ -301,28 +301,28 @@ if plot_TV_results:
                 continue
 
         json.dump(norms_dict,
-                  open(save_dir + "TV_results/" + 'TV_fidelities.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_fidelities.json', 'w'))
 
         json.dump(GT_norms_dict,
-                  open(save_dir + "TV_results/" + 'TV_GT_fidelities.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_GT_fidelities.json', 'w'))
 
         json.dump(GT_TV_norms_dict,
-                  open(save_dir + "TV_results/" + 'TV_GT_proxy_fidelities.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_GT_proxy_fidelities.json', 'w'))
 
         json.dump(GT_SSIM_dict,
-                  open(save_dir + "TV_results/" + 'TV_GT_SSIM_vals.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_GT_SSIM_vals.json', 'w'))
 
         json.dump(GT_TV_SSIM_dict,
-                  open(save_dir + "TV_results/" + 'TV_GT_proxy_SSIM_vals.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_GT_proxy_SSIM_vals.json', 'w'))
 
         json.dump(H_SSIM_dict,
-                  open(save_dir + "TV_results/" + 'TV_H_SSIM_vals.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_H_SSIM_vals.json', 'w'))
 
         json.dump(stdevs,
-                  open(save_dir + "TV_results/" + 'TV_aggregated_pixel_stds.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_aggregated_pixel_stds.json', 'w'))
 
         json.dump(morans_I_dict,
-                  open(save_dir + "TV_results/" + 'TV_morans_I.json', 'w'))
+                  open(save_dir + ext + "/" + 'TV_morans_I.json', 'w'))
 
 if plot_TV_results_full_avgs:
 
