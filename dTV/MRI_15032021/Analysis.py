@@ -9,9 +9,9 @@ import esda
 from Utils import *
 from skimage.transform import resize
 
-plot_TV_results = True
+plot_TV_results = False
 best_TV_recons = False
-plot_dTV_results = False
+plot_dTV_results = True
 plot_Moran = False
 plot_TV_results_full_avgs = False
 plot_subset_TV_results = False
@@ -367,7 +367,10 @@ if discrepancy_plots:
 
     f.close()
 
-    Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
+    if date=='15032021':
+        Morozov_thresholds = [101165, 70547, 48230, 31739, 18380]
+    elif date=='24052021':
+        Morozov_thresholds = [126000, 88000, 60300, 39500, 22800]
 
     for k, avg in enumerate(avgs):
         print("unpacking average " + avg)
@@ -521,14 +524,27 @@ alphas = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), 
 
 if plot_dTV_results:
 
-    #GT_TV_data = np.load('Results_MRI_dTV/example_TV_recon_Li2SO4_16384_avgs_reg_param_1000_synth_data.npy')
-    #GT_TV_data = np.fft.fftshift(np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy'))
-    GT_TV_data_arr = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
-    GT_TV_data = np.fft.fftshift(GT_TV_data_arr[0] + 1j*GT_TV_data_arr[1])
-    GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
-    GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
-    low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
-    low_res_H_image_normalised = low_res_H_image / np.sqrt(np.sum(np.square(low_res_H_image)))
+    # GT_TV_data_arr = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+    # GT_TV_data = np.fft.fftshift(GT_TV_data_arr[0] + 1j*GT_TV_data_arr[1])
+    # GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
+    # GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
+    # low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+    # low_res_H_image_normalised = low_res_H_image / np.sqrt(np.sum(np.square(low_res_H_image)))
+
+    if date == '15032021':
+        GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+        GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
+        GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
+        low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+        low_res_H_image_normalised = low_res_H_image/np.sqrt(np.sum(np.square(low_res_H_image)))
+
+    elif date == '24052021':
+        GT_TV_data = np.load(dir + 'Results_24052021/example_TV_recon_24052021_synth_data.npy')
+        GT_TV_image = np.load(dir + 'Results_24052021/example_TV_recon_24052021.npy')
+        GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
+        image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
+        low_res_H_image = resize(image_H_high_res, (40, 40))
+        low_res_H_image_normalised = low_res_H_image / np.sqrt(np.sum(np.square(low_res_H_image)))
 
     norms_dict = {}
     GT_norms_dict = {}
@@ -548,10 +564,10 @@ if plot_dTV_results:
         H_SSIM_dict['avgs=' + avg] = {}
         stdevs['avgs=' + avg] = {}
 
-        with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg +'_pre_registered.json') as f:
+        with open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_' + avg +'_pre_registered.json') as f:
             d = json.load(f)
 
-        print(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_' + avg +'_pre_registered.json')
+        print(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_' + avg +'_pre_registered.json')
 
         # grabbing just the affine params, and putting into new dictionary
 
@@ -561,9 +577,9 @@ if plot_dTV_results:
         # grabbing dataset again to compute GT diff
 
         f_coeff_list = []
-        for i in range(3, 35):
-            f_coeffs = np.reshape(np.fromfile(dir + 'Data_15032021/Li_data/' + str(i) + '/fid', dtype=np.int32), (64, 128))
-            f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+        for i in Li_range:
+            f_coeffs = np.reshape(np.fromfile(dir + 'Data_'+date+'/Li_data/' + str(i) + '/fid', dtype=np.int32), low_res_shape)
+            f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
             f_coeff_list.append(f_coeffs_unpacked)
 
         f_coeff_arr = np.asarray(f_coeff_list)
@@ -623,20 +639,27 @@ if plot_dTV_results:
                     recon_image = np.abs(recon[0] + 1j * recon[1])
                     fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
-                    # grabbing the 32x32 reconstruction from the synthetic K-space data
-                    if output_dim == int(64):
-                        fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
-                        fourier_shift = np.fft.ifftshift(fourier_complex)
-                        fourier_shift_subsampled = fourier_shift[32 - 16:32 + 16, 32 - 16:32 + 16]
-                        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
-                        rec_low_res = np.abs(rec_fourier)
+                    # grabbing the 32x32 or 40x40 reconstruction from the synthetic K-space data
+                    # if output_dim == int(64):
+                    #     fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+                    #     fourier_shift = np.fft.ifftshift(fourier_complex)
+                    #     fourier_shift_subsampled = fourier_shift[32 - 16:32 + 16, 32 - 16:32 + 16]
+                    #     rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+                    #     rec_low_res = np.abs(rec_fourier)
+                    #
+                    # if output_dim == int(128):
+                    #     fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+                    #     fourier_shift = np.fft.ifftshift(fourier_complex)
+                    #     fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
+                    #     rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+                    #     rec_low_res = np.abs(rec_fourier)
 
-                    if output_dim == int(128):
-                        fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
-                        fourier_shift = np.fft.ifftshift(fourier_complex)
-                        fourier_shift_subsampled = fourier_shift[64 - 16:64 + 16, 64 - 16:64 + 16]
-                        rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
-                        rec_low_res = np.abs(rec_fourier)
+                    fourier_complex = np.fft.fft2(recon[0] + 1j * recon[1])
+                    fourier_shift = np.fft.ifftshift(fourier_complex)
+                    fourier_shift_subsampled = fourier_shift[output_dim//2 - low_res_data_width//2:output_dim//2 + low_res_data_width//2,
+                                               output_dim//2 - low_res_data_width//2:output_dim//2 + low_res_data_width//2]
+                    rec_fourier = np.fft.ifft2(np.fft.fftshift(fourier_shift_subsampled))
+                    rec_low_res = np.abs(rec_fourier)
 
                     # example data, just to check consistency of fftshifts etc....
                     if j == 4 and output_dim == int(32) and alpha == alphas[15] and i == 5:
@@ -659,12 +682,22 @@ if plot_dTV_results:
                     GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                     # SSIM vals
-                    if output_dim == int(32):
-                        image = recon_image
-                    elif output_dim == int(64):
-                        image = rec_low_res
-                    elif output_dim == int(128):
-                        image = rec_low_res
+
+                    if date=='15032021':
+                        if output_dim == int(32):
+                            image = recon_image
+                        elif output_dim == int(64):
+                            image = rec_low_res
+                        elif output_dim == int(128):
+                            image = rec_low_res
+
+                    elif date=='24052021':
+                        if output_dim == int(40):
+                            image = recon_image
+                        elif output_dim == int(80):
+                            image = rec_low_res
+                        elif output_dim == int(128):
+                            image = rec_low_res
 
                     image_normalised = image/np.sqrt(np.sum(np.square(image)))
                     GT_image_normalised = GT_image/np.sqrt(np.sum(np.square(GT_image)))
@@ -677,7 +710,7 @@ if plot_dTV_results:
                     H_SSIM_vals.append(H_SSIM)
 
                 fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_"+date+"_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "_reg_param_" + '{:.1e}'.format(alpha) + "_new.pdf")
                 plt.close()
 
@@ -705,31 +738,31 @@ if plot_dTV_results:
                 plt.figure()
                 plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                 plt.colorbar()
-                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_31112020_data_" + avg + "_avgs_32_to_" + str(
+                plt.savefig(save_dir + "dTV_results_pre_registered/" + avg +"_avgs/" + str(output_dim) +"/dTV_no_regis_"+date+"_data_" + avg + "_avgs_32_to_" + str(
                     output_dim) + "reg_param_" + '{:.1e}'.format(alpha) + 'stdev_plot_new.pdf')
                 plt.close()
 
     json.dump(norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_fidelities.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_fidelities.json', 'w'))
 
     json.dump(GT_norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_fidelities.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_GT_fidelities.json', 'w'))
 
     json.dump(GT_TV_norms_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_from_TV_fidelities.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_GT_from_TV_fidelities.json', 'w'))
 
     json.dump(GT_SSIM_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_SSIM_vals.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_GT_SSIM_vals.json', 'w'))
 
     json.dump(GT_TV_SSIM_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_GT_proxy_SSIM_vals.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_GT_proxy_SSIM_vals.json', 'w'))
 
     json.dump(H_SSIM_dict,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_H_SSIM_vals.json',
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_H_SSIM_vals.json',
                    'w'))
 
     json.dump(stdevs,
-              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_15032021_pre_registered_aggregated_pixel_stds.json', 'w'))
+              open(save_dir + 'dTV_results_pre_registered/dTV_7Li_'+date+'_pre_registered_aggregated_pixel_stds.json', 'w'))
 
     #json.dump(affine_param_dict,
      #         open(save_dir + '/New/results/dTV_results_no_regis/Robustness_31112020_dTV_affine_params_new.json', 'w'))
