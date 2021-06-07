@@ -597,7 +597,7 @@ if plot_dTV_results:
 
         coeffs = f_coeff_list_grouped
         coeffs_minus_GT = coeffs - fully_averaged_coeffs
-        coeffs_minus_GT_TV = coeffs - GT_TV_data
+        coeffs_minus_GT_TV = coeffs - (GT_TV_data[0] + 1j*GT_TV_data[1])
 
         for output_dim in output_dims:
             GT_norms_dict['avgs=' + avg]['output_dim=' + str(output_dim)] = {}
