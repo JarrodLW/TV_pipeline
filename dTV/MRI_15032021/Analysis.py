@@ -57,8 +57,8 @@ if plot_TV_results:
         low_res_H_image_normalised = low_res_H_image/np.sqrt(np.sum(np.square(low_res_H_image)))
 
     elif date == '24052021':
-        GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_24052021_synth_data.npy')
-        GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_24052021.npy')
+        GT_TV_data = np.load(dir + 'Results_24052021/example_TV_recon_24052021_synth_data.npy')
+        GT_TV_image = np.load(dir + 'Results_24052021/example_TV_recon_24052021.npy')
         GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
         image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
         low_res_H_image = resize(image_H_high_res, (40, 40))
@@ -229,7 +229,7 @@ if plot_TV_results:
                             recons.append(image)
 
                         fig.tight_layout(w_pad=0.4, h_pad=0.4)
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_31112020_data_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + ext + "_new.pdf")
                         plt.close()
 
@@ -258,19 +258,19 @@ if plot_TV_results:
                         morans_I_dict['avgs=' + avg]['output_dim=' + str(output_dim)][
                             'reg_param=' + '{:.1e}'.format(reg_param)] = morans_I_vals
 
-                        np.save(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        np.save(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_arr.npy", np.std(recons, axis=0))
 
                         plt.figure()
                         plt.imshow(np.std(recons, axis=0), cmap=plt.cm.gray)
                         plt.colorbar()
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_"+ avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param)+"stdev_plot.pdf")
                         plt.close()
 
                         plt.figure()
                         plt.hist(np.ndarray.flatten(np.std(recons, axis=0)), bins=40)
-                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_15032021_" + avg + "_avgs_32_to_" + str(
+                        plt.savefig(save_dir + "TV_results/" + avg +"_avgs/" + str(output_dim) + "/TV_"+date+"_" + avg + "_avgs_32_to_" + str(
                             output_dim) + "reg_param_" + '{:.1e}'.format(reg_param) + "stdev_hist.pdf")
                         plt.close()
 
