@@ -156,6 +156,14 @@ if plot_TV_results:
 
                             image = np.abs(recon[0] + 1j*recon[1])
 
+                            if date=='15032021':
+                                if output_dim is not int(32):
+                                    image = resize(image, (32, 32))
+
+                            elif date == '24052021':
+                                if output_dim is not int(40):
+                                    image = resize(image, (40, 40))
+
                             data = np.zeros((output_dim, output_dim), dtype='complex')
                             data[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
                             output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2] = coeffs[i]
