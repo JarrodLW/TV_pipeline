@@ -7,8 +7,9 @@ from skimage.measure import block_reduce
 import libpysal
 import esda
 from Utils import *
+from skimage.transform import resize
 
-plot_TV_results = False
+plot_TV_results = True
 best_TV_recons = False
 plot_dTV_results = False
 plot_Moran = False
@@ -18,26 +19,50 @@ discrepancy_plots = False
 dTV_discrepancy_plots = False
 affine_param_plots = False
 best_recons = False
-hyperparam_sweep_results = True
+hyperparam_sweep_results = False
 plot_hyperparam_sweep_results = False
+
+date = '24052021'
+#date = '15032021'
+
+if date=='15032021':
+    low_res_shape = (64, 128)
+    Li_range = range(3, 35)
+    low_res_data_width = 32
+    output_dims = [int(32), int(64)]
+
+elif date=='24052021':
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
+    output_dims = [int(40), int(80), int(128)]
 
 avgs = ['512', '1024', '2048', '4096', '8192']
 reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2]), np.logspace(3., 4.5, num=20)))
 #output_dims = [int(32), int(64)]
-output_dims = [int(64)]
+#output_dims = [int(64)]
 #output_dims = [int(32)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
-save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_15032021/'
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/Experiments/MRI_birmingham/Results_'+date+'/'
 
 if plot_TV_results:
 
-    GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
-    GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
-    GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
-    low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
-    low_res_H_image_normalised = low_res_H_image/np.sqrt(np.sum(np.square(low_res_H_image)))
+    if date == '15032021':
+        GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_15032021_synth_data.npy')
+        GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_15032021.npy')
+        GT_TV_image = np.abs(GT_TV_image[0] + 1j*GT_TV_image[1])
+        low_res_H_image = np.load('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_low_res.npy')
+        low_res_H_image_normalised = low_res_H_image/np.sqrt(np.sum(np.square(low_res_H_image)))
+
+    elif date == '24052021':
+        GT_TV_data = np.load(dir + 'Results_15032021/example_TV_recon_24052021_synth_data.npy')
+        GT_TV_image = np.load(dir + 'Results_15032021/example_TV_recon_24052021.npy')
+        GT_TV_image = np.abs(GT_TV_image[0] + 1j * GT_TV_image[1])
+        image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
+        low_res_H_image = resize(image_H_high_res, (40, 40))
+        low_res_H_image_normalised = low_res_H_image / np.sqrt(np.sum(np.square(low_res_H_image)))
 
     for k, ext in enumerate(extensions):
 
@@ -70,9 +95,9 @@ if plot_TV_results:
 
             if k==0:
                 # getting the data
-                for i in range(3, 35):
+                for i in Li_range:
                     f_coeffs = np.reshape(np.fromfile(dir + 'Data_15032021/Li_data/' + str(i) + '/fid', dtype=np.int32), (64, 128))
-                    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs)
+                    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
                     f_coeff_list.append(f_coeffs_unpacked)
 
             f_coeff_arr = np.asarray(f_coeff_list)
@@ -131,24 +156,27 @@ if plot_TV_results:
                             image = np.abs(recon[0] + 1j*recon[1])
 
                             data = np.zeros((output_dim, output_dim), dtype='complex')
-                            data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = coeffs[i]
+                            data[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                            output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2] = coeffs[i]
                             data = np.fft.fftshift(data)
                             #data = np.fft.fftshift(coeffs[i])
 
                             fully_averaged_data = np.zeros((output_dim, output_dim), dtype='complex')
-                            fully_averaged_data[output_dim // 2 - 16:output_dim // 2 + 16, output_dim // 2 - 16:output_dim // 2 + 16] = \
+                            fully_averaged_data[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                            output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2] = \
                             fully_averaged_coeffs
                             fully_averaged_data = np.fft.fftshift(fully_averaged_data)
                             #fully_averaged_data = np.fft.fftshift(fully_averaged_coeffs)
 
                             GT_proxy = np.zeros((output_dim, output_dim), dtype='complex')
-                            GT_proxy[output_dim // 2 - 16: output_dim // 2 + 16, output_dim // 2 - 16: output_dim // 2 + 16]=\
+                            GT_proxy[output_dim // 2 - low_res_data_width//2: output_dim // 2 + low_res_data_width//2,
+                            output_dim // 2 - low_res_data_width//2: output_dim // 2 + low_res_data_width//2]=\
                                 np.fft.ifftshift(GT_TV_data[0]+1j*GT_TV_data[1])
                             GT_proxy = np.fft.fftshift(GT_proxy)
 
                             subsampling_matrix = np.zeros((output_dim, output_dim))
-                            subsampling_matrix[output_dim // 2 - 16:output_dim // 2 + 16,
-                            output_dim // 2 - 16:output_dim // 2 + 16] = 1
+                            subsampling_matrix[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                            output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2] = 1
                             subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
                             synth_data = np.asarray([subsampling_matrix, subsampling_matrix])*forward_op(forward_op.domain.element([recon[0], recon[1]]))
