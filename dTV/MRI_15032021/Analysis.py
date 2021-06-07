@@ -25,6 +25,9 @@ plot_hyperparam_sweep_results = False
 date = '24052021'
 #date = '15032021'
 
+TV_reg_type = 'complex_TV'
+#TV_reg_type = 'real_imag_TV'
+
 if date=='15032021':
     low_res_shape = (64, 128)
     Li_range = range(3, 35)
@@ -42,7 +45,7 @@ reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2
 #output_dims = [int(32), int(64)]
 #output_dims = [int(64)]
 #output_dims = [int(32)]
-output_dims = [int(128)]
+#output_dims = [int(128)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
@@ -89,7 +92,17 @@ if plot_TV_results:
 
             f_coeff_list = []
 
-            with open(save_dir + 'TV_results/TV_7Li_'+date+'_'+str(avg)+'.json') as f:
+            if date == '15032021':
+                ext = 'TV_results'
+
+            elif date == '24052021':
+                if TV_reg_type == 'real_imag_TV':
+                    ext = 'TV_results'
+
+                elif TV_reg_type == 'complex_TV':
+                    ext = 'TV_complex_results'
+
+            with open(save_dir + ext + '/TV_7Li_'+date+'_'+str(avg)+'.json') as f:
                 d = json.load(f)
 
             print("read avgs" + avg)
