@@ -644,6 +644,7 @@ if plot_dTV_results:
                     diff_shift = np.fft.ifftshift(diff)
                     fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
                                         output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
+                    fourier_diff = np.asarray([np.real(fourier_diff), np.imag(fourier_diff)])
 
                     print(np.shape(fourier_diff))
                     print(np.shape(coeffs_minus_GT[i, :, :]))
