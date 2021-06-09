@@ -46,6 +46,7 @@ reg_params = np.concatenate((np.asarray([0.001, 1., 10**0.5, 10., 10**1.5, 10**2
 #output_dims = [int(64)]
 #output_dims = [int(32)]
 #output_dims = [int(128)]
+output_dims = [int(80), int(128)]
 
 dir = 'dTV/MRI_15032021/'
 extensions = ['']
@@ -663,30 +664,30 @@ if plot_dTV_results:
                     #     'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
                     # NOTE: for the 24052021 dataset, there's an error in the fourier diffs that were saved alongside
-                    # the reconstructions, so we have to recompute them here
+                    # the reconstructions, so we have to recompute them here. Needs fixing!
 
-                    complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
-                                                      shape=[output_dim, output_dim], dtype='complex')
-                    image_space = complex_space.real_space ** 2
-                    forward_op = RealFourierTransform(image_space)
+                    # complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                    #                                   shape=[output_dim, output_dim], dtype='complex')
+                    # image_space = complex_space.real_space ** 2
+                    # forward_op = RealFourierTransform(image_space)
+                    #
+                    # data_odl = forward_op.range.element([np.real(np.fft.fftshift(coeffs[i])),
+                    #                                      np.imag(np.fft.fftshift(coeffs[i]))])
+                    # diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
+                    # diff = diff[0].asarray() + 1j * diff[1].asarray()
+                    # diff_shift = np.fft.ifftshift(diff)
+                    # fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                    #                     output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
+                    # fourier_diff = np.asarray([np.real(fourier_diff), np.imag(fourier_diff)])
 
-                    data_odl = forward_op.range.element([np.real(np.fft.fftshift(coeffs[i])),
-                                                         np.imag(np.fft.fftshift(coeffs[i]))])
-                    diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
-                    diff = diff[0].asarray() + 1j * diff[1].asarray()
-                    diff_shift = np.fft.ifftshift(diff)
-                    fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
-                                        output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
-                    fourier_diff = np.asarray([np.real(fourier_diff), np.imag(fourier_diff)])
-
-                    print(np.shape(fourier_diff))
-                    print(np.shape(coeffs_minus_GT[i, :, :]))
-
-                    GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
-                    GT_TV_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT_TV[i, :, :]
-
+                    # print(np.shape(fourier_diff))
+                    # print(np.shape(coeffs_minus_GT[i, :, :]))
+                    #
+                    # GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
+                    # GT_TV_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT_TV[i, :, :]
+                    #
                     recon_image = np.abs(recon[0] + 1j * recon[1])
-                    fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
+                    # fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
                     # grabbing the 32x32 or 40x40 reconstruction from the synthetic K-space data
                     # if output_dim == int(64):
@@ -722,13 +723,13 @@ if plot_dTV_results:
                     axs[2 * (i // 4), i % 4].imshow(recon_image, cmap=plt.cm.gray, interpolation='none')
                     axs[2 * (i // 4), i % 4].axis("off")
 
-                    axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray, interpolation='none')
-                    axs[1 + 2 * (i // 4), i % 4].axis("off")
+                    # axs[1 + 2 * (i // 4), i % 4].imshow(fourier_diff_image, cmap=plt.cm.gray, interpolation='none')
+                    # axs[1 + 2 * (i // 4), i % 4].axis("off")
 
-                    diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
+                    # diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
                     recons.append(recon_image)
-                    GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
-                    GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
+                    # GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
+                    # GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                     # SSIM vals
 
