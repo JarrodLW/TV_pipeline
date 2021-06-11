@@ -18,7 +18,7 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 from skimage.transform import resize
 
-alpha = sys.argv[1]
+alpha = float(sys.argv[1])
 
 run_expt = True
 plot = False
@@ -30,12 +30,6 @@ naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
 
 # plt.figure()
 # plt.imshow(np.abs(naive_recon), cmap=plt.cm.gray)
-
-# Fourier upsampling
-output_dim = 120
-padded_data = np.zeros((output_dim, output_dim), dtype='complex')
-padded_data[(output_dim-40)//2:(output_dim+40)//2, (output_dim-40)//2:(output_dim+40)//2] = Li_fourier
-Fourier_upsampled_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(padded_data)))
 
 # plt.figure()
 # plt.imshow(np.abs(Fourier_upsampled_recon), cmap=plt.cm.gray)
@@ -181,3 +175,10 @@ if run_expt:
     json.dump(d, open(filename, 'w'))
     print("Written outputfile at " + dt.datetime.now().isoformat())
 
+if plot:
+    # Fourier upsampling
+    output_dim = 120
+    padded_data = np.zeros((output_dim, output_dim), dtype='complex')
+    padded_data[(output_dim - 40) // 2:(output_dim + 40) // 2,
+    (output_dim - 40) // 2:(output_dim + 40) // 2] = Li_fourier
+    Fourier_upsampled_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(padded_data)))
