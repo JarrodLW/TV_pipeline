@@ -53,8 +53,8 @@ sinfos['high_res'] = image_H_high_res
 
 etas = np.logspace(-3., -1, num=5).tolist()
 gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-etas = [0.01]
-gammas = [0.99]
+#etas = [0.01]
+#gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
 #niter = 300
