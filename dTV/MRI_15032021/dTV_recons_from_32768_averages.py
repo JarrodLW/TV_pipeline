@@ -205,14 +205,11 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            plot = axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
+            pcm = axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
                                  cmap=plt.cm.gray)
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
-
-                if j==-1:
-                    f.colorbar(plot, ax=axarr[0, j], shrink=0.6)
 
             if j == 0:
                 axarr[2*i, 0].text(-0.2, 0.5, r"$\eta$ = "+'{:.1e}'.format(eta), fontsize=5, weight="bold",
@@ -223,6 +220,7 @@ if plot:
                                    cmap=plt.cm.gray)
             axarr[2*i+1, j].axis("off")
 
+    f.colorbar(pcm, ax=[axarr[0, -1]], location='right', shrink=0.6)
     f.suptitle("dTV recons with "+r"$\alpha$ = "+ '{:.1e}'.format(alpha), fontsize=10)
     plt.tight_layout(w_pad=0.3, h_pad=0.3, rect=[0, 0, 1, 0.96])
     plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
