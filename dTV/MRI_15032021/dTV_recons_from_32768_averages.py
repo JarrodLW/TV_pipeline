@@ -205,12 +205,12 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
+            plot = axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
                                  cmap=plt.cm.gray)
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
-                f.colorbar(ax=axarr[0, j], shrink=0.6)
+                f.colorbar(plot, ax=axarr[0, j], shrink=0.6)
 
             if j == 0:
                 axarr[2*i, 0].text(-0.2, 0.5, r"$\eta$ = "+'{:.1e}'.format(eta), fontsize=5, weight="bold",
