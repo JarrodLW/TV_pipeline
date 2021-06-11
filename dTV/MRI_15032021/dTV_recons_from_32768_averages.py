@@ -205,7 +205,7 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            pcm = axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
+            axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
                                  cmap=plt.cm.gray)
             axarr[2 * i, j].axis("off")
             if i == 0:
@@ -216,7 +216,7 @@ if plot:
                                    horizontalalignment='center', verticalalignment='center', rotation=90,
                                    transform=axarr[2*i, 0].transAxes)
 
-            axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
+            pcm = axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
                                    cmap=plt.cm.gray)
             axarr[2*i+1, j].axis("off")
 
