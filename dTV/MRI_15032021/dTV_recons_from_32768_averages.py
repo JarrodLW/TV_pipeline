@@ -18,7 +18,7 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 from skimage.transform import resize
 
-alpha = int(sys.argv[1])
+alpha = sys.argv[1]
 
 run_expt = True
 plot = False
