@@ -50,10 +50,10 @@ sinfos['high_res'] = image_H_high_res
 #sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
-#etas = np.logspace(-3., -1, num=5).tolist()
-#gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-etas = [0.01]
-gammas = [0.99]
+etas = np.logspace(-3., -1, num=5).tolist()
+gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
+#etas = [0.01]
+#gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
 niter = 300
@@ -201,17 +201,16 @@ if plot:
     f, axarr = plt.subplots(10, 6, figsize=(6, 10))
 
     for i, eta in enumerate(etas):
-
         for j, gamma in enumerate(gammas):
 
             axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
                                  cmap=plt.cm.gray)
             axarr[2*i, j].axis("off")
-            # if i == 0:
-            #     axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
+            if i == 0:
+                axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
 
-            # if j == 0:
-            #     axarr[2*i, 0].set_ylabel(r"$\eta$ = "+str(eta), fontsize=5, weight="bold")
+            if j == 0:
+                axarr[2*i, 0].set_ylabel(r"$\eta$ = "+str(eta), fontsize=5, weight="bold")
 
             axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
                                    cmap=plt.cm.gray)
