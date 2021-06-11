@@ -190,7 +190,7 @@ if plot:
             d3 = d2['gamma=0.95']
             d4 = d3['eta=0.01']
             recon = np.asarray(d4['recon'])
-            f_diff = np.asarray(d4['fourier_recon'])
+            f_diff = np.asarray(d4['fourier_diff'])
 
             recon_images[i, j, :, :] = np.abs(recon[0] + 1j*recon[1])
             fourier_diff_images[i, j, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
