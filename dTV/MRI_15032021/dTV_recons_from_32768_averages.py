@@ -176,6 +176,6 @@ if run_expt:
             # print("Written outputfile at " + dt.datetime.now().isoformat())
 
     print("About to write to datafile: " + filename + " at " + dt.datetime.now().isoformat())
-        json.dump(d, open(filename, 'w'))
+    json.dump(d, open(filename, 'w'))
     print("Written outputfile at " + dt.datetime.now().isoformat())
 
