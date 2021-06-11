@@ -220,7 +220,7 @@ if plot:
                                    cmap=plt.cm.gray)
             axarr[2*i+1, j].axis("off")
 
-    f.colorbar(pcm, ax=[axarr[0, -1]], location='right', shrink=0.6)
+    f.colorbar(pcm, ax=[axarr[0, -1]])
     f.suptitle("dTV recons with "+r"$\alpha$ = "+ '{:.1e}'.format(alpha), fontsize=10)
     plt.tight_layout(w_pad=0.3, h_pad=0.3, rect=[0, 0, 1, 0.96])
     plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
