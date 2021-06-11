@@ -201,8 +201,8 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            axarr[2*i, j].imshow(recon_images, vmax=np.amax(recon_images), interpolation='none')
-            axarr[2*i+1, j].imshow(fourier_diff_images, vmax=np.amax(fourier_diff_images), interpolation='none')
+            axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none')
+            axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none')
 
     plt.tight_layout(w_pad=0.3, h_pad=0.3)
     plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
