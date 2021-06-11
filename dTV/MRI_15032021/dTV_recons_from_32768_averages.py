@@ -42,8 +42,8 @@ image_H_high_res = resize(image_H_high_res, (120, 120))
 image_H_med_res = resize(image_H_high_res, (80, 80))
 image_H_low_res = resize(image_H_high_res, (40, 40))
 
-plt.figure()
-plt.imshow(image_H_high_res, cmap=plt.cm.gray)
+# plt.figure()
+# plt.imshow(image_H_high_res, cmap=plt.cm.gray)
 
 sinfos = {}
 sinfos['high_res'] = image_H_high_res
@@ -146,8 +146,8 @@ if run_expt:
                 ud_vars = [0, 1]
 
                 # %%
-                #palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
-                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
+                palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
+                #palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=cb, L=L)
                 palm.run(niter)
 
                 print("end: " + dt.datetime.now().isoformat())
