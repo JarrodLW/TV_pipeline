@@ -200,7 +200,7 @@ if plot:
             fourier_diff_images[i, j, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
 
 
-    f, axarr = plt.subplots(10, 6, figsize=(6, 10))
+    f, axarr = plt.subplots(10, 6, figsize=(6, 10), constrained_layout=True)
 
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
