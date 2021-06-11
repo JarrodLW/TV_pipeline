@@ -349,19 +349,19 @@ im_array = np.zeros((3, 128, 128))
 im_array[0] = image_H_high_res_normalised
 im_array[2] = image_Li_upsampled_normalised
 
-checkerboard = compare_images(image_H_high_res_normalised, image_Li_upsampled_normalised, method='checkerboard',
+checkerboard = compare_images(image_H_high_res_normalised, 2*image_Li_upsampled_normalised, method='checkerboard',
                               n_tiles=(64, 64))
 
 fig, axs = plt.subplots(1, 4, figsize=(20, 5))
 axs[0].imshow(image_H_high_res_normalised, cmap=plt.cm.gray)
-axs[0].axis("off")
+#axs[0].axis("off")
 axs[0].title.set_text("High-res H image")
 axs[1].imshow(image_Li_upsampled_normalised, cmap=plt.cm.gray)
-axs[1].axis("off")
+#axs[1].axis("off")
 axs[1].title.set_text("Upsampled Li GT image")
 axs[2].imshow(checkerboard, cmap=plt.cm.gray)
-axs[2].axis("off")
+#axs[2].axis("off")
 axs[2].title.set_text("Checkerboard")
 axs[3].imshow(10*im_array.transpose((1,2,0)))
-axs[3].axis("off")
+#axs[3].axis("off")
 axs[3].title.set_text("Superposition")

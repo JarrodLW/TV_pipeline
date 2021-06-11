@@ -89,15 +89,33 @@ for avg_ind in range(len(avgs)):
 fully_averaged = np.average(f_coeff_arr, axis=0)
 fully_averaged_shifted = np.fft.fftshift(fully_averaged)
 
+recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
+stdev_fully_averaged = np.sqrt(np.sum(np.square(np.abs(recon_fully_averaged[:8, :]))))
+stdev_long_run = np.sqrt(np.sum(np.square(np.abs(recon_long_run[:8, :]))))
+
 if date=='24052021': # averaging with the data from the full run
 
-    fully_averaged_shifted = (fully_averaged_shifted + fourier_long_run)/2
+    fully_averaged_shifted_2 = (fully_averaged_shifted + (stdev_fully_averaged/stdev_long_run)*fourier_long_run)/2
 
-recon_fully_averaged = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted))
+np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/32768_data.npy', fully_averaged_shifted_2)
+
+recon_fully_averaged_2 = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted_2))
+
+stdev_fully_averaged_2 = np.sqrt(np.sum(np.square(np.abs(recon_fully_averaged_2[:8, :]))))
 
 plt.figure()
-plt.imshow(np.abs(recon_fully_averaged), cmap=plt.cm.gray)
+plt.imshow(np.abs(recon_long_run), cmap=plt.cm.gray, vmax=160)
 plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(recon_fully_averaged), cmap=plt.cm.gray, vmax=160)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(recon_fully_averaged_2), cmap=plt.cm.gray, vmax=160)
+plt.colorbar()
+
+
 
 recon_arr = np.zeros((len(avgs), 32, low_res_data_width, low_res_data_width), dtype='complex')
 upsampled_size = 2*low_res_data_width

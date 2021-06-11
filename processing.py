@@ -161,7 +161,7 @@ class VariationalRegClass:
             if datafit == None:
                 datafit_func = odl.solvers.L2NormSquared(forward_op.range).translated(data_odl)
 
-            if datafit == 'CT_KL':
+            elif datafit == 'CT_KL':
                 prior = data_odl
                 max_intens = datafit_options.get('max_intens', None)
 
@@ -170,6 +170,9 @@ class VariationalRegClass:
 
                 else:
                     datafit_func = CTKullbackLeibler(forward_op.range, prior=prior, max_intens=max_intens)
+
+            elif datafit == 'l1':
+                datafit_func = odl.solvers.L1Norm(forward_op.range).translated(data_odl)
 
             # Make separable sum of functionals, order must be the same as in `op`
             g = odl.solvers.SeparableSum(datafit_func, *reg_norms)

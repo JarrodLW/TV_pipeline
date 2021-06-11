@@ -11,6 +11,7 @@ import myOperators as ops
 import libpysal
 import esda
 from Utils import *
+import datetime as dt
 
 date = '24052021'
 #date = '15032021'
@@ -30,18 +31,20 @@ elif date=='24052021':
     Li_range = range(8, 40)
     low_res_data_width = 40
 
-# dir_Li = 'dTV/MRI_15032021/Data_15032021/Li_data/'
-f_coeff_list = []
+# f_coeff_list = []
+#
+# for i in Li_range:
+#     f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), low_res_shape)
+#     f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
+#     f_coeff_list.append(f_coeffs_unpacked)
+#
+# reg_params = np.logspace(2., np.log10(5*10**3), num=15)
+# output_dims = [int(40)]
+# Li_fourier = np.average(np.asarray(f_coeff_list), axis=0)
+#
+# naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
 
-for i in Li_range:
-    f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), low_res_shape)
-    f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, low_res_data_width)
-    f_coeff_list.append(f_coeffs_unpacked)
-
-reg_params = np.logspace(2., np.log10(5*10**3), num=15)
-output_dims = [int(40)]
-Li_fourier = np.average(np.asarray(f_coeff_list), axis=0)
-
+Li_fourier = np.fft.fftshift(np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
 
 plt.figure()
@@ -50,7 +53,11 @@ plt.imshow(np.abs(naive_recon), cmap=plt.cm.gray)
 run_exp = True
 #plot_results = True
 
-recon_arr = np.zeros((15, 2, low_res_data_width, low_res_data_width))
+#recon_arr = np.zeros((15, 2, low_res_data_width, low_res_data_width))
+reg_params = np.logspace(2., np.log10(5*10**3), num=15)
+#reg_params = [1000]
+output_dims = [int(40), int(80), int(128)]
+#output_dims = [int(40)]
 #reg_params = [1000.]
 
 if run_exp:
@@ -59,8 +66,12 @@ if run_exp:
     exp = 0
 
     model = VariationalRegClass('MRI', 'TV', TV_reg_type='complex_TV')
-    for k, reg_param in enumerate(reg_params):
-        for output_dim in output_dims:
+
+    for output_dim in output_dims:
+        regularised_recons['output_size=' + str(output_dim)] = {}
+
+        for k, reg_param in enumerate(reg_params):
+            regularised_recons['output_size=' + str(output_dim)]['lambda=' + '{:.1e}'.format(reg_param)] = {}
 
             print("Experiment_" + str(exp))
             exp+=1
@@ -75,15 +86,26 @@ if run_exp:
             subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
             recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
-            recon_arr[k, 0, :, :] = np.real(recons[0])
-            recon_arr[k, 1, :, :] = np.imag(recons[0])
+            # recon_arr[k, 0, :, :] = np.real(recons[0])
+            # recon_arr[k, 1, :, :] = np.imag(recons[0])
+
+            regularised_recons['output_size=' + str(output_dim)]['lambda=' + '{:.1e}'.format(reg_param)][
+                'recon'] = [
+                np.real(np.real(recons[0])).tolist(),
+                np.imag(np.imag(recons[0])).tolist()]
 
 if TV_reg_type=='real_imag_TV':
-    np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_'+date+'/TV_reg_recons_16384.npy', recon_arr)
+    np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_'+date+'/TV_reg_recons_32768.npy', recon_arr)
 
 elif TV_reg_type=='complex_TV':
-    np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_' + date + '/TV_complex_reg_recons_16384.npy',
-            recon_arr)
+    # np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_' + date + '/TV_complex_reg_recons_32768.npy',
+    #         recon_arr)
+
+    outputfile = '/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_' + date + '/TV_complex_reg_recons_32768.json'
+
+    print("About to write to datafile: " + outputfile + " at " + dt.datetime.now().isoformat())
+    json.dump(regularised_recons, open(outputfile, 'w'))
+    print("Written outputfile at " + dt.datetime.now().isoformat())
 
 recon_arr_16384 = np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/TV_complex_reg_recons_16384.npy')
 #recon_arr_16384 = np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/TV_reg_recons_16384.npy')

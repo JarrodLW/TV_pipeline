@@ -863,9 +863,9 @@ if dTV_discrepancy_plots:
 
     for k, avg in enumerate(avgs):
 
-        discrep_arr = np.zeros((len(alphas), 32))
-        GT_discrep_arr = np.zeros((len(alphas), 32))
-        GT_TV_discrep_arr = np.zeros((len(alphas), 32))
+        # discrep_arr = np.zeros((len(alphas), 32))
+        # GT_discrep_arr = np.zeros((len(alphas), 32))
+        # GT_TV_discrep_arr = np.zeros((len(alphas), 32))
         GT_SSIM_arr = np.zeros((len(alphas), 32))
         GT_proxy_SSIM_arr = np.zeros((len(alphas), 32))
         H_SSIM_arr = np.zeros((len(alphas), 32))
@@ -879,14 +879,14 @@ if dTV_discrepancy_plots:
 
         for i, alpha in enumerate(alphas):
 
-            discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(alpha)]).astype('float64')
-            discrep_arr[i, :] = discrep
-
-            GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
-            GT_discrep_arr[i, :] = GT_discrep
-
-            GT_TV_discrep = np.asarray(DD3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
-            GT_TV_discrep_arr[i, :] = GT_TV_discrep
+            # discrep = np.asarray(d3['reg_param='+'{:.1e}'.format(alpha)]).astype('float64')
+            # discrep_arr[i, :] = discrep
+            #
+            # GT_discrep = np.asarray(D3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            # GT_discrep_arr[i, :] = GT_discrep
+            #
+            # GT_TV_discrep = np.asarray(DD3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
+            # GT_TV_discrep_arr[i, :] = GT_TV_discrep
 
             GT_SSIM_vals = np.asarray(D_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             GT_SSIM_arr[i, :] = GT_SSIM_vals
@@ -897,37 +897,37 @@ if dTV_discrepancy_plots:
             H_SSIM_vals = np.asarray(DDD_SSIM3['reg_param=' + '{:.1e}'.format(alpha)]).astype('float64')
             H_SSIM_arr[i, :] = H_SSIM_vals
 
-        axarr[0, 1].errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
-                     yerr=np.std(GT_discrep_arr[1:], axis=1),
-                     label=avg + 'avgs', color="C" + str(k % 10))
-        axarr[0, 1].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
-                 linestyle=":")
-        axarr[0, 1].set_xlabel("log(alpha)")
-        axarr[0, 1].set_ylabel("l2-discrepancy")
-        axarr[0, 1].set_title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
-        axarr[0, 1].legend()
-
-        axarr[1, 0].errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_TV_discrep_arr, axis=1)[1:],
-                     yerr=np.std(GT_TV_discrep_arr[1:], axis=1),
-                     label=avg + 'avgs', color="C" + str(k % 10))
-        axarr[1, 0].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25),
-                 color="C" + str(k % 10),
-                 linestyle=":")
-        axarr[1, 0].set_xlabel("log(alpha)")
-        axarr[1, 0].set_ylabel("l2-discrepancy")
-        axarr[1, 0].set_title(
-            "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
-        axarr[1, 0].legend()
-
-        axarr[0, 0].errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:],
-                             yerr=np.std(discrep_arr[1:], axis=1),
-                             label=avg + 'avgs', color="C" + str(k % 10))
-        axarr[0, 0].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
-                         linestyle=":")
-        axarr[0, 0].set_xlabel("log(alpha)")
-        axarr[0, 0].set_ylabel("l2-discrepancy")
-        axarr[0, 0].set_title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
-        axarr[0, 0].legend()
+        # axarr[0, 1].errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_discrep_arr, axis=1)[1:],
+        #              yerr=np.std(GT_discrep_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # axarr[0, 1].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
+        #          linestyle=":")
+        # axarr[0, 1].set_xlabel("log(alpha)")
+        # axarr[0, 1].set_ylabel("l2-discrepancy")
+        # axarr[0, 1].set_title("L2-discrepancy between "+output_dim+"-by-"+output_dim+" dTV-regularised recons\n and 16384-averaged data")
+        # axarr[0, 1].legend()
+        #
+        # axarr[1, 0].errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_TV_discrep_arr, axis=1)[1:],
+        #              yerr=np.std(GT_TV_discrep_arr[1:], axis=1),
+        #              label=avg + 'avgs', color="C" + str(k % 10))
+        # axarr[1, 0].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25),
+        #          color="C" + str(k % 10),
+        #          linestyle=":")
+        # axarr[1, 0].set_xlabel("log(alpha)")
+        # axarr[1, 0].set_ylabel("l2-discrepancy")
+        # axarr[1, 0].set_title(
+        #     "L2-discrepancy between " + output_dim + "-by-" + output_dim + " dTV-regularised recons\n and groundtruth proxy")
+        # axarr[1, 0].legend()
+        #
+        # axarr[0, 0].errorbar(np.log10(np.asarray(alphas))[1:], np.average(discrep_arr, axis=1)[1:],
+        #                      yerr=np.std(discrep_arr[1:], axis=1),
+        #                      label=avg + 'avgs', color="C" + str(k % 10))
+        # axarr[0, 0].plot(np.log10(np.asarray(alphas))[1:], Morozov_thresholds[k] * np.ones(25), color="C" + str(k % 10),
+        #                  linestyle=":")
+        # axarr[0, 0].set_xlabel("log(alpha)")
+        # axarr[0, 0].set_ylabel("l2-discrepancy")
+        # axarr[0, 0].set_title("L2 data discrepancy for " + output_dim + "-by-" + output_dim + " dTV-regularised recons")
+        # axarr[0, 0].legend()
 
         axarr[1, 1].errorbar(np.log10(np.asarray(alphas))[1:], np.average(GT_proxy_SSIM_arr, axis=1)[1:],
                      yerr=np.std(GT_proxy_SSIM_arr[1:], axis=1),

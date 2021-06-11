@@ -188,7 +188,7 @@ json.dump(d, open(outputfile, 'w'))
 print("Written outputfile at " + dt.datetime.now().isoformat())
 
 # plotting
-d = json.load(open('dTV/MRI_15032021/Results_24052021/dTV_7Li_24052021_1024_pre_registered.json', 'r'))
+d = json.load(open('dTV/MRI_15032021/Results_24052021/dTV_7Li_24052021_2048_pre_registered.json', 'r'))
 
 #d2 = d['measurement=0']
 #d3 = d2['output_size=80']
@@ -238,11 +238,11 @@ for i in range(2):
         recon_im = np.abs(recon[0] + 1j * recon[1])
         recon_small_im = resize(recon_im, (40, 40))
 
-        pcm = axs[2*i, j].imshow(recon_small_im, cmap=plt.cm.gray)
-        axs[2*i, j].axis("off")
+        # pcm = axs[2*i, j].imshow(recon_small_im, cmap=plt.cm.gray)
+        # axs[2*i, j].axis("off")
 
-        # pcm = axs[2 * i, j].imshow(recon_im, cmap=plt.cm.gray)
-        # axs[2 * i, j].axis("off")
+        pcm = axs[2 * i, j].imshow(recon_im, cmap=plt.cm.gray)
+        axs[2 * i, j].axis("off")
 
         pcm = axs[2*i + 1, j].imshow(f_diff_abs, cmap=plt.cm.gray)
         axs[2*i + 1, j].axis("off")
