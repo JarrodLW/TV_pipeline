@@ -19,6 +19,7 @@ import datetime as dt
 from skimage.transform import resize
 
 alpha = float(sys.argv[1])
+#alpha=10.
 
 run_expt = False
 plot = True
@@ -52,11 +53,12 @@ sinfos['high_res'] = image_H_high_res
 
 etas = np.logspace(-3., -1, num=5).tolist()
 gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-#etas = [0.01]
-#gammas = [0.99]
+etas = [0.01]
+gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
-niter = 300
+#niter = 300
+niter = 100
 
 Yaff = odl.tensor_space(6)
 exp = 0
@@ -208,6 +210,7 @@ if plot:
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
+                f.colorbar(ax=axarr[0, j], shrink=0.6)
 
             if j == 0:
                 axarr[2*i, 0].text(-0.2, 0.5, r"$\eta$ = "+'{:.1e}'.format(eta), fontsize=5, weight="bold",
