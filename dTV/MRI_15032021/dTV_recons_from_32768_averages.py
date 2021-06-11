@@ -200,7 +200,7 @@ if plot:
             fourier_diff_images[i, j, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
 
 
-    f, axarr = plt.subplots(10, 6, figsize=(6, 10), constrained_layout=True)
+    f, axarr = plt.subplots(10, 6, figsize=(6, 10))
 
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
@@ -222,7 +222,7 @@ if plot:
 
     f.colorbar(pcm, ax=[axarr[0, -1]])
     f.suptitle("dTV recons with "+r"$\alpha$ = "+ '{:.1e}'.format(alpha), fontsize=10)
-    plt.tight_layout(w_pad=0.3, h_pad=0.3, rect=[0, 0, 1, 0.96])
+    plt.tight_layout(w_pad=0.3, h_pad=0.3, rect=[0, 0, 0.96, 0.96])
     plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
 
     output_dim = 120
