@@ -218,7 +218,7 @@ if plot:
                                    cmap=plt.cm.gray)
             axarr[2*i+1, j].axis("off")
 
-
+    plt.title("dTV recons with "+r"$\alpha$ = "+ '{:.1e}'.format(alpha))
     plt.tight_layout(w_pad=0.3, h_pad=0.3)
     plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
 
