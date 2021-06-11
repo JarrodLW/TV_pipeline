@@ -205,13 +205,14 @@ if plot:
 
             axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
                                  cmap=plt.cm.gray)
+            axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
-            else:
-                axarr[2 * i, j].axis("off")
 
             if j == 0:
-                axarr[2*i, 0].set_ylabel(r"$\eta$ = "+str(eta), fontsize=5, weight="bold")
+                axarr[2*i, 0].text(-0.2, 0.5, r"$\eta$ = "+str(eta), fontsize=5, weight="bold",
+                                   horizontalalignment='center', verticalalignment='center', rotation=90,
+                                   transform=axarr[2*i, 0].transAxes)
 
             axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
                                    cmap=plt.cm.gray)
