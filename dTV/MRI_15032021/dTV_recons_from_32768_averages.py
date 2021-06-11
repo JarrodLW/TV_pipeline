@@ -84,6 +84,8 @@ if run_expt:
 
         sinfo = sinfos[dict_key]
 
+        d['output_size=' + str(sinfo.shape[0])] = {}
+
         height, width = sinfo.shape
         complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
                                               shape=[height, width], dtype='complex', interp='linear')
