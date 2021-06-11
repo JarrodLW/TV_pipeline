@@ -20,8 +20,8 @@ from skimage.transform import resize
 
 alpha = float(sys.argv[1])
 
-run_expt = True
-plot = False
+run_expt = False
+plot = True
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -52,9 +52,6 @@ sinfos['high_res'] = image_H_high_res
 
 etas = np.logspace(-3., -1, num=5).tolist()
 gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-#etas = [0.01]
-#gammas = [0.95]
-#gamma = 0.95
 strong_cvx = 1e-5
 niter_prox = 20
 niter = 300
@@ -178,10 +175,37 @@ if run_expt:
 if plot:
     # Fourier upsampling
 
-    filename = '/Users/jlw31/Desktop/dTV_with_regis_alpha_0.99.json'
     with open(filename, 'r') as f:
         d = json.load(f)
     print("Loaded previous datafile at " + dt.datetime.now().isoformat())
+
+    d2 = d['output_size=120']
+
+    recon_images = np.zeros((len(etas), len(gammas), 120, 120))
+    fourier_diff_images = np.zeros((len(etas), len(gammas), 40, 40))
+
+    for i, eta in enumerate(etas):
+        for j, gamma in enumerate(gammas):
+
+            d3 = d2['gamma=0.95']
+            d4 = d3['eta=0.01']
+            recon = np.asarray(d4['recon'])
+            f_diff = np.asarray(d4['fourier_recon'])
+
+            recon_images[i, j, :, :] = np.abs(recon[0] + 1j*recon[1])
+            fourier_diff_images[i, j, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
+
+
+    f, axarr = plt.subplots(10, 6, figsize=(6, 10))
+
+    for i, eta in enumerate(etas):
+        for j, gamma in enumerate(gammas):
+
+            axarr[2*i, j].imshow(recon_images, vmax=np.amax(recon_images), interpolation='none')
+            axarr[2*i+1, j].imshow(fourier_diff_images, vmax=np.amax(fourier_diff_images), interpolation='none')
+
+    plt.tight_layout(w_pad=0.3, h_pad=0.3)
+    plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
 
     output_dim = 120
     padded_data = np.zeros((output_dim, output_dim), dtype='complex')
