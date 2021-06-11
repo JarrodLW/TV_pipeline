@@ -50,10 +50,10 @@ sinfos['high_res'] = image_H_high_res
 #sinfos['med_res'] = image_H_med_res
 #sinfos['low_res'] = image_H_low_res
 
-#etas = np.logspace(-3., -1, num=5).tolist()
-#gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-etas = [0.01]
-gammas = [0.95]
+etas = np.logspace(-3., -1, num=5).tolist()
+gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
+#etas = [0.01]
+#gammas = [0.95]
 #gamma = 0.95
 strong_cvx = 1e-5
 niter_prox = 20
@@ -177,6 +177,12 @@ if run_expt:
 
 if plot:
     # Fourier upsampling
+
+    filename = '/Users/jlw31/Desktop/dTV_with_regis_alpha_0.99.json'
+    with open(filename, 'r') as f:
+        d = json.load(f)
+    print("Loaded previous datafile at " + dt.datetime.now().isoformat())
+
     output_dim = 120
     padded_data = np.zeros((output_dim, output_dim), dtype='complex')
     padded_data[(output_dim - 40) // 2:(output_dim + 40) // 2,
