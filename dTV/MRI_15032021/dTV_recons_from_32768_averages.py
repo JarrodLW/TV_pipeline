@@ -21,8 +21,9 @@ from skimage.transform import resize
 alpha = float(sys.argv[1])
 #alpha=10.
 
-run_expt = False
-plot = True
+run_expt = True
+plot = False
+regis = False
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -57,8 +58,7 @@ gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
 #gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
-#niter = 300
-niter = 100
+niter = 300
 
 Yaff = odl.tensor_space(6)
 exp = 0
@@ -72,7 +72,11 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
                'Experiments/MRI_birmingham/Results_24052021/dTV_processing_of_32768'
 
 # save_dir = 'dTV/MRI_15032021/Results_15032021'
-filename = save_dir + '/dTV_with_regis_alpha_'+str(alpha)+'.json'
+
+if regis:
+    filename = save_dir + '/dTV_with_regis_alpha_'+str(alpha)+'.json'
+else:
+    filename = save_dir + '/dTV_no_regis_alpha_' + str(alpha) + '.json'
 
 if run_expt:
     for dict_key in sinfos.keys():
@@ -144,7 +148,11 @@ if run_expt:
                       odl.solvers.CallbackShow(step=5))
 
                 L = [1, 1e+2]
-                ud_vars = [0, 1]
+
+                if regis:
+                    ud_vars = [0, 1]
+                else:
+                    ud_vars = [0]
 
                 # %%
                 palm = algs.PALM(f, g, ud_vars=ud_vars, x=x0.copy(), callback=None, L=L)
