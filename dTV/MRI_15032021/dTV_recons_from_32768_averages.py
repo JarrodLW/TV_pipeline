@@ -18,12 +18,12 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 from skimage.transform import resize
 
-alpha = float(sys.argv[1])
-#alpha=10.
+#alpha = float(sys.argv[1])
+alpha=10.
 
 run_expt = False
 plot = True
-regis = False
+regis = True
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -54,11 +54,12 @@ sinfos['high_res'] = image_H_high_res
 
 etas = np.logspace(-3., -1, num=5).tolist()
 gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-#etas = [0.01]
-#gammas = [0.99]
+etas = [0.01]
+gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
-niter = 300
+#niter = 300
+niter = 100
 
 Yaff = odl.tensor_space(6)
 exp = 0
@@ -199,9 +200,9 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            d3 = d2['gamma=0.95']
-            d4 = d3['eta=0.01']
-            recon = np.asarray(d4['recon'])
+            d3 = d2['gamma='+str(gamma)]
+            d4 = d3['eta='+ str(eta)]
+            recon = np.asarray(d4['recon'])  ###ERROR HERE!!!!!!
             f_diff = np.asarray(d4['fourier_diff'])
 
             recon_images[i, j, :, :] = np.abs(recon[0] + 1j*recon[1])
@@ -214,7 +215,7 @@ if plot:
         for j, gamma in enumerate(gammas):
 
             axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
-                                 cmap=plt.cm.gray)
+                                 cmap=plt.cm.gray, vmax=np.amax(recon_images))
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
@@ -225,7 +226,7 @@ if plot:
                                    transform=axarr[2*i, 0].transAxes)
 
             pcm = axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
-                                   cmap=plt.cm.gray)
+                                   cmap=plt.cm.gray, vmax=np.amax(fourier_diff_images))
             axarr[2*i+1, j].axis("off")
 
     f.colorbar(pcm, ax=[axarr[1, -1]])
