@@ -215,7 +215,7 @@ if plot:
         for j, gamma in enumerate(gammas):
 
             axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
-                                 cmap=plt.cm.gray, vmax=np.amax(recon_images))
+                                 cmap=plt.cm.gray)
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")
@@ -226,7 +226,7 @@ if plot:
                                    transform=axarr[2*i, 0].transAxes)
 
             pcm = axarr[2*i+1, j].imshow(fourier_diff_images[i, j], vmax=np.amax(fourier_diff_images), interpolation='none',
-                                   cmap=plt.cm.gray, vmax=np.amax(fourier_diff_images))
+                                   cmap=plt.cm.gray)
             axarr[2*i+1, j].axis("off")
 
     f.colorbar(pcm, ax=[axarr[1, -1]])
