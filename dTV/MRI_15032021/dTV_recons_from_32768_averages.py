@@ -231,7 +231,11 @@ if plot:
     f.colorbar(pcm, ax=[axarr[1, -1]])
     f.suptitle("dTV recons with "+r"$\alpha$ = "+ '{:.1e}'.format(alpha), fontsize=10)
     plt.tight_layout(w_pad=0.3, h_pad=0.3, rect=[0, 0, 0.85, 0.96])
-    plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
+
+    if regis:
+        plt.savefig(save_dir + '/recons_dTV_with_regis_alpha_'+str(alpha)+'.pdf')
+    else:
+        plt.savefig(save_dir + '/recons_dTV_no_regis_alpha_' + str(alpha) + '.pdf')
 
     output_dim = 120
     padded_data = np.zeros((output_dim, output_dim), dtype='complex')
