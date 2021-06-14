@@ -18,8 +18,8 @@ import dTV.myFunctionals as fctls
 import datetime as dt
 from skimage.transform import resize
 
-#alpha = float(sys.argv[1])
-alpha=10.
+alpha = float(sys.argv[1])
+#alpha=10.
 
 run_expt = False
 plot = True
@@ -54,12 +54,12 @@ sinfos['high_res'] = image_H_high_res
 
 etas = np.logspace(-3., -1, num=5).tolist()
 gammas = [0.9, 0.925, 0.95, 0.975, 0.99, 0.995]
-etas = [0.01]
-gammas = [0.99]
+#etas = [0.01]
+#gammas = [0.99]
 strong_cvx = 1e-5
 niter_prox = 20
-#niter = 300
-niter = 100
+niter = 300
+#niter = 100
 
 Yaff = odl.tensor_space(6)
 exp = 0
