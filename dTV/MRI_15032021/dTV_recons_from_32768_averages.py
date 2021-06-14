@@ -21,8 +21,8 @@ from skimage.transform import resize
 alpha = float(sys.argv[1])
 #alpha=10.
 
-run_expt = True
-plot = False
+run_expt = False
+plot = True
 regis = False
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
