@@ -16,8 +16,8 @@ import datetime as dt
 date = '24052021'
 #date = '15032021'
 
-run_expt = False
-plot = True
+run_expt = True
+plot = False
 
 #TV_reg_type = 'real_imag_TV'
 TV_reg_type = 'complex_TV'
@@ -57,9 +57,9 @@ plt.imshow(np.abs(naive_recon), cmap=plt.cm.gray)
 
 #recon_arr = np.zeros((15, 2, low_res_data_width, low_res_data_width))
 reg_params = np.logspace(2., np.log10(5*10**3), num=15)
-#reg_params = [100]
-output_dims = [int(40), int(80), int(120)]
-#output_dims = [int(120)]
+reg_params = [0.]
+#output_dims = [int(40), int(80), int(120)]
+output_dims = [int(120)]
 
 
 filename = '/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_' + date + '/TV_complex_reg_recons_32768.json'
@@ -139,12 +139,12 @@ if run_expt:
 
                 regularised_recons['output_size=' + str(output_dim)]['lambda=' + '{:.1e}'.format(reg_param)][
                     'recon'] = [
-                    np.real(np.real(recons[0])).tolist(),
-                    np.imag(np.imag(recons[0])).tolist()]
+                    np.real(recons[0]).tolist(),
+                    np.imag(recons[0]).tolist()]
                 regularised_recons['output_size=' + str(output_dim)]['lambda=' + '{:.1e}'.format(reg_param)][
                     'fourier_diff'] = [
-                    np.real(np.real(diff_shifted_window)).tolist(),
-                    np.imag(np.imag(diff_shifted_window)).tolist()]
+                    np.real(diff_shifted_window).tolist(),
+                    np.imag(diff_shifted_window).tolist()]
 
     if TV_reg_type=='real_imag_TV':
         np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_'+date+'/TV_reg_recons_32768.npy', recon_arr)
@@ -182,21 +182,21 @@ if plot:
         recon = np.asarray(d3['recon'])
         f_diff = np.asarray(d3['fourier_diff'])
 
-        recon_images[i, j, :, :] = np.abs(recon[0] + 1j*recon[1])
-        fourier_diff_images[i, j, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
+        recon_images[i, :, :] = np.abs(recon[0] + 1j*recon[1])
+        fourier_diff_images[i, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
 
 
     f, axarr = plt.subplots(6, 5, figsize=(10, 12))
 
     for i, reg_param in enumerate(reg_params):
 
-        axarr[2*(i//5), i%%5].imshow(recon_images[i//5, i%%5], vmax=np.amax(recon_images), interpolation='none',
+        axarr[2*(i//5), i%5].imshow(recon_images[i], vmax=np.amax(recon_images), interpolation='none',
                              cmap=plt.cm.gray)
-        axarr[2 * (i//5), i%%5].axis("off")
+        axarr[2 * (i//5), i%5].axis("off")
 
-        pcm = axarr[2*(i//5)+1, i%%5].imshow(fourier_diff_images[i//5, i%%5], vmax=np.amax(fourier_diff_images), interpolation='none',
+        pcm = axarr[2*(i//5)+1, i%5].imshow(fourier_diff_images[i], vmax=np.amax(fourier_diff_images), interpolation='none',
                                cmap=plt.cm.gray)
-        axarr[2*(i//5)+1, i%%5].axis("off")
+        axarr[2*(i//5)+1, i%5].axis("off")
 
     #f.colorbar(pcm, ax=[axarr[1, -1]])
     plt.tight_layout(w_pad=0.3, h_pad=0.3)
