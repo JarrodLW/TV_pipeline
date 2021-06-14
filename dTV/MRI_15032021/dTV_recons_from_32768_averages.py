@@ -23,7 +23,7 @@ alpha = float(sys.argv[1])
 
 run_expt = False
 plot = True
-regis = False
+regis = True
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
