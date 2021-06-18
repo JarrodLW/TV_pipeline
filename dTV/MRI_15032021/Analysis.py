@@ -660,8 +660,8 @@ if plot_dTV_results:
                     recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
 
-                    # fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
-                    #     'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
+                    fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                        'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
                     # NOTE: for the 24052021 dataset, there's an error in the fourier diffs that were saved alongside
                     # the reconstructions, so we have to recompute them here. Needs fixing!
@@ -683,11 +683,11 @@ if plot_dTV_results:
                     # print(np.shape(fourier_diff))
                     # print(np.shape(coeffs_minus_GT[i, :, :]))
                     #
-                    # GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
-                    # GT_TV_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT_TV[i, :, :]
+                    GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
+                    GT_TV_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT_TV[i, :, :]
                     #
                     recon_image = np.abs(recon[0] + 1j * recon[1])
-                    # fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
+                    fourier_diff_image = np.abs(fourier_diff[0] + 1j*fourier_diff[1])
 
                     # grabbing the 32x32 or 40x40 reconstruction from the synthetic K-space data
                     # if output_dim == int(64):
@@ -728,8 +728,8 @@ if plot_dTV_results:
 
                     # diff_norms.append(np.sqrt(np.sum(np.square(fourier_diff_image))))
                     recons.append(recon_image)
-                    # GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
-                    # GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
+                    GT_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_fourier_diff)))))
+                    GT_TV_diff_norms.append(np.sqrt(np.sum(np.square(np.abs(GT_TV_fourier_diff)))))
 
                     # SSIM vals
 
