@@ -23,7 +23,7 @@ alpha = float(sys.argv[1])
 
 run_expt = False
 plot = True
-regis = True
+regis = False
 
 Li_fourier = np.fft.fftshift(np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy'))
 naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
@@ -214,8 +214,10 @@ if plot:
     for i, eta in enumerate(etas):
         for j, gamma in enumerate(gammas):
 
-            axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
-                                 cmap=plt.cm.gray)
+            # axarr[2*i, j].imshow(recon_images[i, j], vmax=np.amax(recon_images), interpolation='none',
+            #                      cmap=plt.cm.gray)
+            axarr[2 * i, j].imshow(recon_images[i, j], interpolation='none',
+                                   cmap=plt.cm.gray)
             axarr[2 * i, j].axis("off")
             if i == 0:
                 axarr[0, j].set_title(r"$\gamma$ = "+str(gamma), fontsize=5, weight="bold")

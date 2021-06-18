@@ -52,14 +52,20 @@ naive_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(Li_fourier)))
 
 plt.figure()
 plt.imshow(np.abs(naive_recon), cmap=plt.cm.gray)
+plt.colorbar()
+
+synth_data = np.fft.fftshift(np.fft.fft2(np.fft.fftshift(naive_recon)))
+
+plt.imshow(np.abs(synth_data - Li_fourier), cmap=plt.cm.gray)
+plt.colorbar()
 
 #plot_results = True
 
 #recon_arr = np.zeros((15, 2, low_res_data_width, low_res_data_width))
-reg_params = np.logspace(2., np.log10(5*10**3), num=15)
-reg_params = [0.]
-#output_dims = [int(40), int(80), int(120)]
-output_dims = [int(120)]
+reg_params = np.concatenate((np.asarray([0.]), np.logspace(2., np.log10(5*10**3), num=15)))
+#reg_params = [0.]
+output_dims = [int(40), int(80), int(120)]
+#output_dims = [int(40)]
 
 
 filename = '/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_' + date + '/TV_complex_reg_recons_32768.json'
@@ -82,7 +88,7 @@ if run_expt:
     #regularised_recons = {}
     exp = 0
 
-    model = VariationalRegClass('MRI', 'TV', TV_reg_type='complex_TV')
+    model = VariationalRegClass('MRI', 'TV', TV_reg_type=TV_reg_type)
 
     for output_dim in output_dims:
 
@@ -116,16 +122,20 @@ if run_expt:
                 print("Experiment_" + str(exp))
                 exp+=1
 
+                normalising_factor = 1
                 data = np.zeros((output_dim, output_dim), dtype='complex')
                 data[output_dim// 2 - low_res_data_width // 2:output_dim // 2 + low_res_data_width // 2,
-                output_dim // 2 - low_res_data_width // 2:output_dim // 2 + low_res_data_width // 2]  = Li_fourier
+                output_dim // 2 - low_res_data_width // 2:output_dim // 2 + low_res_data_width // 2]  = Li_fourier/normalising_factor
                 data = np.fft.fftshift(data)
                 subsampling_matrix = np.zeros((output_dim, output_dim))
                 subsampling_matrix[output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2,
                 output_dim//2 - low_res_data_width//2 :output_dim//2 + low_res_data_width//2] = 1
                 subsampling_matrix = np.fft.fftshift(subsampling_matrix)
 
-                recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix, niter=5000)
+                stepsize_ratio = 0.01
+                #stepsize_ratio = 1.
+                recons = model.regularised_recons_from_subsampled_data(data, reg_param, subsampling_arr=subsampling_matrix,
+                                                                       niter=5000, stepsize_ratio=stepsize_ratio)
                 # recon_arr[k, 0, :, :] = np.real(recons[0])
                 # recon_arr[k, 1, :, :] = np.imag(recons[0])
 
@@ -171,9 +181,10 @@ if plot:
         d = json.load(f)
     print("Loaded previous datafile at " + dt.datetime.now().isoformat())
 
-    d2 = d['output_size=120']
+    output_size = 40
+    d2 = d['output_size='+str(output_size)]
 
-    recon_images = np.zeros((len(reg_params), 120, 120))
+    recon_images = np.zeros((len(reg_params), output_size, output_size))
     fourier_diff_images = np.zeros((len(reg_params), 40, 40))
 
     for i, reg_param in enumerate(reg_params):
@@ -186,20 +197,20 @@ if plot:
         fourier_diff_images[i, :, :] = np.abs(f_diff[0] + 1j*f_diff[1])
 
 
-    f, axarr = plt.subplots(6, 5, figsize=(10, 12))
+    f, axarr = plt.subplots(4, 8, figsize=(8, 4))
 
     for i, reg_param in enumerate(reg_params):
 
-        axarr[2*(i//5), i%5].imshow(recon_images[i], vmax=np.amax(recon_images), interpolation='none',
+        axarr[2*(i//8), i%8].imshow(recon_images[i], vmax=np.amax(recon_images), interpolation='none',
                              cmap=plt.cm.gray)
-        axarr[2 * (i//5), i%5].axis("off")
+        axarr[2 * (i//8), i%8].axis("off")
 
-        pcm = axarr[2*(i//5)+1, i%5].imshow(fourier_diff_images[i], vmax=np.amax(fourier_diff_images), interpolation='none',
+        pcm = axarr[2*(i//8)+1, i%8].imshow(fourier_diff_images[i], vmax=np.amax(fourier_diff_images), interpolation='none',
                                cmap=plt.cm.gray)
-        axarr[2*(i//5)+1, i%5].axis("off")
+        axarr[2*(i//8)+1, i%8].axis("off")
 
-    #f.colorbar(pcm, ax=[axarr[1, -1]])
-    plt.tight_layout(w_pad=0.3, h_pad=0.3)
+    f.colorbar(pcm, ax=[axarr[3, -1]])
+    #plt.tight_layout(w_pad=0.3, h_pad=0.3)
 
 
 

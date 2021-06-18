@@ -125,9 +125,10 @@ elif reg_type=='dTVNN':
         sinfo = sinfo.T
 
     #alpha = 0.1
-    alpha = 0.01
-    #eta = 0.1
-    eta = 0.01
+    #alpha = 0.01
+    alpha = 0.001
+    eta = 0.1
+    #eta = 0.01
     gamma = 0.99
     strong_cvx = 1e-5
     niter_prox = 20

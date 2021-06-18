@@ -35,7 +35,7 @@ class VariationalRegClass:
                                                 subsampling_arr=None, niter=200, recon_init=None,
                                                 enforce_positivity=False, a_offset=None, a_range=None,
                                                 d_offset=None, d_width=None, reg_param_2=1, datafit=None,
-                                                datafit_options={}):
+                                                datafit_options={}, stepsize_ratio=1.):
 
         # data_stack: a rank 3 numpy array
         # measurement_type: string 'MRI', 'CT', 'STEM'
@@ -185,8 +185,16 @@ class VariationalRegClass:
             # --- Select solver parameters and solve using PDHG --- #
             # Estimated operator norm, add 10 percent to ensure ||K||_2^2 * sigma * tau < 1
             op_norm = 1.1 * odl.power_method_opnorm(op)
-            tau = 1.0 / op_norm  # Step size for the primal variable
-            sigma = 1.0 / op_norm  # Step size for the dual variable
+            tau = np.sqrt(stepsize_ratio)*1.0 / op_norm  # Step size for the primal variable
+            sigma = 1.0 / (np.sqrt(stepsize_ratio)*op_norm)  # Step size for the dual variable
+
+            op_norm_fourier = odl.power_method_opnorm(op[0])
+            op_norm_TV = odl.power_method_opnorm(op[1])
+
+            print("op_norm_fourier "+str(op_norm_fourier))
+            print("op_norm_TV "+str(op_norm_TV))
+
+            #exit()
 
             # Choose a starting point
             if recon_init is None:
@@ -199,11 +207,21 @@ class VariationalRegClass:
                     x[0] = self.image_space.element(recon_init)
                     x[1] = V.zero()
 
+            st = 1000
+            fidelity = datafit_func*forward_op
+            cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                  odl.solvers.CallbackPrint(fidelity, fmt='f(x)={0:.4g}') &
+                  odl.solvers.CallbackShowConvergence(fidelity))# &
+                  #odl.solvers.CallbackShow(step=st))
+                  #odl.solvers.CallbackPrintNorm())
+
             # Run the algorithm
             print('Running PDHG on data ' + str(i + 1) + " of " + str(data_stack.shape[0]))
             t0 = time()
             print("so far so good")
-            odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma)
+            odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma, callback=cb)
             dt = time() - t0
             print('done in %.2fs.' % dt)
 

@@ -1,10 +1,12 @@
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
+from skimage.transform import resize
 
 file_ptycho = 'dTV/CT_data/Ptycho_XRF_27042021/scan_104797SI14G00_phase.nxs'
 file_XRF = 'dTV/CT_data/Ptycho_XRF_27042021/i14-104797-xrf_windows-xsp3_addetector.nxs'
 file_XRF_GT = 'dTV/CT_data/Ptycho_XRF_27042021/i14-104795-xrf_windows-xsp3_addetector.nxs'
+phase_contrast = 'dTV/CT_data/Ptycho_XRF_27042021/dpc_i14-104797pdq2.nxs'
 
 f_ptycho = h5py.File(file_ptycho, 'r+')
 recon_ptycho = f_ptycho['entry']['phase_SI14G00']['data'][:, :, 0, 0]
@@ -53,3 +55,19 @@ np.save('dTV/CT_data/Ptycho_XRF_27042021/Ptycho.npy', recon_ptycho)
 np.save('dTV/CT_data/Ptycho_XRF_27042021/XRF_Ca_Ka.npy', recon_XRF_Ca_Ka)
 np.save('dTV/CT_data/Ptycho_XRF_27042021/XRF_Ca_Ka_high_res.npy', recon_XRF_Ca_Ka_GT)
 
+
+# phase contrast image
+f_phase_contrast = h5py.File(phase_contrast, 'r+')
+
+image = f_phase_contrast['entry002']['Phase']['data']
+
+plt.figure()
+plt.imshow(image, cmap=plt.cm.gray)
+
+np.save('dTV/CT_data/Ptycho_XRF_27042021/phase_contrast.npy', image)
+
+ptycho_im = np.load('dTV/CT_data/Ptycho_XRF_27042021/Ptycho.npy')
+ptycho_im_downsized = resize(ptycho_im, (80, 68))
+
+plt.figure()
+plt.imshow(ptycho_im_downsized, cmap=plt.cm.gray)
