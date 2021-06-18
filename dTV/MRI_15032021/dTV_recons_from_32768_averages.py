@@ -19,7 +19,7 @@ import datetime as dt
 from skimage.transform import resize
 
 alpha = float(sys.argv[1])
-#alpha=10.
+#alpha=600.
 
 run_expt = False
 plot = True
@@ -143,10 +143,12 @@ if run_expt:
 
                 g = odl.solvers.SeparableSum(reg_im, reg_affine)
 
+                func = f + g
                 cb = (odl.solvers.CallbackPrintIteration(end=', ') &
                       odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
                       odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                      odl.solvers.CallbackShow(step=5))
+                      odl.solvers.CallbackShow(step=5) &
+                      odl.solvers.CallbackShowConvergence(func))
 
                 L = [1, 1e+2]
 
