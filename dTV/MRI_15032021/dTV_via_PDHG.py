@@ -196,7 +196,7 @@ if run_expt:
     json.dump(d, open(filename, 'w'))
     print("Written outputfile at " + dt.datetime.now().isoformat())
 
-if plot:
+# if plot:
     # TV_fully_averaged = np.load('dTV/MRI_15032021/Results_24052021/example_TV_reg_Li_fully_averaged_lambda_1000.npy')
     #
     # f, axarr = plt.subplots(6, 6, figsize=(6, 6))
