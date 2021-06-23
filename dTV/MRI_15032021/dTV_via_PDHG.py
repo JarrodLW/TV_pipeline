@@ -76,11 +76,11 @@ else:
     d = {}
 
 if run_expt:
-    #alphas = np.linspace(0, 50, num=21)
-    alphas = [20.]
+    alphas = np.linspace(0, 50, num=21)
+    #alphas = [20.]
     niter = 2000
     exp = 0
-    for i in range(2):
+    for i in range(32):
         exp+=1
         print("Experiment number: "+str(exp))
 
