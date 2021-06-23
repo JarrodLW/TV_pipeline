@@ -80,7 +80,7 @@ if run_expt:
     alphas = [20.]
     niter = 2000
     exp = 0
-    for i in range(32):
+    for i in range(2):
         exp+=1
         print("Experiment number: "+str(exp))
 
