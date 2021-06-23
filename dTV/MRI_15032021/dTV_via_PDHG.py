@@ -195,6 +195,7 @@ if run_expt:
                     'reg_param=' + '{:.1e}'.format(alpha)][
                     'discrep'] = discrep
 
+
     print("About to write to datafile: " + filename + " at " + dt.datetime.now().isoformat())
     json.dump(d, open(filename, 'w'))
     print("Written outputfile at " + dt.datetime.now().isoformat())
