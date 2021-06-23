@@ -13,6 +13,7 @@ Rough_tests.py
 *.tif
 *.png
 *.npy
+*.mat
 Temp_data_manipulation/
 dTV/7Li_1H_MRI_Data_31112020/
 dTV/Checking_dTV_on_H_data.py

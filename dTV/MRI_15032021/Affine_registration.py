@@ -334,26 +334,29 @@ np.save('dTV/MRI_15032021/Results_15032021/pre_registered_H_image_high_res_2.npy
 ### results from matlab for 24052021 dataset
 
 from skimage.util import compare_images
+from scipy.io import savemat, loadmat
 
-image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
-image_H_med_res = resize(image_H_high_res, (80, 80))
-image_H_low_res = resize(image_H_high_res, (40, 40))
+previous = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.npy')
+mat = loadmat('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res.mat')
+pre_registered = mat['movingRegisteredRigid']
+image_H_med_res = resize(pre_registered, (80, 80))
+image_H_low_res = resize(pre_registered, (40, 40))
 
 image_Li = np.load('dTV/MRI_15032021/Results_24052021/example_TV_reg_Li_fully_averaged_lambda_1000.npy')
 image_Li_upsampled = resize(image_Li, (128, 128))
 
-image_H_high_res_normalised = image_H_high_res/np.sqrt(np.sum(np.square(image_H_high_res)))
+pre_registered_normalised = pre_registered/np.sqrt(np.sum(np.square(pre_registered)))
 image_Li_upsampled_normalised = image_Li_upsampled/np.sqrt(np.sum(np.square(image_Li_upsampled)))
 
 im_array = np.zeros((3, 128, 128))
-im_array[0] = image_H_high_res_normalised
+im_array[0] = pre_registered_normalised
 im_array[2] = image_Li_upsampled_normalised
 
-checkerboard = compare_images(image_H_high_res_normalised, 2*image_Li_upsampled_normalised, method='checkerboard',
+checkerboard = compare_images(pre_registered_normalised, 2*image_Li_upsampled_normalised, method='checkerboard',
                               n_tiles=(64, 64))
 
 fig, axs = plt.subplots(1, 4, figsize=(20, 5))
-axs[0].imshow(image_H_high_res_normalised, cmap=plt.cm.gray)
+axs[0].imshow(pre_registered_normalised, cmap=plt.cm.gray)
 #axs[0].axis("off")
 axs[0].title.set_text("High-res H image")
 axs[1].imshow(image_Li_upsampled_normalised, cmap=plt.cm.gray)

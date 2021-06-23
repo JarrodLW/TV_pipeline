@@ -660,28 +660,28 @@ if plot_dTV_results:
                     recon = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
                         'alpha=' + '{:.1e}'.format(alpha)]['recon']).astype('float64')
 
-                    fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
-                        'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
+                    # fourier_diff = np.asarray(d['measurement=' + str(i)]['output_size=' + str(output_dim)][
+                    #     'alpha=' + '{:.1e}'.format(alpha)]['fourier_diff']).astype('float64')
 
-                    # NOTE: for the 24052021 dataset, there's an error in the fourier diffs that were saved alongside
-                    # the reconstructions, so we have to recompute them here. Needs fixing!
+                    NOTE: for the 24052021 dataset, there's an error in the fourier diffs that were saved alongside
+                    the reconstructions, so we have to recompute them here. Needs fixing!
 
-                    # complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
-                    #                                   shape=[output_dim, output_dim], dtype='complex')
-                    # image_space = complex_space.real_space ** 2
-                    # forward_op = RealFourierTransform(image_space)
-                    #
-                    # data_odl = forward_op.range.element([np.real(np.fft.fftshift(coeffs[i])),
-                    #                                      np.imag(np.fft.fftshift(coeffs[i]))])
-                    # diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
-                    # diff = diff[0].asarray() + 1j * diff[1].asarray()
-                    # diff_shift = np.fft.ifftshift(diff)
-                    # fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
-                    #                     output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
-                    # fourier_diff = np.asarray([np.real(fourier_diff), np.imag(fourier_diff)])
+                    complex_space = odl.uniform_discr(min_pt=[-1., -1.], max_pt=[1., 1.],
+                                                      shape=[output_dim, output_dim], dtype='complex')
+                    image_space = complex_space.real_space ** 2
+                    forward_op = RealFourierTransform(image_space)
 
-                    # print(np.shape(fourier_diff))
-                    # print(np.shape(coeffs_minus_GT[i, :, :]))
+                    data_odl = forward_op.range.element([np.real(np.fft.fftshift(coeffs[i])),
+                                                         np.imag(np.fft.fftshift(coeffs[i]))])
+                    diff = forward_op(forward_op.domain.element([recon[0], recon[1]])) - data_odl
+                    diff = diff[0].asarray() + 1j * diff[1].asarray()
+                    diff_shift = np.fft.ifftshift(diff)
+                    fourier_diff = diff_shift[output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2,
+                                        output_dim // 2 - low_res_data_width//2:output_dim // 2 + low_res_data_width//2]
+                    fourier_diff = np.asarray([np.real(fourier_diff), np.imag(fourier_diff)])
+
+                    print(np.shape(fourier_diff))
+                    print(np.shape(coeffs_minus_GT[i, :, :]))
                     #
                     GT_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT[i, :, :]
                     GT_TV_fourier_diff = fourier_diff[0] + 1j*fourier_diff[1] + coeffs_minus_GT_TV[i, :, :]
