@@ -186,7 +186,7 @@ if run_expt:
                     d['measurement=' + str(i)]['output_size=' + str(height)][
                         'reg_param=' + '{:.1e}'.format(alpha)][
                         'synth_data'] = synth_data.tolist()
-                    d['measurement=' + str(i)]['output_size=' + str(height])]['reg_param=' + '{:.1e}'.format(alpha)][
+                    d['measurement=' + str(i)]['output_size=' + str(height)]['reg_param=' + '{:.1e}'.format(alpha)][
                         'fourier_diff'] = f_diff.tolist()
                     d['measurement=' + str(i)]['output_size=' + str(height)][
                         'reg_param=' + '{:.1e}'.format(alpha)][
