@@ -181,14 +181,14 @@ if run_expt:
                     f_diff = synth_data - data_shifted
                     discrep = g*op(forward_op(recon) - data_odl)
 
-                    d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['reg_param=' + '{:.1e}'.format(alpha)][
+                    d['measurement=' + str(i)]['output_size=' + str(height)]['reg_param=' + '{:.1e}'.format(alpha)][
                         'recon'] = recon.tolist()
-                    d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])][
+                    d['measurement=' + str(i)]['output_size=' + str(height)][
                         'reg_param=' + '{:.1e}'.format(alpha)][
                         'synth_data'] = synth_data.tolist()
-                    d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])]['reg_param=' + '{:.1e}'.format(alpha)][
+                    d['measurement=' + str(i)]['output_size=' + str(height])]['reg_param=' + '{:.1e}'.format(alpha)][
                         'fourier_diff'] = f_diff.tolist()
-                    d['measurement=' + str(i)]['output_size=' + str(sinfo.shape[0])][
+                    d['measurement=' + str(i)]['output_size=' + str(height)][
                         'reg_param=' + '{:.1e}'.format(alpha)][
                         'discrep'] = discrep
 
