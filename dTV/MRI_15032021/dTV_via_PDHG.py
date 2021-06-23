@@ -226,5 +226,3 @@ if run_expt:
     # axarr[0, 5].set_title("Resid.")
     # f.colorbar(pcm, ax=[axarr[-1, -1]], shrink=0.75)
     # #plt.tight_layout()
-    #
-    #
