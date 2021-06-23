@@ -42,7 +42,7 @@ num = 2**avg_ind
 for i in range(num):
     data_arr = np.roll(f_coeff_arr, i, axis=0)
     for ele in range(len(f_coeff_list)//num):
-        f_coeff_arr_combined[avg_ind, ele+i*len(f_coeff_list)//num, :, :] = np.sum(data_arr[num*ele:num*(ele+1)], axis=0)/num
+        f_coeff_arr_combined[ele+i*len(f_coeff_list)//num, :, :] = np.sum(data_arr[num*ele:num*(ele+1)], axis=0)/num
 
 height, width = (40, 40)
 height *= upsample_factor
