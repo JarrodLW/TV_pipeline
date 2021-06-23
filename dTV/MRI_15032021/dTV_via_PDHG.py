@@ -182,7 +182,7 @@ if run_expt:
                 data_shifted = np.asarray([np.fft.fftshift(data_odl.asarray()[0]),
                                            np.fft.fftshift(data_odl.asarray()[1])])
                 f_diff = synth_data - data_shifted
-                discrep = g*op(forward_op(recon) - data_odl)
+                #discrep = g*op(forward_op(recon) - data_odl)
 
                 d['measurement=' + str(i)]['output_size=' + str(height)]['reg_param=' + '{:.1e}'.format(alpha)][
                     'recon'] = recon.tolist()
@@ -191,9 +191,9 @@ if run_expt:
                     'synth_data'] = synth_data.tolist()
                 d['measurement=' + str(i)]['output_size=' + str(height)]['reg_param=' + '{:.1e}'.format(alpha)][
                     'fourier_diff'] = f_diff.tolist()
-                d['measurement=' + str(i)]['output_size=' + str(height)][
-                    'reg_param=' + '{:.1e}'.format(alpha)][
-                    'discrep'] = discrep
+                # d['measurement=' + str(i)]['output_size=' + str(height)][
+                #     'reg_param=' + '{:.1e}'.format(alpha)][
+                #     'discrep'] = discrep
 
 
     print("About to write to datafile: " + filename + " at " + dt.datetime.now().isoformat())
