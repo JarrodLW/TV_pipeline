@@ -208,7 +208,7 @@ if plot:
     downsampled_recon_images = np.zeros((6, 40, 40))
     fourier_recon_images = np.zeros((6, 40, 40))
 
-    for measurement in measurements:
+    for i, measurement in enumerate(measurements):
         for alpha in alphas:
             d2 = d['measurement='+str(measurement)]
             d3 = d2['output_size='+str(output_size)]
@@ -229,10 +229,10 @@ if plot:
             fourier_recon = np.fft.fftshift(np.fft.ifft2(data))
             fourier_recon_image = np.abs(fourier_recon)
 
-            recon_images[int(measurement), :, :] = recon_image
-            f_diff_images[int(measurement), :, :] = f_diff_image
-            downsampled_recon_images[int(measurement), :, :] = downsampled_recon_image
-            fourier_recon_images[int(measurement), :, :] = fourier_recon_image
+            recon_images[i, :, :] = recon_image
+            f_diff_images[i, :, :] = f_diff_image
+            downsampled_recon_images[i, :, :] = downsampled_recon_image
+            fourier_recon_images[i, :, :] = fourier_recon_image
 
         f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
