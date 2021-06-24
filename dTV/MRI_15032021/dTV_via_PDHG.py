@@ -75,8 +75,8 @@ else:
     print("Could not find: " + filename)
     d = {}
 
+alphas = np.linspace(0, 50, num=21)
 if run_expt:
-    alphas = np.linspace(0, 50, num=21)
     niter = 2000
     exp = 0
     for i in range(32):
