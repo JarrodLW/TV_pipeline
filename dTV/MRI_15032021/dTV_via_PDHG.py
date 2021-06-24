@@ -222,11 +222,11 @@ if plot:
 
             #discrep = np.sqrt(np.sum(np.square(f_diff_image)))
             synth_data = np.asarray(d4["synth_data"])
-            downsampled_recon = np.fftshift(np.ifft2(synth_data[0] + 1j*synth_data[1]))
+            downsampled_recon = np.fft.fftshift(np.ifft2(synth_data[0] + 1j*synth_data[1]))
             downsampled_recon_image = np.abs(downsampled_recon)
 
             data = f_coeff_arr_combined[int(measurement), :, :]
-            fourier_recon = np.fftshift(np.ifft2(data))
+            fourier_recon = np.fft.fftshift(np.ifft2(data))
             fourier_recon_image = np.abs(fourier_recon)
 
             recon_images[int(measurement), :, :] = recon_image
