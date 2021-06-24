@@ -192,7 +192,8 @@ if run_expt:
     print("Written outputfile at " + dt.datetime.now().isoformat())
 
 if plot:
-    TV_fully_averaged = np.load('dTV/MRI_15032021/Results_24052021/example_TV_reg_Li_fully_averaged_lambda_1000.npy')
+    TV_fully_averaged = np.load("dTV/MRI_15032021/Results_24052021/example_TV_recon_with_PDHG_on_32768.npy")
+    TV_fully_averaged_image = np.abs(TV_fully_averaged[0] + 1j*TV_fully_averaged[1])
 
     print("About to read datafile: " + filename + " at " + dt.datetime.now().isoformat())
     with open(filename, 'r') as f:
