@@ -234,31 +234,31 @@ if plot:
             downsampled_recon_images[i, :, :] = downsampled_recon_image
             fourier_recon_images[i, :, :] = fourier_recon_image
 
-        f, axarr = plt.subplots(6, 6, figsize=(6, 6))
+            f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
-        if sinfo is None:
-            sinfo = np.zeros((height, width))
+            if sinfo is None:
+                sinfo = np.zeros((height, width))
 
-        for i in range(6):
-            axarr[i, 0].imshow(sinfo, cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 0].axis("off")
-            axarr[i, 1].imshow(fourier_recon_images[i], cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 1].axis("off")
-            axarr[i, 2].imshow(TV_fully_averaged_image, cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 2].axis("off")
-            axarr[i, 3].imshow(recon_images[i], cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 3].axis("off")
-            axarr[i, 4].imshow(downsampled_recon_images[i], cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 4].axis("off")
-            pcm = axarr[i, 5].imshow(f_diff_images[i], cmap=plt.cm.gray, interpolation='None')
-            axarr[i, 5].axis("off")
+            for i in range(6):
+                axarr[i, 0].imshow(sinfo, cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 0].axis("off")
+                axarr[i, 1].imshow(fourier_recon_images[i], cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 1].axis("off")
+                axarr[i, 2].imshow(TV_fully_averaged_image, cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 2].axis("off")
+                axarr[i, 3].imshow(recon_images[i], cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 3].axis("off")
+                axarr[i, 4].imshow(downsampled_recon_images[i], cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 4].axis("off")
+                pcm = axarr[i, 5].imshow(f_diff_images[i], cmap=plt.cm.gray, interpolation='None')
+                axarr[i, 5].axis("off")
 
-        axarr[0, 0].set_title("Guide")
-        axarr[0, 1].set_title("Fourier")
-        axarr[0, 2].set_title("Target")
-        axarr[0, 3].set_title("dTV")
-        axarr[0, 4].set_title("Subs.")
-        axarr[0, 5].set_title("Resid.")
-        f.colorbar(pcm, ax=[axarr[-1, -1]], shrink=0.75)
-        #plt.tight_layout()
-        plt.savefig(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"reg_param_" + '{:.1e}'.format(alpha)+".pdf")
+            axarr[0, 0].set_title("Guide")
+            axarr[0, 1].set_title("Fourier")
+            axarr[0, 2].set_title("Target")
+            axarr[0, 3].set_title("dTV")
+            axarr[0, 4].set_title("Subs.")
+            axarr[0, 5].set_title("Resid.")
+            f.colorbar(pcm, ax=[axarr[-1, -1]], shrink=0.75)
+            #plt.tight_layout()
+            plt.savefig(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"_reg_param_" + '{:.1e}'.format(alpha)+".pdf")
