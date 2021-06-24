@@ -244,7 +244,7 @@ if plot:
             axarr[i, 0].axis("off")
             axarr[i, 1].imshow(fourier_recon_images[i], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 1].axis("off")
-            axarr[i, 2].imshow(TV_fully_averaged, cmap=plt.cm.gray, interpolation='None')
+            axarr[i, 2].imshow(TV_fully_averaged_image, cmap=plt.cm.gray, interpolation='None')
             axarr[i, 2].axis("off")
             axarr[i, 3].imshow(recon_images[i], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 3].axis("off")
