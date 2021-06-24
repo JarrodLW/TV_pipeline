@@ -261,4 +261,4 @@ if plot:
         axarr[0, 5].set_title("Resid.")
         f.colorbar(pcm, ax=[axarr[-1, -1]], shrink=0.75)
         #plt.tight_layout()
-        plt.savefig(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"reg_param_" + '{:.1e}'.format(alpha))
+        plt.savefig(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"reg_param_" + '{:.1e}'.format(alpha)+".pdf")
