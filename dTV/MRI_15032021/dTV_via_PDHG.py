@@ -213,7 +213,7 @@ if plot:
 
     bias_variance_vals = np.zeros((2, len(alphas)))
     bias_variance_vals_complex = np.zeros((2, len(alphas)))
-    discrepancies = np.zeros(len(alphas), 32)
+    #discrepancies = np.zeros(len(alphas), 32)
 
     for j, alpha in enumerate(alphas):
 
@@ -252,7 +252,7 @@ if plot:
             downsampled_recons[i, 1, :, :] = downsampled_recon[1]
             fourier_recon_images[i, :, :] = fourier_recon_image
 
-            discrepancies[j, i] = np.sqrt(np.sum(np.square(f_diff_image)))
+            #discrepancies[j, i] = np.sqrt(np.sum(np.square(f_diff_image)))
 
         f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
