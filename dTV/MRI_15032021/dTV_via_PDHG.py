@@ -208,6 +208,14 @@ if plot:
     downsampled_recon_images = np.zeros((32, 40, 40))
     fourier_recon_images = np.zeros((32, 40, 40))
 
+    # for obtaining downsampled images
+    complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
+                                      shape=[40, 40], dtype='complex', interp='linear')
+    image_space = complex_space.real_space ** 2
+
+    # defining the forward op - I should do the subsampling in a more efficient way
+    fourier_transf = ops.RealFourierTransform(image_space)
+
     for j, alpha in enumerate(alphas):
         bias_variance_vals = np.zeros((len(alphas), 2))
 
@@ -224,8 +232,10 @@ if plot:
 
             #discrep = np.sqrt(np.sum(np.square(f_diff_image)))
             synth_data = np.asarray(d4["synth_data"])
-            downsampled_recon = np.fft.fftshift(np.fft.ifft2(synth_data[0] + 1j*synth_data[1]))
-            downsampled_recon_image = np.abs(downsampled_recon)
+            synth_data_odl = fourier_transf.range.element(np.fft.fftshift(synth_data))
+            #downsampled_recon = np.fft.fftshift(np.fft.ifft2(synth_data[0] + 1j*synth_data[1]))
+            downsampled_recon = fourier_transf.inverse(synth_data_odl).asarray()
+            downsampled_recon_image = np.abs(downsampled_recon[0] + 1j*downsampled_recon[1])
 
             data = f_coeff_arr_combined[i, :, :]
             fourier_recon = np.fft.fftshift(np.fft.ifft2(data))
