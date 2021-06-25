@@ -272,6 +272,11 @@ if plot:
         variance = np.average(np.sum((downsampled_recon_images - average_recon_image)**2, axis=(1, 2)))
         bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
 
+        norm_averaged_recon_image = np.sqrt(np.sum(np.square(average_recon_image)))
+        norm_TV_image = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
+        print("norm of averaged recon image: "+str(norm_averaged_recon_image))
+        print("norm of GT: " + str(norm_TV_image))
+
         bias_variance_vals[j, 0] = bias
         bias_variance_vals[j, 1] = variance
 
