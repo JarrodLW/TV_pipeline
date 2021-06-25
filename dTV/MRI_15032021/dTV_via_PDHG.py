@@ -232,7 +232,7 @@ if plot:
 
             #discrep = np.sqrt(np.sum(np.square(f_diff_image)))
             synth_data = np.asarray(d4["synth_data"])
-            synth_data_odl = fourier_transf.range.element([np.fft.fftshift(synth_data)[0], np.fft.fftshift(synth_data)[1]])
+            synth_data_odl = fourier_transf.range.element([np.fft.fftshift(synth_data[0]), np.fft.fftshift(synth_data[1])])
             #downsampled_recon = np.fft.fftshift(np.fft.ifft2(synth_data[0] + 1j*synth_data[1]))
             downsampled_recon = fourier_transf.inverse(synth_data_odl).asarray()
             downsampled_recon_image = np.abs(downsampled_recon[0] + 1j*downsampled_recon[1])
