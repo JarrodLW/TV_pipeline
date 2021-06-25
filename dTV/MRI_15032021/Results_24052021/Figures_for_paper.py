@@ -96,6 +96,7 @@ rel_TV_variance_1024 = TV_bias_variance_1024[1, :]/GT_norm**2
 rel_TV_bias_2048 = TV_bias_variance_2048[0, :]/GT_norm
 rel_TV_variance_2048 = TV_bias_variance_2048[1, :]/GT_norm**2
 
+plt.figure()
 plt.scatter(rel_dTV_variance_2048, rel_dTV_bias_2048, marker='*', label='dTV, 2048 avgs')
 plt.plot(rel_dTV_variance_2048, rel_dTV_bias_2048)
 plt.scatter(rel_dTV_variance_1024, rel_dTV_bias_1024, marker='*', label='dTV, 1024 avgs')

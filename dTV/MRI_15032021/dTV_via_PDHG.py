@@ -33,6 +33,8 @@ for i in Li_range:
     f_coeffs_unpacked = unpacking_fourier_coeffs_15032021(f_coeffs, 40)
     f_coeff_list.append(f_coeffs_unpacked)
 
+full_avg_Fourier_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(np.average(np.asarray(f_coeff_list), axis=0))))
+
 f_coeff_arr = np.asarray(f_coeff_list)
 f_coeff_arr_combined = np.zeros((32, 40, 40), dtype='complex')
 
@@ -288,7 +290,8 @@ if plot:
 
         average_recon_image = np.average(downsampled_recon_images, axis=0)
         variance = np.average(np.sum((downsampled_recon_images - average_recon_image)**2, axis=(1, 2)))
-        bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
+        #bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
+        bias = np.sqrt(np.sum(np.square(average_recon_image - full_avg_Fourier_recon)))
 
         average_recon = np.average(downsampled_recons, axis=0)
         variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
@@ -299,7 +302,7 @@ if plot:
         print("norm of averaged recon image: "+str(norm_averaged_recon_image))
         print("norm of GT: " + str(norm_TV_image))
 
-        bias_variance_vals[0, j] =bias
+        bias_variance_vals[0, j] = bias
         bias_variance_vals[1, j] = variance
 
         bias_variance_vals_complex[0, j] = bias_complex
