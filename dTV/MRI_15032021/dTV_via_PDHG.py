@@ -242,7 +242,7 @@ if plot:
             sinfo = np.zeros((height, width))
 
         for i, measurement in enumerate(measurements):
-            axarr[i, 0].imshow(sinfo[measurement], cmap=plt.cm.gray, interpolation='None')
+            axarr[i, 0].imshow(sinfo, cmap=plt.cm.gray, interpolation='None')
             axarr[i, 0].axis("off")
             axarr[i, 1].imshow(fourier_recon_images[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 1].axis("off")
