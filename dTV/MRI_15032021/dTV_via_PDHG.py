@@ -290,4 +290,4 @@ if plot:
         bias_variance_vals[0, j] = bias
         bias_variance_vals[1, j] = variance
 
-    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
+    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_"+upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)

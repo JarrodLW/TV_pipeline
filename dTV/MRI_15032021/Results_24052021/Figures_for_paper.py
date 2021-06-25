@@ -71,14 +71,23 @@ f.colorbar(im2, ax=axarr[2], shrink=0.5)
 f.colorbar(im3, ax=axarr[3], shrink=0.5)
 
 ## Bias-variance plot
-avg = 2048
+
+TV_fully_averaged = np.load("dTV/MRI_15032021/Results_24052021/example_TV_recon_with_PDHG_on_32768.npy")
+TV_fully_averaged_image = np.abs(TV_fully_averaged[0] + 1j*TV_fully_averaged[1])
+GT_norm = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
 
 save_dir = '/Users/jlw31/Desktop/Results_on_24052021_dataset/New_PDHG/Statistics'
-filename = save_dir + '/upsample_factor_3_bias_variance_'+str(avg)+'_avgs.npy'
+filename_1024 = save_dir + '/upsample_factor_3_bias_variance_1024_avgs.npy'
+filename_2048 = save_dir + '/upsample_factor_3_bias_variance_2048_avgs.npy'
 
-bias_variance = np.load(filename)
+bias_variance_1024 = np.load(filename_1024)
+bias_variance_2048 = np.load(filename_2048)
 
-bias = bias_variance[0, :]
-variance = bias_variance[1, :]
+rel_bias_1024 = bias_variance_1024[0, :]/GT_norm
+rel_variance_1024 = bias_variance_1024[1, :]/GT_norm**2
+rel_bias_2048 = bias_variance_2048[0, :]/GT_norm
+rel_variance_2048 = bias_variance_2048[1, :]/GT_norm**2
 
-plt.plot(bias, variance)
+plt.scatter(variance_2048, rel_bias_2048, label='2048 avgs')
+plt.scatter(variance_1024, rel_bias_1024, label='1024 avgs')
+plt.legend()
