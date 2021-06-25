@@ -268,8 +268,8 @@ if plot:
 
         print("number of recon images: "+str(recon_images.shape[0]))
 
-        average_recon_image = np.average(recon_images, axis=0)
-        variance = np.average(np.sum((recon_images - average_recon_image)**2, axis=(1, 2)))
+        average_recon_image = np.average(downsampled_recon_images, axis=0)
+        variance = np.average(np.sum((downsampled_recon_images - average_recon_image)**2, axis=(1, 2)))
         bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
 
         bias_variance_vals[j, 0] = bias
