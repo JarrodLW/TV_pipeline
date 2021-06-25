@@ -78,7 +78,7 @@ filename = save_dir + '/upsample_factor_3_bias_variance_'+str(avg)+'_avgs.npy'
 
 bias_variance = np.load(filename)
 
-bias = bias_variance[:, 0]
-variance = bias_variance[:, 1]
+bias = bias_variance[0, :]
+variance = bias_variance[1, :]
 
 plt.plot(bias, variance)

@@ -211,13 +211,13 @@ if plot:
     # defining the forward op - I should do the subsampling in a more efficient way
     fourier_transf = ops.RealFourierTransform(image_space)
 
+    bias_variance_vals = np.zeros((2, len(alphas)))
     for j, alpha in enumerate(alphas):
 
         recon_images = np.zeros((32, output_size, output_size))
         f_diff_images = np.zeros((32, 40, 40))
         downsampled_recon_images = np.zeros((32, 40, 40))
         fourier_recon_images = np.zeros((32, 40, 40))
-        bias_variance_vals = np.zeros((2, len(alphas)))
 
         for i in range(32):
             d2 = d['measurement='+str(i)]
