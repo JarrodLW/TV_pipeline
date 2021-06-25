@@ -308,4 +308,4 @@ if plot:
     np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
     np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
         upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)
-    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_discrepancies_"+str(avg)+"_avgs.npy", discrepancies)
+    #np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_discrepancies_"+str(avg)+"_avgs.npy", discrepancies)
