@@ -212,12 +212,16 @@ if plot:
     fourier_transf = ops.RealFourierTransform(image_space)
 
     bias_variance_vals = np.zeros((2, len(alphas)))
+    bias_variance_vals_complex = np.zeros((2, len(alphas)))
+    discrepancies = np.zeros(len(alphas), 32)
+
     for j, alpha in enumerate(alphas):
 
         recon_images = np.zeros((32, output_size, output_size))
         f_diff_images = np.zeros((32, 40, 40))
         downsampled_recon_images = np.zeros((32, 40, 40))
         fourier_recon_images = np.zeros((32, 40, 40))
+        downsampled_recons = np.zeros((32, 2, 40, 40))
 
         for i in range(32):
             d2 = d['measurement='+str(i)]
@@ -244,7 +248,11 @@ if plot:
             recon_images[i, :, :] = recon_image
             f_diff_images[i, :, :] = f_diff_image
             downsampled_recon_images[i, :, :] = downsampled_recon_image
+            downsampled_recons[i, 0, :, :] = downsampled_recon[0]
+            downsampled_recons[i, 1, :, :] = downsampled_recon[1]
             fourier_recon_images[i, :, :] = fourier_recon_image
+
+            discrepancies[j, i] = np.sqrt(np.sum(np.square(f_diff_image)))
 
         f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
@@ -282,12 +290,22 @@ if plot:
         variance = np.average(np.sum((downsampled_recon_images - average_recon_image)**2, axis=(1, 2)))
         bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
 
+        average_recon = np.average(downsampled_recons, axis=0)
+        variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
+        bias_complex = np.sqrt(np.sum(np.square(average_recon - TV_fully_averaged)))
+
         norm_averaged_recon_image = np.sqrt(np.sum(np.square(average_recon_image)))
         norm_TV_image = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
         print("norm of averaged recon image: "+str(norm_averaged_recon_image))
         print("norm of GT: " + str(norm_TV_image))
 
-        bias_variance_vals[0, j] = bias
+        bias_variance_vals[0, j] =bias
         bias_variance_vals[1, j] = variance
 
+        bias_variance_vals_complex[0, j] = bias_complex
+        bias_variance_vals_complex[1, j] = variance_complex
+
     np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
+        upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)
+    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_discrepancies_"+str(avg)+"_avgs.npy", discrepancies)

@@ -77,17 +77,36 @@ TV_fully_averaged_image = np.abs(TV_fully_averaged[0] + 1j*TV_fully_averaged[1])
 GT_norm = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
 
 save_dir = '/Users/jlw31/Desktop/Results_on_24052021_dataset/New_PDHG/Statistics'
-filename_1024 = save_dir + '/dTV_upsample_factor_3_bias_variance_1024_avgs.npy'
-filename_2048 = save_dir + '/dTV_upsample_factor_3_bias_variance_2048_avgs.npy'
+dTV_filename_1024 = save_dir + '/dTV_upsample_factor_3_bias_variance_1024_avgs.npy'
+dTV_filename_2048 = save_dir + '/dTV_upsample_factor_3_bias_variance_2048_avgs.npy'
+TV_filename_1024 = save_dir + '/TV_upsample_factor_1_bias_variance_1024_avgs.npy'
+TV_filename_2048 = save_dir + '/TV_upsample_factor_1_bias_variance_2048_avgs.npy'
 
-bias_variance_1024 = np.load(filename_1024)
-bias_variance_2048 = np.load(filename_2048)
+dTV_bias_variance_1024 = np.load(dTV_filename_1024)
+dTV_bias_variance_2048 = np.load(dTV_filename_2048)
+TV_bias_variance_1024 = np.load(TV_filename_1024)
+TV_bias_variance_2048 = np.load(TV_filename_2048)
 
-rel_bias_1024 = bias_variance_1024[0, :]/GT_norm
-rel_variance_1024 = bias_variance_1024[1, :]/GT_norm**2
-rel_bias_2048 = bias_variance_2048[0, :]/GT_norm
-rel_variance_2048 = bias_variance_2048[1, :]/GT_norm**2
+rel_dTV_bias_1024 = dTV_bias_variance_1024[0, :]/GT_norm
+rel_dTV_variance_1024 = dTV_bias_variance_1024[1, :]/GT_norm**2
+rel_dTV_bias_2048 = dTV_bias_variance_2048[0, :]/GT_norm
+rel_dTV_variance_2048 = dTV_bias_variance_2048[1, :]/GT_norm**2
+rel_TV_bias_1024 = TV_bias_variance_1024[0, :]/GT_norm
+rel_TV_variance_1024 = TV_bias_variance_1024[1, :]/GT_norm**2
+rel_TV_bias_2048 = TV_bias_variance_2048[0, :]/GT_norm
+rel_TV_variance_2048 = TV_bias_variance_2048[1, :]/GT_norm**2
 
-plt.scatter(variance_2048, rel_bias_2048, label='2048 avgs')
-plt.scatter(variance_1024, rel_bias_1024, label='1024 avgs')
+plt.scatter(rel_dTV_variance_2048, rel_dTV_bias_2048, marker='*', label='dTV, 2048 avgs')
+plt.plot(rel_dTV_variance_2048, rel_dTV_bias_2048)
+plt.scatter(rel_dTV_variance_1024, rel_dTV_bias_1024, marker='*', label='dTV, 1024 avgs')
+plt.plot(rel_dTV_variance_1024, rel_dTV_bias_1024)
+plt.scatter(rel_TV_variance_2048, rel_TV_bias_2048, marker='+', label='TV, 2048 avgs')
+plt.plot(rel_TV_variance_2048, rel_TV_bias_2048)
+plt.scatter(rel_TV_variance_1024, rel_TV_bias_1024, marker='+', label='TV, 1024 avgs')
+plt.plot(rel_TV_variance_1024, rel_TV_bias_1024)
 plt.legend()
+plt.xlabel("Variance over GT norm squared")
+plt.ylabel("Bias over GT norm")
+plt.ylim((0.,2.))
+plt.title("Bias-variance tradeoff")
+
