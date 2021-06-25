@@ -203,14 +203,16 @@ if plot:
     measurements = [0, 5, 10, 15, 20, 25]
     output_size = int(upsample_factor*40)
 
-    recon_images = np.zeros((6, output_size, output_size))
-    f_diff_images = np.zeros((6, 40, 40))
-    downsampled_recon_images = np.zeros((6, 40, 40))
-    fourier_recon_images = np.zeros((6, 40, 40))
+    recon_images = np.zeros((32, output_size, output_size))
+    f_diff_images = np.zeros((32, 40, 40))
+    downsampled_recon_images = np.zeros((32, 40, 40))
+    fourier_recon_images = np.zeros((32, 40, 40))
 
-    for alpha in alphas:
-        for i, measurement in enumerate(measurements):
-            d2 = d['measurement='+str(measurement)]
+    for j, alpha in enumerate(alphas):
+        bias_variance_vals = np.zeros((len(alphas), 2))
+
+        for i in range(32):
+            d2 = d['measurement='+str(i)]
             d3 = d2['output_size='+str(output_size)]
             d4 = d3['reg_param='+ '{:.1e}'.format(alpha)]
 
@@ -225,7 +227,7 @@ if plot:
             downsampled_recon = np.fft.fftshift(np.fft.ifft2(synth_data[0] + 1j*synth_data[1]))
             downsampled_recon_image = np.abs(downsampled_recon)
 
-            data = f_coeff_arr_combined[int(measurement), :, :]
+            data = f_coeff_arr_combined[i, :, :]
             fourier_recon = np.fft.fftshift(np.fft.ifft2(data))
             fourier_recon_image = np.abs(fourier_recon)
 
@@ -234,23 +236,23 @@ if plot:
             downsampled_recon_images[i, :, :] = downsampled_recon_image
             fourier_recon_images[i, :, :] = fourier_recon_image
 
-            f, axarr = plt.subplots(6, 6, figsize=(6, 6))
+        f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
         if sinfo is None:
             sinfo = np.zeros((height, width))
 
-        for i in range(6):
-            axarr[i, 0].imshow(sinfo, cmap=plt.cm.gray, interpolation='None')
+        for i, measurement in enumerate(measurements):
+            axarr[i, 0].imshow(sinfo[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 0].axis("off")
-            axarr[i, 1].imshow(fourier_recon_images[i], cmap=plt.cm.gray, interpolation='None')
+            axarr[i, 1].imshow(fourier_recon_images[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 1].axis("off")
             axarr[i, 2].imshow(TV_fully_averaged_image, cmap=plt.cm.gray, interpolation='None')
             axarr[i, 2].axis("off")
-            axarr[i, 3].imshow(recon_images[i], cmap=plt.cm.gray, interpolation='None')
+            axarr[i, 3].imshow(recon_images[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 3].axis("off")
-            axarr[i, 4].imshow(downsampled_recon_images[i], cmap=plt.cm.gray, interpolation='None')
+            axarr[i, 4].imshow(downsampled_recon_images[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 4].axis("off")
-            pcm = axarr[i, 5].imshow(f_diff_images[i], cmap=plt.cm.gray, interpolation='None')
+            pcm = axarr[i, 5].imshow(f_diff_images[measurement], cmap=plt.cm.gray, interpolation='None')
             axarr[i, 5].axis("off")
 
         axarr[0, 0].set_title("Guide")
@@ -263,3 +265,14 @@ if plot:
         #plt.tight_layout()
         plt.savefig(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"_reg_param_" + '{:.1e}'.format(alpha)+".pdf")
         plt.close()
+
+        print("number of recon images: "+str(recon_images.shape[0]))
+
+        average_recon_image = np.average(recon_images, axis=0)
+        variance = np.average(np.sum((recon_images - average_recon_image)**2, axis=(1, 2)))
+        bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
+
+        bias_variance_vals[j, 0] = bias
+        bias_variance_vals[j, 1] = variance
+
+    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"_bias_variance.npy", bias_variance_vals)

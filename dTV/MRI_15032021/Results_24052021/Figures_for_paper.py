@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Utils import *
 import scipy as sp
+import json
+import datetime as dt
 
 dir_H = 'dTV/MRI_15032021/Data_24052021/H_data/'
 dir_Li = 'dTV/MRI_15032021/Data_24052021/Li_data/'
@@ -52,6 +54,8 @@ recon_high_res = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(f_coeffs)))
 
 #max = np.amax(np.asarray([np.abs(recon_512), np.abs(recon_2048), np.abs(recon_32768)]))
 
+## Displaying the data
+
 f, axarr = plt.subplots(1, 4, figsize=(12, 4))
 im0 = axarr[0].imshow(np.abs(recon_high_res), cmap=plt.cm.gray)
 axarr[0].axis("off")
@@ -65,5 +69,18 @@ f.colorbar(im0, ax=axarr[0], shrink=0.5)
 f.colorbar(im1, ax=axarr[1], shrink=0.5)
 f.colorbar(im2, ax=axarr[2], shrink=0.5)
 f.colorbar(im3, ax=axarr[3], shrink=0.5)
+
+## Bias-variance plot
+avg = 1024
+
+save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
+               'Experiments/MRI_birmingham/Results_24052021/PDHG_results'
+
+filename = save_dir + '/dTV_' + str(avg) + '_avgs.json'
+
+print("About to read datafile: " + filename + " at " + dt.datetime.now().isoformat())
+with open(filename, 'r') as f:
+    d = json.load(f)
+print("Loaded datafile at " + dt.datetime.now().isoformat())
 
 
