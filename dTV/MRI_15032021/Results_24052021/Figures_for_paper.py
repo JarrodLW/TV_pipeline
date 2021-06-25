@@ -71,16 +71,14 @@ f.colorbar(im2, ax=axarr[2], shrink=0.5)
 f.colorbar(im3, ax=axarr[3], shrink=0.5)
 
 ## Bias-variance plot
-avg = 1024
+avg = 2048
 
-save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-               'Experiments/MRI_birmingham/Results_24052021/PDHG_results'
+save_dir = '/Users/jlw31/Desktop/Results_on_24052021_dataset/New_PDHG/Statistics'
+filename = save_dir + '/upsample_factor_3_bias_variance_'+str(avg)+'_avgs.npy'
 
-filename = save_dir + '/dTV_' + str(avg) + '_avgs.json'
+bias_variance = np.load(filename)
 
-print("About to read datafile: " + filename + " at " + dt.datetime.now().isoformat())
-with open(filename, 'r') as f:
-    d = json.load(f)
-print("Loaded datafile at " + dt.datetime.now().isoformat())
+bias = bias_variance[:, 0]
+variance = bias_variance[:, 1]
 
-
+plt.plot(bias, variance)

@@ -203,11 +203,6 @@ if plot:
     measurements = [0, 5, 10, 15, 20, 25]
     output_size = int(upsample_factor*40)
 
-    recon_images = np.zeros((32, output_size, output_size))
-    f_diff_images = np.zeros((32, 40, 40))
-    downsampled_recon_images = np.zeros((32, 40, 40))
-    fourier_recon_images = np.zeros((32, 40, 40))
-
     # for obtaining downsampled images
     complex_space = odl.uniform_discr(min_pt=[-1, -1], max_pt=[1, 1],
                                       shape=[40, 40], dtype='complex', interp='linear')
@@ -217,7 +212,12 @@ if plot:
     fourier_transf = ops.RealFourierTransform(image_space)
 
     for j, alpha in enumerate(alphas):
-        bias_variance_vals = np.zeros((len(alphas), 2))
+
+        recon_images = np.zeros((32, output_size, output_size))
+        f_diff_images = np.zeros((32, 40, 40))
+        downsampled_recon_images = np.zeros((32, 40, 40))
+        fourier_recon_images = np.zeros((32, 40, 40))
+        bias_variance_vals = np.zeros((2, len(alphas)))
 
         for i in range(32):
             d2 = d['measurement='+str(i)]
@@ -287,7 +287,7 @@ if plot:
         print("norm of averaged recon image: "+str(norm_averaged_recon_image))
         print("norm of GT: " + str(norm_TV_image))
 
-        bias_variance_vals[j, 0] = bias
-        bias_variance_vals[j, 1] = variance
+        bias_variance_vals[0, j] = bias
+        bias_variance_vals[1, j] = variance
 
     np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
