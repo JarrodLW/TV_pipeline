@@ -295,7 +295,8 @@ if plot:
 
         average_recon = np.average(downsampled_recons, axis=0)
         variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
-        bias_complex = np.sqrt(np.sum(np.square(average_recon - TV_fully_averaged)))
+        bias_complex = np.sqrt(np.sum(np.square(average_recon - np.asarray([np.real(full_avg_Fourier_recon),
+                                                                            np.imag(full_avg_Fourier_recon)]))))
 
         norm_averaged_recon_image = np.sqrt(np.sum(np.square(average_recon_image)))
         norm_TV_image = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
