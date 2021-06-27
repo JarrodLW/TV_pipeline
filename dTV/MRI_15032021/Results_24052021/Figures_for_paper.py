@@ -78,7 +78,7 @@ GT_norm = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
 
 save_dir = '/Users/jlw31/Desktop/Results_on_24052021_dataset/New_PDHG/Statistics'
 dTV_filename_1024 = save_dir + '/dTV_upsample_factor_3_bias_variance_1024_avgs.npy'
-dTV_filename_2048 = save_dir + '/dTV_upsample_factor_3_bias_variance_2048_avgs.npy'
+dTV_filename_2048 = save_dir + '/dTV_upsample_factor_3_bias_variance_complex_2048_avgs.npy'
 TV_filename_1024 = save_dir + '/TV_upsample_factor_1_bias_variance_1024_avgs.npy'
 TV_filename_2048 = save_dir + '/TV_upsample_factor_1_bias_variance_2048_avgs.npy'
 
