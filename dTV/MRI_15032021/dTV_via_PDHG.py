@@ -19,8 +19,8 @@ method = str(sys.argv[1])
 upsample_factor = int(sys.argv[2])
 avg = int(sys.argv[3])
 
-run_expt = False
-plot = True
+run_expt = True
+plot = False
 
 # grabbing guide image
 image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res_filtered.npy')
