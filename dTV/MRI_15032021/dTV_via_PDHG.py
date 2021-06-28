@@ -82,8 +82,7 @@ else:
 
 alphas = np.linspace(0, 50, num=21)
 if run_expt:
-    #niter = 2000
-    niter = 2
+    niter = 2000
     exp = 0
     for i in range(32):
         exp+=1
