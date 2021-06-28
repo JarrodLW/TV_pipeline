@@ -165,16 +165,16 @@ if run_expt:
 
                 x = op.domain.zero()
 
-                obj = f + g*op
-                cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                                  odl.solvers.CallbackPrint(obj, fmt='f(x)={0:.4g}') &
-                                  odl.solvers.CallbackShowConvergence(obj) &
-                                  odl.solvers.CallbackShow(step=10))
+                # obj = f + g*op
+                # cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                #                   odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                #                   odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                #                   odl.solvers.CallbackPrint(obj, fmt='f(x)={0:.4g}') &
+                #                   odl.solvers.CallbackShowConvergence(obj) &
+                #                   odl.solvers.CallbackShow(step=10))
 
                 t0 = time()
-                odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma, callback=cb)
+                odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma, callback=None)
                 t1 = time()
                 print("Experiment completed in "+ str(t1-t0))
 
