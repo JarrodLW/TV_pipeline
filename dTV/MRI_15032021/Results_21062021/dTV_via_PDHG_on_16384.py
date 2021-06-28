@@ -15,7 +15,7 @@ import sys
 import json
 import os
 
-data = np.load('dTV/MRI_15032021/Results_21052021/32768_data.npy')
+data = np.load('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_21062021/16384_data.npy')
 height = width = 40
 
 # calculating Morozov noise level
@@ -35,7 +35,7 @@ exp = 0
 d = {}
 
 sinfo=None
-filename = 'dTV/MRI_15032021/Results_24052021/TV_with_PDHG_on_32768.npy'
+filename = 'dTV/MRI_15032021/Results_21062021/TV_with_PDHG_on_16384.npy'
 
 for alpha in alphas:
     exp += 1
@@ -170,11 +170,11 @@ for i, alpha in enumerate(alphas[:-1]):
     axarr[1 + 2 * (i // 5), i % 5].axis("off")
 
 plt.tight_layout()
-plt.savefig("dTV/MRI_15032021/Results_24052021/TV_with_PDHG_on_32768_plot.png")
+plt.savefig("dTV/MRI_15032021/Results_21062021/TV_with_PDHG_on_16384_plot.png")
 
-example_rec = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[4])]['recon'])
-example_f_diff = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[4])]['fourier_diff'])
-example_synth_data = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[4])]['synth_data'])
+example_rec = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[5])]['recon'])
+example_f_diff = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[5])]['fourier_diff'])
+example_synth_data = np.asarray(d['reg_param=' + '{:.1e}'.format(alphas[5])]['synth_data'])
 
-np.save("dTV/MRI_15032021/Results_24052021/example_TV_recon_with_PDHG_on_32768.npy", example_rec)
-np.save("dTV/MRI_15032021/Results_24052021/example_TV_recon_with_PDHG_on_32768_synth_data.npy", example_synth_data)
+np.save("dTV/MRI_15032021/Results_21062021/example_TV_recon_with_PDHG_on_16384.npy", example_rec)
+np.save("dTV/MRI_15032021/Results_21062021/example_TV_recon_with_PDHG_on_16384_synth_data.npy", example_synth_data)
