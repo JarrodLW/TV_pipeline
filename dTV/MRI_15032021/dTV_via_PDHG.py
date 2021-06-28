@@ -22,8 +22,8 @@ date = str(sys.argv[4])
 
 #date='21062021'
 
-run_expt = True
-plot = False
+run_expt = False
+plot = True
 
 # grabbing guide image
 image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res_filtered.npy')
