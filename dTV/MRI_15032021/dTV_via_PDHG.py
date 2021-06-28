@@ -18,7 +18,7 @@ import os
 method = str(sys.argv[1])
 upsample_factor = int(sys.argv[2])
 avg = int(sys.argv[3])
-date = str(sys.arg[4])
+date = str(sys.argv[4])
 
 #date='21062021'
 
