@@ -8,7 +8,8 @@ from Utils import *
 avgs = ['512', '1024', '2048', '4096', '8192']
 output_dims = [int(32), int(64)]
 
-date = '24052021'
+date = '21062021'
+#date = '24052021'
 #date = '15032021'
 
 dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
@@ -24,6 +25,13 @@ if date=='15032021':
 elif date=='24052021':
     H_index_low_res = 29
     H_index_high_res = 32
+    low_res_shape = (80, 128)
+    Li_range = range(8, 40)
+    low_res_data_width = 40
+
+elif date=='21062021':
+    H_index_low_res = 18
+    H_index_high_res = 17
     low_res_shape = (80, 128)
     Li_range = range(8, 40)
     low_res_data_width = 40
@@ -97,7 +105,7 @@ if date=='24052021': # averaging with the data from the full run
 
     fully_averaged_shifted_2 = (fully_averaged_shifted + (stdev_fully_averaged/stdev_long_run)*fourier_long_run)/2
 
-np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/32768_data.npy', fully_averaged_shifted_2)
+    np.save('/Users/jlw31/PycharmProjects/TV_pipeline/dTV/MRI_15032021/Results_24052021/32768_data.npy', fully_averaged_shifted_2)
 
 recon_fully_averaged_2 = np.fft.fftshift(np.fft.ifft2(fully_averaged_shifted_2))
 

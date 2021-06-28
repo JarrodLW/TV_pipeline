@@ -18,6 +18,9 @@ import os
 method = str(sys.argv[1])
 upsample_factor = int(sys.argv[2])
 avg = int(sys.argv[3])
+date = str(sys.arg[4])
+
+#date='21062021'
 
 run_expt = True
 plot = False
@@ -26,7 +29,7 @@ plot = False
 image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res_filtered.npy')
 
 f_coeff_list = []
-dir_Li = 'dTV/MRI_15032021/Data_24052021/Li_data/'
+dir_Li = 'dTV/MRI_15032021/Data_'+date+'/Li_data/'
 Li_range = range(8, 40)
 for i in Li_range:
     f_coeffs = np.reshape(np.fromfile(dir_Li +str(i)+'/fid', dtype=np.int32), (80, 128))
@@ -57,7 +60,7 @@ elif method=='dTV':
     sinfo = resize(image_H_high_res, (height, width))
 
 save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday/' \
-               'Experiments/MRI_birmingham/Results_24052021/PDHG_results'
+               'Experiments/MRI_birmingham/Results_'+date+'/PDHG_results'
 
 if method == 'TV':
     filename = save_dir + '/TV_'+str(avg)+'_avgs.json'
@@ -79,7 +82,8 @@ else:
 
 alphas = np.linspace(0, 50, num=21)
 if run_expt:
-    niter = 2000
+    #niter = 2000
+    niter = 2
     exp = 0
     for i in range(32):
         exp+=1
@@ -161,16 +165,16 @@ if run_expt:
 
                 x = op.domain.zero()
 
-                # obj = f + g*op
-                # cb = (odl.solvers.CallbackPrintIteration(end=', ') &
-                #                   odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
-                #                   odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
-                #                   odl.solvers.CallbackPrint(obj, fmt='f(x)={0:.4g}') &
-                #                   odl.solvers.CallbackShowConvergence(obj) &
-                #                   odl.solvers.CallbackShow(step=10))
+                obj = f + g*op
+                cb = (odl.solvers.CallbackPrintIteration(end=', ') &
+                                  odl.solvers.CallbackPrintTiming(cumulative=False, end=', ') &
+                                  odl.solvers.CallbackPrintTiming(fmt='total={:.3f}s', cumulative=True) &
+                                  odl.solvers.CallbackPrint(obj, fmt='f(x)={0:.4g}') &
+                                  odl.solvers.CallbackShowConvergence(obj) &
+                                  odl.solvers.CallbackShow(step=10))
 
                 t0 = time()
-                odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma, callback=None)
+                odl.solvers.pdhg(x, f, g, op, niter=niter, tau=tau, sigma=sigma, callback=cb)
                 t1 = time()
                 print("Experiment completed in "+ str(t1-t0))
 
