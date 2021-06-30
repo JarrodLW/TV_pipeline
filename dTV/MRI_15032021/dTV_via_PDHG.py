@@ -218,7 +218,7 @@ if plot:
 
     bias_variance_vals = np.zeros((2, len(alphas)))
     bias_variance_vals_complex = np.zeros((2, len(alphas)))
-    discrepancies = np.zeros(len(alphas), 32)
+    discrepancies = np.zeros((len(alphas), 32))
 
     for j, alpha in enumerate(alphas):
 
