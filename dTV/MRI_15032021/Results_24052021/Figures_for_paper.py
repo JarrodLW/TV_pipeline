@@ -126,3 +126,123 @@ plt.xlim((0., 0.6))
 #plt.axis.set_aspect("equal")
 plt.title("Bias-variance")
 
+# Bias variance for dTV
+avgs = [512, 1024, 2048, 4096, 8192]
+colours = ['k', 'r', 'b', 'g', 'y']
+
+plt.figure()
+for i, avg in enumerate(avgs):
+
+    filename = save_dir + '/dTV_upsample_factor_3_bias_variance_'+str(avg)+'_avgs.npy'
+    dTV_bias_variance = np.load(filename)
+    rel_dTV_bias = dTV_bias_variance[0, :] / GT_norm
+    rel_dTV_variance = dTV_bias_variance[1, :] / GT_norm ** 2
+
+    plt.scatter(rel_dTV_variance, rel_dTV_bias, color=colours[i], marker='+', label='dTV, '+str(avg)+' avgs')
+    plt.plot(rel_dTV_variance, rel_dTV_bias, color=colours[i])
+    plt.ylim((0., 1.5))
+    plt.xlim((0., 0.6))
+    plt.legend()
+    plt.xlabel("Variance over GT norm squared")
+    plt.ylabel("Bias over GT norm")
+    plt.title("Bias-variance for dTV recons")
+
+# Bias variance plots for TV
+avgs = [512, 1024, 2048, 4096, 8192]
+colours = ['k', 'r', 'b', 'g', 'y']
+
+plt.figure()
+for i, avg in enumerate(avgs):
+
+    filename = save_dir + '/TV_upsample_factor_1_bias_variance_'+str(avg)+'_avgs.npy'
+    dTV_bias_variance = np.load(filename)
+    rel_TV_bias = dTV_bias_variance[0, :] / GT_norm
+    rel_TV_variance = dTV_bias_variance[1, :] / GT_norm ** 2
+
+    plt.scatter(rel_TV_variance, rel_TV_bias, color=colours[i], marker='+', label='TV, '+str(avg)+' avgs')
+    plt.plot(rel_TV_variance, rel_TV_bias, color=colours[i])
+    plt.ylim((0., 1.5))
+    plt.xlim((0., 0.6))
+    plt.legend()
+    plt.xlabel("Variance over GT norm squared")
+    plt.ylabel("Bias over GT norm")
+    plt.title("Bias-variance for TV recons")
+
+# Bias variance plots for filtered
+avgs = [512, 1024, 2048, 4096, 8192]
+colours = ['k', 'r', 'b', 'g', 'y']
+
+plt.figure()
+for i, avg in enumerate(avgs):
+
+    filename = 'dTV/MRI_15032021/Results_24052021/bias_variance_for_filtered_Fourier_'+str(avg)+'.npy'
+    dTV_bias_variance = np.load(filename)
+    rel_TV_bias = dTV_bias_variance[0, :] / GT_norm
+    rel_TV_variance = dTV_bias_variance[1, :] / GT_norm ** 2
+
+    plt.scatter(rel_TV_variance, rel_TV_bias, color=colours[i], marker='+', label='TV, '+str(avg)+' avgs')
+    plt.plot(rel_TV_variance, rel_TV_bias, color=colours[i])
+    plt.ylim((0., 1.5))
+    plt.xlim((0., 0.6))
+    plt.legend()
+    plt.xlabel("Variance over GT norm squared")
+    plt.ylabel("Bias over GT norm")
+    plt.title("Bias-variance for filtered recons")
+
+
+# Discrepancy plots for dTV
+Morozovs = [126000, 88000, 60300, 39500, 22800]
+
+alphas = np.linspace(0, 50, num=21)
+
+plt.figure()
+
+for i, avg in enumerate(avgs):
+
+    discrepancies = np.load(save_dir + '/dTV_upsample_factor_3_discrepancies_'+str(avg)+'_avgs.npy')
+
+    plt.scatter(alphas, np.average(discrepancies, axis=1), color=colours[i], label='512 avgs')
+    plt.plot(alphas, np.average(discrepancies, axis=1), color=colours[i])
+    plt.plot(alphas, [Morozovs[i]]*len(alphas), color=colours[i], linestyle='dashed')
+
+plt.legend()
+plt.xlabel(r'$\alpha$')
+plt.ylabel('L2 fidelity')
+plt.title('Fidelity to data for dTV recons')
+
+# Discrepancy plots for TV
+Morozovs = [126000, 88000, 60300, 39500, 22800]
+
+alphas = np.linspace(0, 50, num=21)
+
+plt.figure()
+
+for i, avg in enumerate(avgs):
+    discrepancies = np.load(save_dir + '/TV_upsample_factor_1_discrepancies_' + str(avg) + '_avgs.npy')
+
+    plt.scatter(alphas, np.average(discrepancies, axis=1), color=colours[i], label='512 avgs')
+    plt.plot(alphas, np.average(discrepancies, axis=1), color=colours[i])
+    plt.plot(alphas, [Morozovs[i]] * len(alphas), color=colours[i], linestyle='dashed')
+
+plt.legend()
+plt.xlabel(r'$\alpha$')
+plt.ylabel('L2 fidelity')
+plt.title('Fidelity to data for TV recons')
+
+# MSE plots
+
+plt.figure()
+for i, avg in enumerate(avgs):
+
+    filename = save_dir + '/dTV_upsample_factor_3_bias_variance_'+str(avg)+'_avgs.npy'
+    dTV_bias_variance = np.load(filename)
+    bias = dTV_bias_variance[0, :]
+    variance = dTV_bias_variance[1, :]
+    MSE = bias**2 + variance
+
+    print(MSE)
+
+    plt.scatter(np.log(alphas), MSE, color=colours[i], marker='+', label='dTV, ' + str(avg) + ' avgs')
+    plt.plot(np.log(alphas), MSE, color=colours[i])
+
+

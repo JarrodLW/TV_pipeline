@@ -38,6 +38,17 @@ for i in Li_range:
 
 full_avg_Fourier_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(np.average(np.asarray(f_coeff_list), axis=0))))
 
+# plt.figure()
+# plt.imshow(np.abs(full_avg_Fourier_recon), cmap=plt.cm.gray)
+
+circular_mask = np.roll(circle_mask(40, 0.43), 1, axis=1)
+
+# plt.figure()
+# plt.imshow(circular_mask, cmap=plt.cm.gray)
+#
+# plt.figure()
+# plt.imshow(circular_mask*np.abs(full_avg_Fourier_recon), cmap=plt.cm.gray)
+
 f_coeff_arr = np.asarray(f_coeff_list)
 f_coeff_arr_combined = np.zeros((32, 40, 40), dtype='complex')
 
@@ -217,6 +228,7 @@ if plot:
     fourier_transf = ops.RealFourierTransform(image_space)
 
     bias_variance_vals = np.zeros((2, len(alphas)))
+    masked_bias_variance_vals = np.zeros((2, len(alphas)))
     bias_variance_vals_complex = np.zeros((2, len(alphas)))
     discrepancies = np.zeros((len(alphas), 32))
 
@@ -310,6 +322,9 @@ if plot:
         variance = np.sum(stdev_image**2)
         bias = np.sqrt(np.sum(np.square(bias_image)))
 
+        masked_variance = np.sum(circular_mask*stdev_image**2)
+        masked_bias = np.sqrt(np.sum(np.square(circular_mask*bias_image)))
+
         # average_recon = np.average(downsampled_recons, axis=0)
         # variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
         # bias_complex = np.sqrt(np.sum(np.square(average_recon - np.asarray([np.real(full_avg_Fourier_recon),
@@ -323,10 +338,15 @@ if plot:
         bias_variance_vals[0, j] = bias
         bias_variance_vals[1, j] = variance
 
+        masked_bias_variance_vals[0, j] = masked_bias
+        masked_bias_variance_vals[1, j] = masked_variance
+
         # bias_variance_vals_complex[0, j] = bias_complex
         # bias_variance_vals_complex[1, j] = variance_complex
 
     np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
+        upsample_factor) + "_masked_bias_variance_" + str(avg) + "_avgs.npy", masked_bias_variance_vals)
     np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
         upsample_factor) + "_discrepancies_" + str(avg) + "_avgs.npy", discrepancies)
     # np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
