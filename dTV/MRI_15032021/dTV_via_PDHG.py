@@ -20,7 +20,7 @@ upsample_factor = int(sys.argv[2])
 avg = int(sys.argv[3])
 date = str(sys.argv[4])
 
-date='21062021'
+#date='21062021'
 
 run_expt = False
 plot = True
