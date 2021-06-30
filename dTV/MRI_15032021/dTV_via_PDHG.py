@@ -20,7 +20,7 @@ upsample_factor = int(sys.argv[2])
 avg = int(sys.argv[3])
 date = str(sys.argv[4])
 
-#date='21062021'
+date='21062021'
 
 run_expt = False
 plot = True
@@ -218,7 +218,7 @@ if plot:
 
     bias_variance_vals = np.zeros((2, len(alphas)))
     bias_variance_vals_complex = np.zeros((2, len(alphas)))
-    #discrepancies = np.zeros(len(alphas), 32)
+    discrepancies = np.zeros(len(alphas), 32)
 
     for j, alpha in enumerate(alphas):
 
@@ -257,7 +257,7 @@ if plot:
             downsampled_recons[i, 1, :, :] = downsampled_recon[1]
             fourier_recon_images[i, :, :] = fourier_recon_image
 
-            #discrepancies[j, i] = np.sqrt(np.sum(np.square(f_diff_image)))
+            discrepancies[j, i] = np.sqrt(np.sum(np.square(f_diff_image)))
 
         f, axarr = plt.subplots(6, 6, figsize=(6, 6))
 
@@ -292,14 +292,28 @@ if plot:
         print("number of recon images: "+str(recon_images.shape[0]))
 
         average_recon_image = np.average(downsampled_recon_images, axis=0)
-        variance = np.average(np.sum((downsampled_recon_images - average_recon_image)**2, axis=(1, 2)))
-        bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
-        #bias = np.sqrt(np.sum(np.square(average_recon_image - np.abs(full_avg_Fourier_recon))))
+        stdev_image = np.sqrt(np.average((downsampled_recon_images - average_recon_image)**2, axis=0))
+        bias_image = average_recon_image - TV_fully_averaged_image
 
-        average_recon = np.average(downsampled_recons, axis=0)
-        variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
-        bias_complex = np.sqrt(np.sum(np.square(average_recon - np.asarray([np.real(full_avg_Fourier_recon),
-                                                                            np.imag(full_avg_Fourier_recon)]))))
+        plt.imshow(stdev_image, cmap=plt.cm.gray)
+        plt.colorbar()
+        plt.savefig(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/stdev_image_upsample_factor_" + str(
+            upsample_factor) + "_reg_param_" + '{:.1e}'.format(alpha) + ".pdf")
+        plt.close()
+
+        plt.imshow(bias_image, cmap=plt.cm.gray)
+        plt.colorbar()
+        plt.savefig(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/stdev_image_upsample_factor_" + str(
+            upsample_factor) + "_reg_param_" + '{:.1e}'.format(alpha) + ".pdf")
+        plt.close()
+
+        variance = np.sum(stdev_image**2)
+        bias = np.sqrt(np.sum(np.square(bias_image)))
+
+        # average_recon = np.average(downsampled_recons, axis=0)
+        # variance_complex = np.average(np.sum(np.abs(downsampled_recons - average_recon) ** 2, axis=(1, 2, 3)))
+        # bias_complex = np.sqrt(np.sum(np.square(average_recon - np.asarray([np.real(full_avg_Fourier_recon),
+        #                                                                     np.imag(full_avg_Fourier_recon)]))))
 
         norm_averaged_recon_image = np.sqrt(np.sum(np.square(average_recon_image)))
         norm_TV_image = np.sqrt(np.sum(np.square(TV_fully_averaged_image)))
@@ -309,10 +323,10 @@ if plot:
         bias_variance_vals[0, j] = bias
         bias_variance_vals[1, j] = variance
 
-        bias_variance_vals_complex[0, j] = bias_complex
-        bias_variance_vals_complex[1, j] = variance_complex
+        # bias_variance_vals_complex[0, j] = bias_complex
+        # bias_variance_vals_complex[1, j] = variance_complex
 
     np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
-    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
-        upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)
+    # np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
+    #     upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)
     #np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_discrepancies_"+str(avg)+"_avgs.npy", discrepancies)

@@ -8,8 +8,8 @@ from Utils import *
 avgs = ['512', '1024', '2048', '4096', '8192']
 output_dims = [int(32), int(64)]
 
-date = '21062021'
-#date = '24052021'
+#date = '21062021'
+date = '24052021'
 #date = '15032021'
 
 dir_Li = 'dTV/MRI_15032021/Data_' + date + '/Li_data/'
