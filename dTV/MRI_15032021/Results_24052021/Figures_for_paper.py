@@ -126,6 +126,43 @@ plt.xlim((0., 0.6))
 #plt.axis.set_aspect("equal")
 plt.title("Bias-variance")
 
+# Bias variance for masked recons
+avgs = [1024, 2048]
+
+colours = ['r', 'b']
+methods = ['TV', 'dTV', 'Fourier']
+markers = ['+', '*']
+
+plt.figure()
+for method in methods:
+    for i, avg in enumerate(avgs):
+
+        if method=='TV':
+            filename = save_dir + '/TV_upsample_factor_1_masked_bias_variance_'+str(avg)+'_avgs.npy'
+
+        elif method=='dTV':
+            filename = save_dir + '/dTV_upsample_factor_3_masked_bias_variance_' + str(avg) + '_avgs.npy'
+
+        elif method=='Fourier':
+            filename = np.load(
+                'dTV/MRI_15032021/Results_24052021/masked_bias_variance_for_filtered_Fourier_'+str(avg)+'.npy')
+
+        bias_variance = np.load(filename)
+        bias = bias_variance[0, :] / GT_norm
+        variance = bias_variance[1, :] / GT_norm ** 2
+
+        plt.scatter(variance, bias, color=colours[i], marker=markers[i], label=method+', '+str(avg)+' avgs')
+        plt.plot(variance, bias, color=colours[i])
+
+plt.ylim((0., 1.5))
+plt.xlim((0., 0.6))
+plt.legend()
+plt.xlabel("Variance over GT norm squared")
+plt.ylabel("Bias over GT norm")
+plt.title("Bias-variance for masked recons")
+
+
+
 # Bias variance for dTV
 avgs = [512, 1024, 2048, 4096, 8192]
 colours = ['k', 'r', 'b', 'g', 'y']
@@ -228,6 +265,8 @@ plt.legend()
 plt.xlabel(r'$\alpha$')
 plt.ylabel('L2 fidelity')
 plt.title('Fidelity to data for TV recons')
+
+
 
 # MSE plots
 

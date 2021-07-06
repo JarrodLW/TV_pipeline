@@ -11,8 +11,8 @@ import dTV.myFunctionals as fctls
 ptycho_image = np.load('dTV/CT_data/Ptycho_XRF_27042021/Ptycho.npy')
 XRF_image = np.load('dTV/CT_data/Ptycho_XRF_27042021/XRF_Ca_Ka.npy')
 
-#fit_type = 'L2sq'
-fit_type = 'KL'
+fit_type = 'L2sq'
+#fit_type = 'KL'
 reg_type = 'TVNN'
 reg_param = 0.018
 upsample_factor = 1.

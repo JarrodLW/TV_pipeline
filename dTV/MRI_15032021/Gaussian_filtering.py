@@ -24,6 +24,23 @@ plt.imshow(filtered_image_2, cmap=plt.cm.gray)
 
 np.save('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res_filtered.npy', filtered_image_2)
 
+# filtering of 32768 recon
+
+data = np.load('dTV/MRI_15032021/Results_24052021/32768_data.npy')
+
+full_avg_Fourier_recon = np.fft.fftshift(np.fft.ifft2(np.fft.fftshift(data)))
+filtered_real = sp.ndimage.filters.gaussian_filter(np.real(full_avg_Fourier_recon), 0.5)
+filtered_imag = sp.ndimage.filters.gaussian_filter(np.imag(full_avg_Fourier_recon), 0.5)
+filtered = filtered_real + 1j*filtered_imag
+
+plt.figure()
+plt.imshow(np.abs(full_avg_Fourier_recon), cmap=plt.cm.gray)
+plt.colorbar()
+
+plt.figure()
+plt.imshow(np.abs(filtered), cmap=plt.cm.gray)
+plt.colorbar()
+
 # filtering of Fourier reconstructions
 
 from Utils import *
@@ -69,9 +86,13 @@ fourier_transf = ops.RealFourierTransform(image_space)
 TV_fully_averaged = np.load("dTV/MRI_15032021/Results_24052021/example_TV_recon_with_PDHG_on_32768.npy")
 TV_fully_averaged_image = np.abs(TV_fully_averaged[0] + 1j*TV_fully_averaged[1])
 
+circular_mask = np.roll(circle_mask(40, 0.43), 1, axis=1)
+
 for avg_ind in range(len(avgs)):
     avg = avgs[avg_ind]
     bias_variance_vals = np.zeros((2, len(variances)))
+    masked_bias_variance_vals = np.zeros((2, len(variances)))
+
     for j, var in enumerate(variances):
         recon_filtered_images = np.zeros((32, 40, 40))
         for measurement in range(32):
@@ -91,14 +112,29 @@ for avg_ind in range(len(avgs)):
 
             recon_filtered_images[measurement, :, :] = recon_filtered_image
 
+
         average_recon_image = np.average(recon_filtered_images, axis=0)
-        variance = np.average(np.sum((recon_filtered_images - average_recon_image)**2, axis=(1, 2)))
-        bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
+        #variance = np.average(np.sum((recon_filtered_images - average_recon_image)**2, axis=(1, 2)))
+        #bias = np.sqrt(np.sum(np.square(average_recon_image - TV_fully_averaged_image)))
+
+        stdev_image = np.sqrt(np.average((recon_filtered_images - average_recon_image) ** 2, axis=0))
+        bias_image = average_recon_image - TV_fully_averaged_image
+
+        variance = np.sum(stdev_image ** 2)
+        bias = np.sqrt(np.sum(np.square(bias_image)))
 
         bias_variance_vals[0, j] = bias
         bias_variance_vals[1, j] = variance
 
+        masked_variance = np.sum(circular_mask * stdev_image ** 2)
+        masked_bias = np.sqrt(np.sum(np.square(circular_mask * bias_image)))
+
+        masked_bias_variance_vals[0, j] = masked_bias
+        masked_bias_variance_vals[1, j] = masked_variance
+
     np.save('dTV/MRI_15032021/Results_24052021/bias_variance_for_filtered_Fourier_'+str(avg)+'.npy', bias_variance_vals)
+    np.save('dTV/MRI_15032021/Results_24052021/masked_bias_variance_for_filtered_Fourier_' + str(avg) + '.npy',
+            masked_bias_variance_vals)
 
 plt.figure()
 plt.imshow(np.abs(recon_real_part+1j*recon_imag_part), cmap=plt.cm.gray)
