@@ -344,11 +344,13 @@ if plot:
         # bias_variance_vals_complex[0, j] = bias_complex
         # bias_variance_vals_complex[1, j] = variance_complex
 
-    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
-    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" + method + "_upsample_factor_" + str(
-        upsample_factor) + "_masked_bias_variance_" + str(avg) + "_avgs.npy", masked_bias_variance_vals)
-    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" + method + "_upsample_factor_" + str(
-        upsample_factor) + "_discrepancies_" + str(avg) + "_avgs.npy", discrepancies)
+    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"/"+method+
+            "_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" +
+            method + "_upsample_factor_" + str(upsample_factor) + "_masked_bias_variance_" + str(avg) + "_avgs.npy",
+            masked_bias_variance_vals)
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" +
+            method + "_upsample_factor_" + str(upsample_factor) + "_discrepancies_" + str(avg) + "_avgs.npy", discrepancies)
     # np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
     #     upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)
     #np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_discrepancies_"+str(avg)+"_avgs.npy", discrepancies)
