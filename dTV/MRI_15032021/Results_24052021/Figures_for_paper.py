@@ -248,7 +248,7 @@ plt.ylabel('L2 fidelity')
 plt.title('Fidelity to data for dTV recons')
 
 # Discrepancy plots for TV
-Morozovs = [126000, 88000, 60300, 39500, 22800]
+Morozovs = [126000, 88000, 60300, 39500, 22800] # see Fourier script
 
 alphas = np.linspace(0, 50, num=21)
 

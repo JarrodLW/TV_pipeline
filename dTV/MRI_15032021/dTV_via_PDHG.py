@@ -22,8 +22,8 @@ date = str(sys.argv[4])
 
 #date='21062021'
 
-run_expt = True
-plot = False
+run_expt = False
+plot = True
 
 # grabbing guide image
 image_H_high_res = np.load('dTV/MRI_15032021/Results_24052021/pre_registered_H_high_res_filtered.npy')
@@ -74,9 +74,9 @@ save_dir = '/mnt/jlw31-XDrive/BIMI/ResearchProjects/MJEhrhardt/RC-MA1244_Faraday
                'Experiments/MRI_birmingham/Results_'+date+'/PDHG_results'
 
 if method == 'TV':
-    filename = save_dir + '/TV_'+str(avg)+'_avgs_upsample_factor'+str(upsample_factor)+'.json'
+    filename = save_dir + '/TV_'+str(avg)+'_avgs_upsample_factor_'+str(upsample_factor)+'.json'
 elif method == 'dTV':
-    filename = save_dir + '/dTV_' + str(avg) + '_avgs_upsample_factor'+str(upsample_factor)+'.json'
+    filename = save_dir + '/dTV_' + str(avg) + '_avgs_upsample_factor_'+str(upsample_factor)+'.json'
 
 if os.path.isfile(filename):
 
@@ -344,10 +344,10 @@ if plot:
         # bias_variance_vals_complex[0, j] = bias_complex
         # bias_variance_vals_complex[1, j] = variance_complex
 
-    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
-    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
+    np.save(save_dir+"/"+method+"_results/"+str(avg)+"_avgs/upsample_factor_"+str(upsample_factor)+"/"+method+"_upsample_factor_"+str(upsample_factor)+"_bias_variance_"+str(avg)+"_avgs.npy", bias_variance_vals)
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" + method + "_upsample_factor_" + str(
         upsample_factor) + "_masked_bias_variance_" + str(avg) + "_avgs.npy", masked_bias_variance_vals)
-    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
+    np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/upsample_factor_"+str(upsample_factor)+"/" + method + "_upsample_factor_" + str(
         upsample_factor) + "_discrepancies_" + str(avg) + "_avgs.npy", discrepancies)
     # np.save(save_dir + "/" + method + "_results/" + str(avg) + "_avgs/" + method + "_upsample_factor_" + str(
     #     upsample_factor) + "_bias_variance_complex_" + str(avg) + "_avgs.npy", bias_variance_vals_complex)

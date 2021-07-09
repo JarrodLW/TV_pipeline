@@ -2,6 +2,7 @@ import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.transform import resize
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 file_ptycho = 'dTV/CT_data/Ptycho_XRF_27042021/scan_104797SI14G00_phase.nxs'
 file_XRF = 'dTV/CT_data/Ptycho_XRF_27042021/i14-104797-xrf_windows-xsp3_addetector.nxs'
@@ -30,9 +31,19 @@ recons_XRF[12] = f_XRF['processed']['auxiliary']['0-XRF Elemental Maps from ROIs
 fig, axs = plt.subplots(3, 5, figsize=(10, 6))
 for k, ax in enumerate(axs.flat):
 
-    recon = recons_XRF[k]
+    if k==13 or k==14:
+        recon = np.ones(recons_XRF[0].shape)
+
+    else:
+        recon = recons_XRF[k]
+
     pcm = ax.imshow(recon, vmin=np.amin(recons_XRF), vmax=0.3*np.amax(recons_XRF), cmap=plt.cm.gray)
     ax.axis("off")
+
+    if k<=12:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.04)
+        plt.colorbar(pcm, cax=cax)
 
 plt.tight_layout()
 

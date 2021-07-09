@@ -98,7 +98,7 @@ elif mode=='non-blind deblur':
 if upsample_factor == 1:
     linear_op = odl.IdentityOperator(image_space)
 
-else:
+else: # I think vert and horiz indices need to be swapped ---see Nonblind_deconvolution_XRF_with_PDHG
     vert_ind = np.sort(list(int(upsample_factor)*np.arange(data_height))*int(data_width))
     horiz_ind = list(int(upsample_factor)*np.arange(data_width))*int(data_height)
     sampling_points = [vert_ind, horiz_ind]
